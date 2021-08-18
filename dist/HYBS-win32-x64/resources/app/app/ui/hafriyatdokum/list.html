@@ -1,0 +1,343 @@
+﻿<div id="mainDiv" tabindex="0" ng-controller="hafriyatdokumlistCtrl" class="hbox hbox-auto-xs bg-ligh" ng-init="
+app.settings.asideFolded = true; 
+app.settings.asideDock = true;
+app.settings.container = false;
+app.hideAside = true">
+
+
+    <div class="col item">
+
+        <div class="wrapper">
+
+
+            <div class="row">
+
+                <div class="col-sm-12 ">
+
+                    <div class="panel panel-danger">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="col-md-8">
+                                    <div class="row m-b">
+                                        <div class="col-sm-12">
+
+                                            <select kendo-multi-select k-options="selectOptionsFirma" k-on-change="Filter()"
+                                                k-ng-model="filtre.FirmaId" style="width: 100%"></select>
+                                        </div>
+                                    </div>
+                                    <div class="row m-b">
+
+                                        <div class="col-sm-6">
+                                            <input name="txtBarkod" type="text" ng-model="kabul.DepolamaAlaniAdi"
+                                                disabled class="form-control input-md">
+                                        </div>
+
+
+                                        <div class="col-sm-6">
+
+                                            <select kendo-multi-select k-rebind="filtre.DepolamaAlanId" k-options="selectOptionsSaha"
+                                                k-on-change="Filter()" k-ng-model="filtre.DepolamaAlaniSahaId" style="width: 100%"></select>
+                                        </div>
+                                    </div>
+                                    <div class="row m-b">
+
+                                        <div class="col-sm-6">
+                                            <input kendo-date-picker k-on-change="Filter()" k-ng-model="filtre.BasTarih"
+                                                k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']" style="width: 100%;" />
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <input kendo-date-picker k-on-change="Filter()" k-ng-model="filtre.BitTarih"
+                                                k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']" style="width: 100%;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+
+                                    <div class="block padder-v m-b bg-danger">
+                                        <span class="text-white font-thin h3 block">{{Total_Tutar | currency : "₺"}}</span>
+                                        <span class="text-xs">Toplam Tutar (₺)</span>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="col-md-2 text-center">
+
+
+
+                                    <div class="block padder-v m-b bg-danger">
+                                        <span class="text-white font-thin h3 block">{{Total_Arac}}</span>
+                                        <span class="text-xs">Adet</span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+
+                                <div kendo-sparkline k-series="[{ type: 'area',field: 'TMax',color: '#ff0000', negativeColor: '#0099ff'}]"
+                                    k-tooltip="{ visible: true }" k-data-source="weather" style="height: 50px;"></div>
+
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div data-kendo-grid id="grid" options="mainGridOptions"></div>
+
+
+
+        </div>
+
+
+
+
+    </div>
+
+    <div class="col w-xxl lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b bg-white m-t-md">
+                <h4 class="m-n font-thin h3">Hafriyat Kabul</h4>
+                <small class="text-muted">Kabul Belgesi | Nakit Döküm | Kamu Fiş</small>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper-md bg-white">
+
+                            <div class="alert alert-danger" role="alert" ng-show="uyari">
+                                {{uyari}}
+                            </div>
+
+                            <form name="myForm" class="form-horizontal">
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label text-danger">TÜR</label>
+                                    <div class="col-md-8">
+                                        <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.Tur" disabled
+                                            class="form-control input-md">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label text-danger">BARKOD</label>
+                                    <div class="col-md-8">
+                                        <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BarkodNo"
+                                            disabled class="form-control input-md">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label text-danger">BELGE NO</label>
+                                    <div class="col-md-8">
+                                        <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BelgeNo"
+                                            disabled class="form-control input-md">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label text-danger">OGS</label>
+                                    <div class="col-md-8">
+                                        <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
+                                            ng-model="kabul.Ogs">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <progressbar animate="true" value="iOgs" type="danger" class="progress-xxs"></progressbar>
+                                    <label class="col-md-4 control-label text-danger">PLAKA NO</label>
+                                    <div class="col-md-8">
+                                        <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
+                                            ng-model="kabul.PlakaNo">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <progressbar max="100" animate="true" value="i" type="danger" class="progress-striped active progress-md"><span
+                                            style="white-space:nowrap;">{{tempGelenTonaj}}</span></progressbar>
+                                    <label class="col-md-4 control-label text-danger">TONAJ</label>
+                                    <div class="col-md-8 m-r-n">
+                                        <input type="text" placeholder="Kantardan veri gelmesini bekliyiniz" disabled
+                                            ng-model="kabul.Tonaj" class="form-control input-md">
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label ">DARA</label>
+                                    <div class="col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Dara">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label ">NET</label>
+                                    <div class="col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Net">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label ">TUTAR</label>
+                                    <div class="col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Tutar">
+                                    </div>
+                                </div>
+
+                                <div class="line dker bg-red-100"></div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">FİRMA</label>
+                                    <div class=" col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.FirmaAdi">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">BELGE MİK.</label>
+                                    <div class=" col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.TasinacakAtikMiktari">
+                                    </div>
+                                </div>
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">DÖKÜM MİK.</label>
+                                    <div class=" col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.DokumMiktari">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">KALAN MİK.</label>
+                                    <div class=" col-md-8">
+                                        <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.KalanMiktar">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">FİRMA BAK.</label>
+                                    <div class=" col-md-8">
+                                        <input type="text" disabled disabled class="form-control input-md" ng-model="kabul.Response.GuncelBakiye">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-sm">
+                                    <label class="col-md-4 control-label">IL DIŞI</label>
+                                    <div class=" col-md-8">
+                                        <label class="i-switch m-t-xs m-r">
+                                            <input type="checkbox" checked="" disabled>
+                                            <i></i>
+                                        </label>
+                                    </div>
+                                </div>
+
+
+
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+<script type="text/ng-template" id="araclarModal">
+    <div class="modal-header">
+        <h4>PLAKA SEÇİNİZ {{PlakaNo + " | (" + AracId + ")"}}</h2>     
+
+    </div>
+
+    <div class="modal-body no-padder">
+
+            <div class="row wrapper">
+              
+                    <div class="col-sm-12">
+                      <div class="input-group">
+                        <input id="txtSearch" type="text" class="input-sm form-control" placeholder="Plaka/Firma ara" ng-model="filter" capitalize ng-keydown="Enter($event)">
+                        <span class="input-group-btn">
+                          <button class="btn btn-sm btn-default" type="button">ARA</button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+   
+        <table class="table table-bordered table-success ">
+            <thead>
+                <tr>
+                    <th width="1%"></th>
+                    <th width="20%">PLAKA NO</th>
+                    <th>FİRMA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in TumPlakalar" ng-class="{'bg-red-100' : item.AracId == AracId}" ng-click="setSelected(item)">
+                    <td nowrap >{{$index+1}}</td>
+                    <td nowrap ><strong>{{item.PlakaNo}}</strong></td>
+                    <td nowrap>{{item.FirmaAdi}}</td>               
+                </tr>
+            </tbody>
+        </table>
+
+        
+
+    </div>
+
+    <div class="modal-footer">
+
+            <button type="button" class="btn btn-success w-full"  ng-click="Sec()" >
+                    <span class="text">SEÇ</span>
+                </button>
+        </div>
+
+</script>
+
+<script type="text/ng-template" id="sahaModal">
+    <div class="modal-header">
+    <h4>SAHA SEÇİNİZ</h2>       
+        </div>
+
+    <div class="modal-body no-padder">
+        <table class="table table-bordered table-success ">
+            <thead>
+                <tr>
+                    <th width="1%">#</th>
+                    <th width="20%">SAHA ADI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in SahaListesi" ng-class="{'bg-red-100' : item.DepolamaAlaniSahaId == DepolamaAlaniSahaId}" ng-click="setSelected(item)">
+                    <td nowrap >{{$index+1}}</td>
+                    <td nowrap ><strong>{{item.SahaAdi}}</strong></td>
+                </tr>
+            </tbody>
+        </table>       
+
+    </div>
+
+    <div class="modal-footer">
+
+            <button type="button" class="btn btn-success w-full"  ng-click="Sec()" >
+                    <span class="text">SEÇ</span>
+                </button>
+        </div>
+
+</script>

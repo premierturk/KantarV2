@@ -1,0 +1,43 @@
+<script type="text/ng-template" id="loginModal">
+    <div class="modal-header">
+
+      Giriş Yapınız
+      
+        </div>
+
+    <div class="modal-body wrapper-lg">
+            <form role="form" class="ng-pristine ng-valid">
+
+
+                    <div class="form-group">
+                            <label>Depolama Alanı</label>
+                            <select kendo-drop-down-list k-ng-model="user.DepolamaAlani"
+                            k-data-text-field="'KisaAdi'"
+                            k-data-value-field="'DepolamaAlanId'"
+                            k-option-label="'Seçiniz'"
+                            k-data-source="dsDepolamaAlan"
+                            k-filter="'contains'"
+                            style="width: 100%"></select>
+                     </div>
+
+                    <div class="form-group">
+                      <label>Kullanıcı Adınız</label>
+                      <input type="text" class="form-control" placeholder="Kullanıcı adı" ng-model="user.username">
+                    </div>
+                    <div class="form-group">
+                      <label>Şifre</label>
+                      <input type="password" class="form-control" placeholder="Şifre" ng-model="user.password">
+                    </div>
+              
+            
+         </form>
+
+    </div>
+    <div class="modal-footer">
+
+        <button type="button" class="btn btn-success"  ng-click="login()" >
+            <span class="text">Giriş</span>
+        </button>
+  
+    </div>
+</script>

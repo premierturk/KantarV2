@@ -1,0 +1,29 @@
+{
+  "name": "kantarv2",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "install": "electron-rebuild",
+    "build": "electron-packager . HYBS --platform win32 --arch x64 --out dist/ --overwrite=true"
+  },
+  "author": "Premierturk",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^1.4.1",
+    "electron-rebuild": "^1.4.0"
+  },
+  "dependencies": {
+    "arraybuffer-to-string": "^1.0.2",
+    "data-table": "^2.0.0",
+    "electron-pdf-window": "^1.0.12",
+    "electron-reload": "^1.4.0",
+    "electron-shortcut": "^0.5.0",
+    "lodash": "^4.17.11",
+    "node-run-cmd": "^1.0.1",
+    "nodejs-base64": "^1.0.3",
+    "notiflix": "^3.0.1",
+    "serialport": "^4.0.7"
+  }
+}

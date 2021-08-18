@@ -1,0 +1,137 @@
+﻿
+<div ng-controller="crudkullanici">
+
+    <div class="wrapper-md">
+
+        <div class="row">
+            <div class="col-sm-3">
+                <button class="btn m-b-md  btn-success btn-addon" ng-click="open()"><i class="fa fa-plus"></i> Ekle</button>
+                <button class="btn m-b-md  btn-info btn-addon" ng-click="open(selecteduserid)" ng-disabled="!selecteduserid"><i class="fa fa-pencil-square-o"></i> Düzenle</button>
+                <button class="btn m-b-md  btn-danger btn-addon" ng-click="sil(selecteduserid)" ng-disabled="!selecteduserid"><i class="fa fa-trash"></i> Sil</button>
+            </div>
+            <label class="col-sm-1 control-label">Hafriyat Firması</label>
+            <div class="col-sm-2 ">
+                <label class="i-switch bg-danger m-t-xs m-r">
+                    <input type="checkbox" ng-model="Hf" ng-change="Filter()">
+                    <i></i>
+                </label>
+            </div>
+        </div>
+
+        <div data-kendo-grid id="grid" class="grid-min-height" options="mainGridOptions" k-on-change="handleChange(data, dataItem, columns)">
+
+        </div>
+
+        <script type="text/ng-template" id="myModalContent.html">
+            <div class="modal-body wrapper-lg">
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <h3 class="m-t-none m-b font-thin">Kullanıcı Bilgileri</h3>
+                        <form role="form">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <label>Kullanıcı Adı</label>
+                                        <input type="text" class="form-control" ng-model="u.UserName" placeholder="Kullanıcı adı giriniz" >
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label>Şifre</label>
+                                        <input type="password" class="form-control" ng-model="u.Password" placeholder="Şifre giriniz" >
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Aktif</label><br />
+                                        <label class="i-switch  m-r">
+                                            <input type="checkbox" ng-model="u.Active">
+                                            <i></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Adı Soyadı</label>
+                                        <input type="text" class="form-control" ng-model="u.NameLastName" placeholder="Adı soyadı giriniz" required validationMessage="Firma adını giriniz.">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label>E-Posta</label>
+                                        <input type="email" class="form-control" ng-model="u.Email" placeholder="Örn. myname@example.net" required validationMessage="Firma adını giriniz.">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label>GSM</label>
+                                        <input kendo-masked-text-box ng-model="u.GSM"
+                                               k-mask="'09990000000'" style="width: 100%" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Büyükşehir</label>
+                                        <select kendo-drop-down-list ng-model="u.BuyukSehirId" ng-change="getIlceBelediye(u.BuyukSehirId);" k-option-label="'Seçiniz'"
+                                                k-data-text-field="'BuyukSehirAdi'"
+                                                k-data-value-field="'BuyukSehirId'"
+                                                k-data-source="dsBuyuksehir"
+                                                style="width: 100%"></select>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label>İlçe Belediye </label>
+                                        <select kendo-drop-down-list ng-model="u.IlceBelediyeId" k-option-label="'Seçiniz'"
+                                                k-data-text-field="'BelediyeAdi'"
+                                                k-data-value-field="'IlceBelediyeId'"
+                                                k-data-source="dsIlceBelediye"
+                                                style="width: 100%"></select>
+                                        <span>Sadece ilçe belediye kullanıcıları için seçilecek.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4" ng-repeat="u_ in ug">
+                                        <label class="i-switch m-t-md m-r">
+                                            <input type="checkbox" ng-model="u_.IsSelected" ng-change="GrupSecimi(u_)">
+                                            <i></i>
+                                        </label><span>{{u_.GrupAdi}}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="DAlaniShow">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Depolama Alanı</label>
+                                        <select kendo-drop-down-list ng-model="u.DepolamaAlaniId"
+                                                k-option-label="'Seçiniz'"
+                                                k-data-text-field="'DepolamaAlanAdi'"
+                                                k-data-value-field="'DepolamaAlanId'"
+                                                k-data-source="dsDepolamaAlani"
+                                                k-filter="'contains'"
+                                                style="width: 100%"></select>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" ng-click="Kaydet()" ui-toggle-class="show inline" target="#spin">
+                    <span class="text">Kaydet</span>
+                    <span class="text-active">Kaydediliyor...</span>
+                </button>
+                <i class="fa fa-spin fa-spinner hide" id="spin"></i>
+                <button class="btn btn-danger" type="button" ng-click="Iptal()">Iptal</button>
+            </div>
+        </script>
+
+    </div>
+
+
+</div>

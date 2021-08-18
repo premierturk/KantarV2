@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+  
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
+    <title>HAFRİYAT FİRMALARI</title>
+</head>
+<body>
+    <div  data-ng-app="myApp" data-ng-controller="myController">
+        <table class="table table-striped table-hover p1 text" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>FİRMA</th>
+                    <th>İL</th>
+                    <th>İLÇE</th>
+                    <th>GSM</th>
+                    <th>TEL</th>
+                    <th>ADRES</th>
+                
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in data">
+                    <td>{{ item.FirmaAdi }}</td>
+                    <td>{{ item.IlAdi }}</td>
+                    <td>{{ item.IlceAdi }}</td>
+                    <td>{{ item.GSM1 }}</td>
+                    <td>{{ item.Tel1 }}</td>
+                    <td>{{ item.Adres }}</td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+  <style>
+      .table {
+          font-size: 12px;
+      }
+
+      .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+          padding: 5px;
+      }
+
+  </style>
+    <script>
+
+        var app = angular.module('myApp', []);
+
+        app.controller('myController', function ($scope, $http, $window) {
+
+            $http.get("/HYS.WebApi/api/public/FirmaListesi").then(
+                function (response) {
+                    $scope.data = response.data;
+                },
+                function (errorPl) {
+                    $log.info(errorPl);
+                });
+
+
+        });
+
+
+    </script>
+</body>
+</html>

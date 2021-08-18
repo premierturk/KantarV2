@@ -1,0 +1,103 @@
+﻿<div class="container " ng-controller="SigninFormController" ng-init="app.settings.container = false;">
+
+
+
+    <div class="modal-over bg-white-opacity">
+        <div class="modal-center animated fadeInUp text-center" style="width:400px;margin:-400px 0 0 -200px;">
+
+
+            <a href class="navbar-brand block m-t ">HAFRİYAT YÖNETİM BİLGİ SİSTEMİ</a>
+
+            <div class="wrapper text-center hidden-xs hidden-sm">
+                <img class="b b-a wrapper-xs bg-white img-responsive center-block" src="/HYS/img/logo/logo.jpg" />
+            </div>
+
+            <a href class="navbar-brand block m-t text-md "><span ng-bind-html="app.options.LoginHeader"></span></a>
+
+
+          
+
+            <div class="wrapper text-center">
+                <strong>Giris Yapiniz</strong>
+            </div>
+            <form name="form" class="form-validation" ng-submit="login()">
+                <div class="text-danger wrapper text-center" ng-show="authError">
+                    {{authError}}
+                </div>
+                <div class="list-group list-group-sm">
+                    <div class="list-group-item">
+                        <input type="text" placeholder="Kullanici Adi" class="form-control no-border" ng-model="user.username" required>
+                    </div>
+                    <div class="list-group-item">
+                        <input type="password" placeholder="Şifre" class="form-control no-border" ng-model="user.password" required>
+                    </div>
+             
+
+                    <div vc-recaptcha
+                         class="g-recaptcha m-t"
+                         theme="'light'"
+                         key="model.key"
+                         on-create="setWidgetId(widgetId)"
+                         on-success="setResponse(response)"
+                         on-expire="cbExpiration()"></div>
+                </div>
+                <button type="submit" class="btn btn-lg btn-success btn-block"  ng-disabled='form.$invalid'>Giris</button>
+                <!--<div class="text-center m-t m-b"><a ui-sref="access.forgotpwd">Sifremi unuttum.</a></div>
+                <div class="line line-dashed"></div>
+                <p class="text-center"><small>Hesabiniz bulunmuyor mu?</small></p>
+                <a ui-sref="guvenlik.signup" class="btn btn-lg btn-default btn-block">Hesap Olustur</a>-->
+            </form>
+
+
+            <div class="text-center" ng-include="'tpl/blocks/page_footer.html'"></div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+    <!--<a href class="navbar-brand block m-t">HAFRİYAT YÖNETİM BİLGİ SİSTEMİ</a>
+    <a href class="navbar-brand block m-t">{{app.options.LoginHeader}}</a>
+
+    <div class="w-xxl w-auto-xs">
+
+        <div class="wrapper text-center">
+            <img class="b b-a wrapper-xs bg-white img-responsive center-block" src="/HYS/img/logo/logo.jpg" />
+        </div>
+        <div class="m-b-lg">
+            <div class="wrapper text-center">
+                <strong>Giris Yapiniz</strong>
+            </div>
+            <form name="form" class="form-validation">
+                <div class="text-danger wrapper text-center" ng-show="authError">
+                    {{authError}}
+                </div>
+                <div class="list-group list-group-sm">
+                    <div class="list-group-item">
+                        <input type="text" placeholder="Kullanici Adi" class="form-control no-border" ng-model="user.username" required>
+                    </div>
+                    <div class="list-group-item">
+                        <input type="password" placeholder="Password" class="form-control no-border" ng-model="user.password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-lg btn-primary btn-block" ng-click="login()" ng-disabled='form.$invalid'>Giris</button>
+                <div class="text-center m-t m-b"><a ui-sref="access.forgotpwd">Sifremi unuttum.</a></div>
+                <div class="line line-dashed"></div>
+                <p class="text-center"><small>Hesabiniz bulunmuyor mu?</small></p>
+                <a ui-sref="guvenlik.signup" class="btn btn-lg btn-default btn-block">Hesap Olustur</a>
+            </form>
+        </div>
+
+        <div class="text-center" ng-include="'tpl/blocks/page_footer.html'"></div>
+
+    </div>-->
+
+
+
+
+
+</div>
+

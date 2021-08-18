@@ -1,0 +1,58 @@
+﻿<div class="login-video" ng-controller="SigninFormController" ng-init="app.settings.container = false;">
+
+
+    <video id="bgvid" playsinline autoplay muted loop class="hidden-xs">
+        <source src="{{ videosource }}" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+    <div class="text-white animate4 animation-slideLeft text-center bg-white padder-lg b b-5x bg-gra-blue login-center-video">
+
+        <img class="img-rounded m-t-lg w-lg animate5 animation-slideLeft" src="/HYS/img/logo/logo.jpg" />
+
+        <span class="navbar-brand block m-t animate6 animation-slideLeft">HAFRİYAT YÖNETİM BİLGİ SİSTEMİ</span>
+
+        <span class="block text-sm animate7 animation-slideLeft" ng-bind-html="app.options.LoginHeader"></span>
+
+        <form name="form" class="form-validation m-t" ng-submit="login()">
+            <div class="text-danger wrapper text-center" ng-show="authError">
+                {{authError}}
+            </div>
+            <div class="list-group list-group-sm">
+                <div class="list-group-item animate8 animation-slideLeft">
+                    <input type="text" placeholder="Kullanici Adi" class="form-control no-border" ng-model="user.username" required>
+                </div>
+                <div class="list-group-item animate9 animation-slideLeft">
+                    <input type="password" placeholder="Şifre" class="form-control no-border" ng-model="user.password" required>
+                </div>
+
+                <!--<div vc-recaptcha
+                     class="g-recaptcha m-t animate10 animation-slideLeft"
+                     theme="'light'"
+                     key="model.key"
+                     on-create="setWidgetId(widgetId)"
+                     on-success="setResponse(response)"
+                     on-expire="cbExpiration()"></div>-->
+            </div>
+            <button type="submit" class="btn btn-lg btn-default btn-block animate11 animation-slideLeft" ng-disabled='form.$invalid'>Giriş</button>
+            <!--<div class="text-center m-t m-b"><a ui-sref="access.forgotpwd">Sifremi unuttum.</a></div>
+            <div class="line line-dashed"></div>
+            <p class="text-center"><small>Hesabiniz bulunmuyor mu?</small></p>
+            <a ui-sref="guvenlik.signup" class="btn btn-lg btn-default btn-block">Hesap Olustur</a>-->
+        </form>
+
+        <div class="text-center m-t animate12 animation-slideLeft" ng-include="'tpl/blocks/page_footer.html'"></div>
+
+        <div class="wrapper text-center m b bg-white animate13 animation-slideLeft">
+            <a href="https://itunes.apple.com/us/app/hybs/id1288497690?ls=1&mt=8">
+                <img class="thumb-xl" src="/HYS/img/download.apple.png" />
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=tr.bel.kocaeli.hybs.v2">
+                <img class="thumb-xl" src="/HYS/img/download.google.png" />
+            </a>
+        </div>
+    </div>
+
+    <!--<div class="login-logo hidden-xs hidden-sm m">
+        <img class="thumb-xl" src="/HYS/img/logo/logo.jpg" />
+    </div>-->
+</div>
