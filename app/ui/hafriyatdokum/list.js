@@ -10,6 +10,13 @@ const { ipcRenderer: ipc } = require('electron');
 
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
 
+    if (!angular.isDefined($localStorage.user)) {
+        $rootScope.login();
+
+        return;
+    }
+
+
     $scope.OgsAktif = $localStorage.user.depolamaalani.OgsAktif;
 
 
@@ -110,11 +117,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     }
 
-    if (!angular.isDefined($localStorage.user)) {
-        $rootScope.login();
 
-        return;
-    }
 
     if ($localStorage.user.depolamaalani.OgsAktif) {
         swal({
