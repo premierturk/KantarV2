@@ -58,25 +58,47 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             client.on('data', function (received) {
 
-                for (let i = 0; i < received.length; i++) {
-
-                    if (received[i] == 0x13) {
-
-                        if (received.Length < i + 3)
-                            return;
-                        var hex1 = byteToHex(received[i + 1]);
-                        var hex2 = byteToHex(received[i + 2]);
-                        var hex3 = byteToHex(received[i + 3]);
-
-                        var etiket = parseInt(hex1 + hex2 + hex3, 16);
+                console.log(received);
 
 
-                        // console.log("TCP CLIENT MESSAGE :", etiket);
+                if ($localStorage.user.ilid === 6) {
+                    //bursa
+                    if (received.length < 11) return;
 
-                        e(etiket);
+                    var hex1 = byteToHex(received[8]);
+                    var hex2 = byteToHex(received[9]);
+                    var hex3 = byteToHex(received[10]);
+                    var etiket = parseInt(hex1 + hex2 + hex3, 16);
+                    console.log(etiket);
+                    e(etiket);
 
+                } else if ($localStorage.user.ilid === 1) {
+
+                    //kocaeli
+                    for (let i = 0; i < received.length; i++) {
+
+                        if (received[i] == 0x13) {
+
+                            if (received.Length < i + 3)
+                                return;
+                            var hex1 = byteToHex(received[i + 1]);
+                            var hex2 = byteToHex(received[i + 2]);
+                            var hex3 = byteToHex(received[i + 3]);
+
+                            var etiket = parseInt(hex1 + hex2 + hex3, 16);
+
+
+                            // console.log("TCP CLIENT MESSAGE :", etiket);
+
+                            e(etiket);
+
+                        }
                     }
                 }
+
+
+
+
 
                 // Server send data back to client use client net.Socket object.
                 //client.end('Server received data : ' + data + ', send back to client data size : ' + client.bytesWritten);
@@ -118,6 +140,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     }
 
 
+    var birimfiyat = $localStorage.user.depolamaalani.BirimFiyat.find(function (item) {
+        return item.IlId == $localStorage.user.ilid
+    });
+    if (!angular.isDefined(birimfiyat)) {
+        Notiflix.Notify.warning('Birim fiyat tanımlaması yapınız.');
+        return;
+    }
 
     if ($localStorage.user.depolamaalani.OgsAktif) {
         swal({
@@ -212,6 +241,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             return;
         }
 
+        console.log("Kaydet start");
+
         var Tur = $scope.kabul.Tur;
         var BelgeNo = $scope.kabul.BelgeNo;
         var BarkodNo = $scope.kabul.BarkodNo;
@@ -261,6 +292,10 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         console.log("SAVING..." + data);
         kendoExt.post("api/kantar/hafriyatkabul/KabulBelgesi", data, function (response) {
+
+            $scope.kabul.Temizle();
+
+
 
             Notiflix.Notify.success('Kaydedildi.');
 

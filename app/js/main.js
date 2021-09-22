@@ -52,12 +52,12 @@ angular.module('app')
             options: {
                 UsePrinter: false,
                 TcpPort: 5555,
-                OgsEtiketStart: "1001",
+                OgsEtiketStart: "1261",
                 MinTonaj: 1000,
-                WebApiUrl: "http://localhost:2023/HYS.WebApi/",
+                WebApiUrl: "http://localhost:9988/HYS.WebApi/",
                 //WebApiUrl: "http://hybs.kocaeli.bel.tr/HYS.WebApi/",
                 SerialPort: {
-                    portName: "COM2",
+                    portName: "COM6",
                     autoOpen: false,
                     baudRate: 9600,
                     dataBits: 8,
@@ -147,8 +147,6 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
 
 
     $scope.dsDepolamaAlan = kendoExt.getDs("api/kantar/depolamaList");
-
-
 
     $scope.login = function () {
         $scope.authError = null;
