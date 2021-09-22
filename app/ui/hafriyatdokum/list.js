@@ -1,8 +1,6 @@
 ﻿'use strict';
 
 const net = require('net');
-const serialport = require('serialport');
-const ab2str = require('arraybuffer-to-string');
 const _ = require('lodash');
 const { base64encode, base64decode } = require('nodejs-base64');
 const { ipcRenderer: ipc } = require('electron');
@@ -10,51 +8,34 @@ const { ipcRenderer: ipc } = require('electron');
 
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
 
+
     if (!angular.isDefined($localStorage.user)) {
         $rootScope.login();
-
         return;
     }
 
-
     $scope.OgsAktif = $localStorage.user.depolamaalani.OgsAktif;
-
 
     var mySerialPort = function name(run) {
 
-        const port = new serialport($rootScope.app.options.SerialPort.portName, $rootScope.app.options.SerialPort);
-
-        port.open(function (err) {
-            if (err) {
-                return console.log('Error opening port: ', err.message)
-            }
-        })
-
-
-        port.on('open', function () {
-            return console.log('SERIAL PORT OPEN :', port);
-        })
-
-        port.on('data', function (data) {
-
-            //console.log('SERIAL PORT DATA : ', ab2str(data));
-
-            run(ab2str(data));
-
-        })
+        var client = new net.Socket();
+        client.connect({
+            port: $rootScope.app.options.SerialPortToTcp.port,
+            host: $rootScope.app.options.SerialPortToTcp.host
+        });
+        client.on('data', function (data) {
+            var x = JSON.parse(data);
+            //console.log('Data from server:' + x.Data);
+            run(x.Data);
+        });
 
     };
-
 
     var myTcp = function (e) {
 
         var server = net.createServer(function (client) {
 
             console.log('Client connect : ', client);
-
-            //client.setEncoding('utf-8');
-
-            //client.setTimeout(1000);
 
             client.on('data', function (received) {
 
@@ -117,11 +98,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 });
             });
 
-            // client.on('timeout', function () {
-            //     console.log('Client request time out. ');
-            // })
         });
-
 
         server.listen($rootScope.app.options.TcpPort, function () {
             server.on('close', function () {
@@ -133,10 +110,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             });
             console.log('TCP SERVER LISTEN:', server);
         });
-
-
-
-
     }
 
 
@@ -342,9 +315,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             Kaydet();
 
         });
-
-
-
 
     }
 

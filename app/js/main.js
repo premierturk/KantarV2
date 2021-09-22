@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 const Notiflix = require('notiflix');
+const config = require("../config");
 
 
 angular.module('app')
@@ -49,22 +50,7 @@ angular.module('app')
                 "asideDock": false,
                 "container": false,
             },
-            options: {
-                UsePrinter: false,
-                TcpPort: 5555,
-                OgsEtiketStart: "1261",
-                MinTonaj: 1000,
-                WebApiUrl: "http://localhost:9988/HYS.WebApi/",
-                //WebApiUrl: "http://hybs.kocaeli.bel.tr/HYS.WebApi/",
-                SerialPort: {
-                    portName: "COM6",
-                    autoOpen: false,
-                    baudRate: 9600,
-                    dataBits: 8,
-                    stopBits: 1,
-                    parity: 'none'
-                }
-            },
+            options: config,
         }
 
         $rootScope.app = $scope.app;
@@ -84,10 +70,6 @@ angular.module('app')
         else {
             $localStorage.settings = $scope.app.settings;
         }
-
-
-
-
 
 
 
