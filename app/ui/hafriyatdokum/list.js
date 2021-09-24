@@ -24,8 +24,9 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             host: $rootScope.app.options.SerialPortToTcp.host
         });
         client.on('data', function (data) {
+            console.log('Data from server:' + data);
             var x = JSON.parse(data);
-            //console.log('Data from server:' + x.Data);
+
             run(x.Data);
         });
 
@@ -229,7 +230,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null) return;
         if (BelgeNo == "") {
-            $scope.uyari = "Belge no giriniz!";
+            $scope.uyari = "Belge no okutunuz/giriniz!";
             return;
         }
         if (AracId == null) {
@@ -663,7 +664,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
 
             tempSpark.push(number);
-            if (tempSpark.length >= 130) {
+            if (tempSpark.length >= 100) {
                 tempSpark.splice(0, 1);
             }
 
@@ -993,7 +994,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         var gridElement = $("#grid");
 
         if (gridElement.data("kendoGrid")) {
-            gridElement.height($(window).height() - 35 + "px");
+            gridElement.height($(window).height() - 290 + "px");
             gridElement.data("kendoGrid").resize();
         }
     }

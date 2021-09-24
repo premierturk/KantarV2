@@ -50,7 +50,8 @@ port.on('data', function (data) {
 
 
     sockets.forEach((client) => {
-        client.write(JSON.stringify(d));
+        client.write(" " + JSON.stringify(d) + " ");
+
     });
 
     if (signalr_client.connection.state == 1)
