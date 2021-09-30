@@ -24,7 +24,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             host: $rootScope.app.options.SerialPortToTcp.host
         });
         client.on('data', function (data) {
-            console.log('Data from server:' + data);
+            // console.log('Data from server:' + data);
             var x = JSON.parse(data);
 
             run(x.Data);
@@ -38,9 +38,11 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             console.log('Client connect : ', client);
 
+            $scope.AntenDurumu = "Anten Bağlandı";
+
             client.on('data', function (received) {
 
-                console.log(received);
+                //console.log(received);
 
 
                 if ($localStorage.user.ilid === 6) {
@@ -76,6 +78,30 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
                         }
                     }
+
+                } else if ($localStorage.user.ilid === 41) {
+
+                    //DİYARBAKIR
+                    for (let i = 0; i < received.length; i++) {
+
+                        if (received[i] == 0x13) {
+
+                            if (received.Length < i + 3)
+                                return;
+                            var hex1 = byteToHex(received[i + 1]);
+                            var hex2 = byteToHex(received[i + 2]);
+                            var hex3 = byteToHex(received[i + 3]);
+
+                            var etiket = parseInt(hex1 + hex2 + hex3, 16);
+
+
+                            // console.log("TCP CLIENT MESSAGE :", etiket);
+
+                            e(etiket);
+
+                        }
+                    }
+
                 }
 
 
@@ -110,6 +136,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 console.error(JSON.stringify(error));
             });
             console.log('TCP SERVER LISTEN:', server);
+
+            $scope.AntenDurumu = "Anten Bağlantı Açık";
         });
     }
 
@@ -134,12 +162,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             swal.close();
         });
     }
-
+    $scope.AntenDurumu = "Anten Bağlı Değil";
     $scope.kabul = {
         Tur: "",
         BelgeNo: "",
         BarkodNo: "",
         AracId: null,
+        AracCinsiId: null,
         PlakaNo: "",
         Ogs: "",
         Tutar: 0,
@@ -160,6 +189,19 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.Net = $scope.kabul.Tonaj - $scope.kabul.Dara;
             $scope.kabul.Tutar = $scope.kabul.Tonaj * bFiyat;
 
+
+            if ($localStorage.user.depolamaalani.KantarVarMi == false) {
+                var aracBirimFiyat = $localStorage.user.depolamaalani.AracFiyat.find(function (item) {
+                    return item.AracCinsiId == $scope.kabul.AracCinsiId
+                });
+
+
+                $scope.kabul.Net = parseInt(aracBirimFiyat.Fiyat / $scope.kabul.BirimFiyat);
+                $scope.kabul.Tonaj = $scope.kabul.Net + $scope.kabul.Dara;
+                $scope.kabul.Tutar = aracBirimFiyat.Fiyat;
+
+            }
+
         },
         Temizle: function () {
             $scope.kabul.Response = {};
@@ -167,13 +209,14 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.BelgeNo = "";
             $scope.kabul.BarkodNo = "";
             $scope.kabul.AracId = null;
+            $scope.kabul.AracCinsiId = null;
             $scope.kabul.PlakaNo = "";
             $scope.kabul.Ogs = "";
             $scope.kabul.Tutar = 0;
             $scope.kabul.Tonaj = 0;
             $scope.kabul.Dara = 0;
             $scope.kabul.Net = 0;
-            $scope.kabul.BirimFiyat = 0
+            //$scope.kabul.BirimFiyat = 0
             $scope.kabul.IlDisiBirimFiyat = 0;
             $scope.kabul.SahaId = null;
         },
@@ -187,7 +230,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         SahaId: null,
         Response: {},
     }
-
 
     $scope.$watch('kabul.BelgeNo', function (newValue, oldValue) {
         $scope.Kaydet();
@@ -245,12 +287,17 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.uyari = "Kantar verisi bekleyiniz!";
             return;
         }
+
+        if (Tonaj == null) {
+            $scope.uyari = "Kantar verisi bekleyiniz!";
+            return;
+        }
+
         if (Tonaj <= Dara) {
             $scope.uyari = "Dara tonajdan küçük olamaz!";
             return;
         }
-        $scope.kabul.Temizle();
-
+        //$scope.kabul.Temizle();
 
         var data = {
             AracId: AracId,
@@ -286,7 +333,10 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             //swal("", err.data, "error");
 
-            $scope.kabul.Temizle();
+            //$scope.kabul.Temizle();
+
+            $scope.kabul.BelgeNo = "";
+            $scope.kabul.BarkodNo = "";
 
         });
 
@@ -300,7 +350,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         lastEtiketNo = EtiketNo;
 
         setTimeout(function () {
-
             lastEtiketNo = "";
         }, 5000);
 
@@ -310,10 +359,11 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.PlakaNo = arac.PlakaNo;
             $scope.kabul.Dara = arac.Dara;
             $scope.kabul.AracId = arac.AracId;
+            $scope.kabul.AracCinsiId = arac.AracCinsiId;
 
             $scope.kabul.Hesapla();
 
-            Kaydet();
+            $scope.Kaydet();
 
         });
 
@@ -357,6 +407,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                     $scope.kabul.PlakaNo = arac.PlakaNo;
                     $scope.kabul.Dara = arac.Dara;
                     $scope.kabul.AracId = arac.AracId;
+                    $scope.kabul.AracCinsiId = arac.AracCinsiId;
 
                     $scope.kabul.Hesapla();
 
@@ -436,12 +487,31 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
                 TasimaKabuBelgesi(belgeNo);
 
+            } else if (readBarkod.indexOf(";") > -1) {//BURSA SANAYİ ATIK
+
+                var belgeNo = readBarkod;
+                $scope.$apply(function () {
+                    $scope.kabul.Tur = "SANAYİ ATIĞI";
+                    $scope.kabul.BarkodNo = angular.copy(belgeNo);
+                    $scope.kabul.BelgeNo = angular.copy(belgeNo);
+                });
+
+                //TasimaKabuBelgesi(belgeNo);
+
             }
 
             readBarkod = "";
         }
 
     });
+
+
+
+    $scope.Restart = function () {
+
+        ipc.send('restart', true);
+
+    };
 
 
     $scope.PlakaSec = function () {
@@ -486,13 +556,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
                 swal("Uyarı", "Hatalı belge no", "error");
 
-                $scope.kabul.Temizle();
+                //$scope.kabul.Temizle();
 
             } else {
 
                 if (data.Aktif === false) {
                     swal("Uyarı", "Belge aktif değil", "error");
-                    $scope.kabul.Temizle();
+                    //$scope.kabul.Temizle();
                     return;
                 }
 
@@ -524,30 +594,9 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 if (!$localStorage.user.depolamaalani.OgsAktif) {
 
                     $scope.PlakaSec();
-                    // var modalInstance = $modal.open({
-                    //     keyboard: true,
-                    //     animation: false,
-                    //     templateUrl: 'araclarModal',
-                    //     controller: 'plakasecCtrl',
-                    //     size: 'lg',
-                    //     resolve: {
-                    //         PlakaListesi: function () {
-                    //             return $scope.kabul.Response.Araclar;
-                    //         }
-                    //     }
-                    // });
 
-                    // modalInstance.result.then(function (e) {
-
-                    //     $scope.kabul.PlakaNo = e.PlakaNo;
-                    //     $scope.kabul.Dara = e.Dara;
-                    //     $scope.kabul.AracId = e.AracId;
-
-                    //     $scope.kabul.Hesapla();
-
-                    // });
-
-                }
+                } else
+                    $scope.Kaydet();
 
 
 
@@ -574,13 +623,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
                 swal("Uyarı", "Hatalı belge no", "error");
 
-                $scope.kabul.Temizle();
+                //$scope.kabul.Temizle();
 
             } else {
 
                 if (data.Aktif === false) {
                     swal("Uyarı", "Belge aktif değil", "error");
-                    $scope.kabul.Temizle();
+                    //$scope.kabul.Temizle();
                     return;
                 }
 
@@ -712,7 +761,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     });
 
-
     $scope.filtre = {
         BasTarih: new Date(),
         BitTarih: new Date(),
@@ -721,7 +769,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         DepolamaAlaniSahaId: "",
         raportur: ""
     };
-
 
     $scope.Total_Tutar = 0;
     $scope.Total_Tonaj = 0;
@@ -941,25 +988,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         $scope.Total_Tonaj = parseInt($scope.Total_Tonaj / 1000);
 
-        //$scope.Total_Diff_Ortalama = ($scope.Total_Arac - 1) / $scope.Total_Diff;
-
-        // var query1 = $linq.Enumerable().From(data)
-        //     .GroupBy("$.DepolamaAlanAdi", null, "{ DepolamaAlanAdi: $, Count: $$.Count() }")
-        //     .OrderBy(function (x) {
-        //         return x.Count
-        //     })
-        //     .ToArray();
-
-        // createChart1(query1);
-
-        // var query2 = $linq.Enumerable().From(data)
-        //     .GroupBy("$.Tur", null, "{ Tur: $, Count: $$.Count() }")
-        //     .OrderBy(function (x) {
-        //         return x.Count
-        //     })
-        //     .ToArray();
-
-        // createChart2(query2);
     }
 
 

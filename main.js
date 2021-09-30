@@ -101,7 +101,10 @@ require('electron-reload')(__dirname, {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-
+ipc.on('restart', async (event, data) => {
+  app.exit();
+  app.relaunch();
+});
 
 ipc.on('onprint', async (event, data) => {
 
@@ -148,37 +151,6 @@ ipc.on('onprint', async (event, data) => {
   }, function (err) {
     console.log('Command failed to run with error: ', err);
   });
-
-
-  //const modalPath = path.join(__dirname, 'temp/dokumfisi.html');
-  // let win = new BrowserWindow({ width: 400, height: 200 });
-  // // PDFWindow.addSupport(win)
-  // win.on('close', function () { win = null })
-  // win.loadURL(modalPath)
-
-
-
-  // win.webContents.on('did-finish-load', function () {
-  //   const printOptions = {
-  //     marginsType: 0,
-  //     printBackground: false,
-  //     printSelectionOnly: false,
-  //     landscape: false,
-  //     silent: true,
-  //     printBackground: false,
-  //     deviceName: ''
-  //   };
-
-  //   win.webContents.print(printOptions, (success) => {
-
-  //     console.log("print", success);
-
-  //     if (success) {
-  //       win.close();
-  //       win = null
-  //     }
-  //   });
-
 
 });
 

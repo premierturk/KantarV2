@@ -51,12 +51,10 @@ port.on('data', function (data) {
 
     sockets.forEach((client) => {
         client.write(" " + JSON.stringify(d) + " ");
-
     });
 
     if (signalr_client.connection.state == 1)
         signalr_client.connection.hub.invoke('hubs', 'kantarveri', d.Name, d.Data);
-
 
 })
 

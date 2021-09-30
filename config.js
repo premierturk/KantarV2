@@ -5,9 +5,9 @@ var config = {
     TcpPort: 5555,//anten remote pc port
     OgsEtiketStart: "1001",
     MinTonaj: 1000,
-    WebApiUrl: "http://localhost:2023/HYS.WebApi/",
+    WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
     SignalR: {
-        host: 'http://localhost:2023/HYS.SingnalR/signalr'
+        host: 'http://hybs.diyarbakir.bel.tr//HYS.SingnalR/signalr'
     },
     SerialPort: {//serial porttan veri okumak için gerekli parametreler
         portName: "COM3",
@@ -21,7 +21,11 @@ var config = {
         tcpName: "KANTAR 1",
         host: '10.210.210.27',//localhost
         port: 6633
-    }
+    },
+    mongodb: {
+        server: '10.100.8.58:27017',
+        database: 'HYBS',
+    },
 };
 
 module.exports = config;
