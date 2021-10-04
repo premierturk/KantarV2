@@ -7,12 +7,18 @@ const PDFWindow = require('electron-pdf-window');
 var nrc = require('node-run-cmd');
 const { base64encode, base64decode } = require('nodejs-base64');
 
+
+//const seriToTcp = require('./serialport_to_tcp');
 const app = electron.app
+app.allowRendererProcessReuse = false;
+
+
+
 const BrowserWindow = electron.BrowserWindow;
 
 
 
-app.allowRendererProcessReuse = false
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -28,7 +34,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
+      enableRemoteModule: true
     }
   });
   mainWindow.setMenu(null);
@@ -43,10 +49,13 @@ function createWindow() {
     slashes: true
   }))
 
+
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    app.allowRendererProcessReuse = false;
 
-    require('./serialport_to_tcp')
+    //seriToTcp.start();
   })
 
 
@@ -66,6 +75,9 @@ function createWindow() {
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
   });
+
+
+
 }
 
 
@@ -93,10 +105,10 @@ app.on('activate', function () {
 
 
 // Enable live reload for Electron too
-require('electron-reload')(__dirname, {
-  // Note that the path to electron may vary according to the main file
-  electron: require(`${__dirname}/node_modules/electron`)
-});
+// require('electron-reload')(__dirname, {
+//   // Note that the path to electron may vary according to the main file
+//   electron: require(`${__dirname}/node_modules/electron`)
+// });
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

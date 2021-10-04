@@ -5,9 +5,10 @@ const _ = require('lodash');
 const { base64encode, base64decode } = require('nodejs-base64');
 const { ipcRenderer: ipc } = require('electron');
 
+//const serialport = require('serialport')
+
 
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
-
 
     if (!angular.isDefined($localStorage.user)) {
         $rootScope.login();
@@ -18,17 +19,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     var mySerialPort = function name(run) {
 
-        var client = new net.Socket();
-        client.connect({
-            port: $rootScope.app.options.SerialPortToTcp.port,
-            host: $rootScope.app.options.SerialPortToTcp.host
-        });
-        client.on('data', function (data) {
-            // console.log('Data from server:' + data);
-            var x = JSON.parse(data);
-
-            run(x.Data);
-        });
 
     };
 
@@ -480,7 +470,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             } else if (readBarkod.indexOf("-") > -1) {//FİRMA BARKOD
 
-                var belgeNo = readBarkod;    
+                var belgeNo = readBarkod;
                 TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
 
             } else if (readBarkod.indexOf(";") > -1) {//BURSA SANAYİ ATIK

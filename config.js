@@ -21,7 +21,7 @@ var config = {
     SerialPortToTcp: {//serial porttan veriyi alıp tcp den yayınlamak için kullanılıyor
         tcpName: "KANTAR 1",
         host: '10.210.210.27',//localhost
-        port: 6633
+        port: 6632
     },
     mongodb: {
         server: '10.100.8.58:27017',
