@@ -251,7 +251,11 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         $scope.Kaydet();
     });
 
+    var isSaving = false;
     $scope.Kaydet = function () {
+
+        if (isSaving) return;
+        isSaving = true;
 
         if (!angular.isDefined($localStorage.user)) {
             return;
@@ -273,28 +277,34 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null) return;
         if (BelgeNo == "") {
             $scope.uyari = "Belge no okutunuz/giriniz!";
+            isSaving = false;
             return;
         }
         if (AracId == null) {
             $scope.uyari = "Plaka seçiniz!";
+            isSaving = false;
             return;
         }
         if (Dara == 0) {
             $scope.uyari = "Plaka seçiniz!";
+            isSaving = false;
             return;
         }
         if (Tonaj == 0) {
             $scope.uyari = "Kantar verisi bekleyiniz!";
+            isSaving = false;
             return;
         }
 
         if (Tonaj == null) {
             $scope.uyari = "Kantar verisi bekleyiniz!";
+            isSaving = false;
             return;
         }
 
         if (Tonaj <= Dara) {
             $scope.uyari = "Dara tonajdan küçük olamaz!";
+            isSaving = false;
             return;
         }
         //$scope.kabul.Temizle();
@@ -310,10 +320,10 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             Tonaj: Tonaj
         };
 
-
+        //KABUL BELGESI
         console.log("SAVING..." + data);
         kendoExt.post("api/kantar/hafriyatkabul/KabulBelgesi", data, function (response) {
-
+            isSaving = false;
             $scope.kabul.Temizle();
 
 
@@ -328,7 +338,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         }, function (err) {
 
-
+            isSaving = false;
             Notiflix.Report.failure('HYBS', err.data, 'Tamam');
 
             //swal("", err.data, "error");
@@ -442,8 +452,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         if (event.keyCode == 13) {
             console.log(readBarkod);
 
-
-
             if (readBarkod.indexOf("KF-") > -1 && readBarkod.indexOf("-KF") > -1) {//KAMUFİŞ
 
                 var belgeNo = readBarkod.replace("KF-", "").replace("-KF", "");
@@ -457,14 +465,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             } else if (readBarkod.indexOf("A") > -1 && readBarkod.indexOf("-") > -1) {//KABUL BELGESİ
 
-
                 var belgeNo = readBarkod.split("A")[1];
-                $scope.$apply(function () {
-                    $scope.kabul.Tur = "KABUL BELGESİ";
-                    $scope.kabul.BarkodNo = angular.copy(readBarkod);
-                    $scope.kabul.BelgeNo = angular.copy(belgeNo);
-                });
-                TasimaKabuBelgesi(belgeNo);
+                TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
 
 
             } else if (readBarkod.indexOf("A") > -1) {//NAKİT
@@ -478,23 +480,17 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             } else if (readBarkod.indexOf("-") > -1) {//FİRMA BARKOD
 
-                var belgeNo = readBarkod;
-                $scope.$apply(function () {
-                    $scope.kabul.Tur = "KABUL BELGESİ(FİRMA)";
-                    $scope.kabul.BarkodNo = angular.copy(belgeNo);
-                    $scope.kabul.BelgeNo = angular.copy(belgeNo);
-                });
-
-                TasimaKabuBelgesi(belgeNo);
+                var belgeNo = readBarkod;    
+                TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
 
             } else if (readBarkod.indexOf(";") > -1) {//BURSA SANAYİ ATIK
 
-                var belgeNo = readBarkod;
-                $scope.$apply(function () {
-                    $scope.kabul.Tur = "SANAYİ ATIĞI";
-                    $scope.kabul.BarkodNo = angular.copy(belgeNo);
-                    $scope.kabul.BelgeNo = angular.copy(belgeNo);
-                });
+                // var belgeNo = readBarkod;
+                // $scope.$apply(function () {
+                //     $scope.kabul.Tur = "SANAYİ ATIĞI";
+                //     $scope.kabul.BarkodNo = angular.copy(belgeNo);
+                //     $scope.kabul.BelgeNo = angular.copy(belgeNo);
+                // });
 
                 //TasimaKabuBelgesi(belgeNo);
 
@@ -542,7 +538,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     };
 
 
-    var TasimaKabuBelgesi = function (BelgeNo) {
+    var TasimaKabuBelgesi = function (Barkod, BelgeNo) {
 
         var data = {
             BelgeNo: BelgeNo
@@ -565,6 +561,11 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                     //$scope.kabul.Temizle();
                     return;
                 }
+
+                $scope.kabul.Tur = "KABUL BELGESİ";
+                $scope.kabul.BarkodNo = angular.copy(Barkod);
+                $scope.kabul.BelgeNo = angular.copy(BelgeNo);
+
 
                 $scope.kabul.Response = response.data;
 

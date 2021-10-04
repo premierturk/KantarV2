@@ -304,7 +304,7 @@ angular.module('ui.load', [])
                     pageSize: 50,
                     error: function (e) {
                         if (e.errorThrown == "Unauthorized")
-                            $state.go('signin');
+                            $rootScope.login();
                     },
                     aggregate: agg,
                     sort: sort,
@@ -394,7 +394,7 @@ angular.module('ui.load', [])
                     },
                     error: function (e) {
                         if (e.errorThrown == "Unauthorized")
-                            $state.go('signin');
+                            $rootScope.login();
                         else
                             if (typeof error === "function") {
                                 error(e);
@@ -414,9 +414,10 @@ angular.module('ui.load', [])
                 $http.get(url).then(function (response) {
                     callback(response);
                 }, function (errorPl) {
+                    swal.close();
                     $log.info(errorPl);
                     if (errorPl.status == "401")
-                        $state.go('signin');
+                        $rootScope.login();
                 });
             }
         }

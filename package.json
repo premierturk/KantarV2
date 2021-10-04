@@ -6,9 +6,8 @@
   "scripts": {
     "start": "electron .",
     "tcp": "node serialport_to_tcp.js",
-    "xxx": "npm run start && npm run tcp",
     "install": "electron-rebuild",
-    "build": "electron-packager . HYBS --platform win32 --arch x64 --out dist/ --overwrite=true"
+    "build": "electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --asar=true"
   },
   "author": "Premierturk",
   "license": "CC0-1.0",

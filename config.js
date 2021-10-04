@@ -5,9 +5,10 @@ var config = {
     TcpPort: 5555,//anten remote pc port
     OgsEtiketStart: "1001",
     MinTonaj: 1000,
-    WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
+    WebApiUrl: "http://localhost:2023/HYS.WebApi/",
+    // WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
     SignalR: {
-        host: 'http://hybs.diyarbakir.bel.tr//HYS.SingnalR/signalr'
+        host: 'http://localhost:2023/HYS.SingnalR/signalr'
     },
     SerialPort: {//serial porttan veri okumak için gerekli parametreler
         portName: "COM3",
