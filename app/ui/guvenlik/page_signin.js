@@ -52,7 +52,7 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', '$localStor
             IsMobile: false
         }
 
-        $http.post('/HYS.WebApi/api/User/CheckUser', data)
+        $http.post(url +'api/User/CheckUser', data)
             .then(function (response) {
                 if (response.data == "Unauthorized") {
                     $scope.authError = 'Kullanici adi veya Sifre dogru degil.';

@@ -1,24 +1,23 @@
 const electron = require('electron');
+
+// const { ipcMain } = require('electron');
+// const { ipcRenderer } = require('electron');
 const { ipcMain: ipc } = require('electron');
+
+
 const path = require('path');
 const url = require('url');
 const Shortcut = require('electron-shortcut');
 const PDFWindow = require('electron-pdf-window');
 var nrc = require('node-run-cmd');
 const { base64encode, base64decode } = require('nodejs-base64');
+const serialport = require('serialport')
+const ab2str = require('arraybuffer-to-string');
+const config = require("./config");
 
-
-//const seriToTcp = require('./serialport_to_tcp');
 const app = electron.app
 app.allowRendererProcessReuse = false;
-
-
-
 const BrowserWindow = electron.BrowserWindow;
-
-
-
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -34,7 +33,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      backgroundThrottling: false
     }
   });
   mainWindow.setMenu(null);
@@ -54,8 +54,6 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     app.allowRendererProcessReuse = false;
-
-    //seriToTcp.start();
   })
 
 
@@ -75,6 +73,31 @@ function createWindow() {
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
   });
+
+  //SERIALPORT-------
+  const port = new serialport(config.SerialPort.portName, config.SerialPort);
+  port.open(function (err) {
+    if (err) {
+      return console.log('Error opening port: ', err.message)
+    }
+  })
+  port.on('open', function () {
+    return console.log('SERIAL PORT OPEN :', port);
+  })
+
+  port.on('data', function (data) {
+
+    console.log('SERIAL PORT DATA : ', ab2str(data));
+
+    var d = {
+      Name: config.SerialPortToTcp.tcpName,
+      Data: ab2str(data)
+    };
+
+    //ipc.send(d);
+    mainWindow.webContents.send("comport", JSON.stringify(d));
+
+  })
 
 
 
@@ -104,8 +127,12 @@ app.on('activate', function () {
 })
 
 
+
+
+
 // Enable live reload for Electron too
 // require('electron-reload')(__dirname, {
+//   // Note that the path to electron may vary according to the main file
 //   // Note that the path to electron may vary according to the main file
 //   electron: require(`${__dirname}/node_modules/electron`)
 // });

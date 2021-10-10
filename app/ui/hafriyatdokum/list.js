@@ -1,11 +1,9 @@
 ﻿'use strict';
-
+const electron = require('electron');
 const net = require('net');
 const _ = require('lodash');
 const { base64encode, base64decode } = require('nodejs-base64');
 const { ipcRenderer: ipc } = require('electron');
-
-//const serialport = require('serialport')
 
 
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
@@ -19,13 +17,20 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     var mySerialPort = function name(run) {
 
+        ipc.on("comport", (event, data) => {
+            var d = JSON.parse(data);
+            run(d.Data);
+        });
 
     };
 
+
+    var client_anten;
     var myTcp = function (e) {
 
         var server = net.createServer(function (client) {
 
+            client_anten = client;
             console.log('Client connect : ', client);
 
             $scope.AntenDurumu = "Anten Bağlandı";
@@ -159,6 +164,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         BarkodNo: "",
         AracId: null,
         AracCinsiId: null,
+        AracCinsi: "",
         PlakaNo: "",
         Ogs: "",
         Tutar: 0,
@@ -166,6 +172,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         Dara: 0,
         Net: 0,
         Hesapla: function () {
+
+            if ($scope.kabul.AracId == null) return;
 
             if ($scope.kabul.Response.IsIlDisi)
                 $scope.kabul.IlDisiBirimFiyat = $localStorage.user.depolamaalani.BirimFiyat.find(function (item) {
@@ -181,6 +189,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
 
             if ($localStorage.user.depolamaalani.KantarVarMi == false) {
+
+
                 var aracBirimFiyat = $localStorage.user.depolamaalani.AracFiyat.find(function (item) {
                     return item.AracCinsiId == $scope.kabul.AracCinsiId
                 });
@@ -200,6 +210,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.BarkodNo = "";
             $scope.kabul.AracId = null;
             $scope.kabul.AracCinsiId = null;
+            $scope.kabul.AracCinsi = "";
             $scope.kabul.PlakaNo = "";
             $scope.kabul.Ogs = "";
             $scope.kabul.Tutar = 0;
@@ -241,17 +252,14 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         $scope.Kaydet();
     });
 
-    var isSaving = false;
+
     $scope.Kaydet = function () {
 
-        if (isSaving) return;
-        isSaving = true;
+        console.log("Kaydet start...");
 
         if (!angular.isDefined($localStorage.user)) {
             return;
         }
-
-        console.log("Kaydet start");
 
         var Tur = $scope.kabul.Tur;
         var BelgeNo = $scope.kabul.BelgeNo;
@@ -267,34 +275,28 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null) return;
         if (BelgeNo == "") {
             $scope.uyari = "Belge no okutunuz/giriniz!";
-            isSaving = false;
             return;
         }
         if (AracId == null) {
             $scope.uyari = "Plaka seçiniz!";
-            isSaving = false;
             return;
         }
         if (Dara == 0) {
             $scope.uyari = "Plaka seçiniz!";
-            isSaving = false;
             return;
         }
         if (Tonaj == 0) {
             $scope.uyari = "Kantar verisi bekleyiniz!";
-            isSaving = false;
             return;
         }
 
         if (Tonaj == null) {
             $scope.uyari = "Kantar verisi bekleyiniz!";
-            isSaving = false;
             return;
         }
 
         if (Tonaj <= Dara) {
             $scope.uyari = "Dara tonajdan küçük olamaz!";
-            isSaving = false;
             return;
         }
         //$scope.kabul.Temizle();
@@ -310,13 +312,16 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             Tonaj: Tonaj
         };
 
+
+
         //KABUL BELGESI
-        console.log("SAVING..." + data);
+        console.log("SAVING..." + JSON.stringify(data));
         kendoExt.post("api/kantar/hafriyatkabul/KabulBelgesi", data, function (response) {
-            isSaving = false;
+
+            console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
 
-
+            client_anten.write("0100000111040D12CA\r");
 
             Notiflix.Notify.success('Kaydedildi.');
 
@@ -328,8 +333,9 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         }, function (err) {
 
-            isSaving = false;
-            Notiflix.Report.failure('HYBS', err.data, 'Tamam');
+            console.log("SAVING failure :");
+
+            Notiflix.Notify.failure(err.data);
 
             //swal("", err.data, "error");
 
@@ -359,7 +365,14 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.PlakaNo = arac.PlakaNo;
             $scope.kabul.Dara = arac.Dara;
             $scope.kabul.AracId = arac.AracId;
+            $scope.kabul.AracCinsi = arac.AracCinsi;
             $scope.kabul.AracCinsiId = arac.AracCinsiId;
+
+            if ($scope.kabul.AracCinsiId == 30) {
+                $scope.kabul.BarkodNo = "EVSELATIK";
+                $scope.kabul.BelgeNo = "EVSELATIK";
+                $scope.kabul.Tur = "EVSELATIK";
+            }
 
             $scope.kabul.Hesapla();
 
@@ -407,7 +420,14 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                     $scope.kabul.PlakaNo = arac.PlakaNo;
                     $scope.kabul.Dara = arac.Dara;
                     $scope.kabul.AracId = arac.AracId;
+                    $scope.kabul.AracCinsi = arac.AracCinsi;
                     $scope.kabul.AracCinsiId = arac.AracCinsiId;
+
+                    if ($scope.kabul.AracCinsiId == 30) {
+                        $scope.kabul.BarkodNo = "EVSELATIK";
+                        $scope.kabul.BelgeNo = "EVSELATIK";
+                        $scope.kabul.Tur = "EVSELATIK";
+                    }
 
                     $scope.kabul.Hesapla();
 
@@ -492,11 +512,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     });
 
 
-
     $scope.Restart = function () {
-
         ipc.send('restart', true);
-
     };
 
 
@@ -520,6 +537,14 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.PlakaNo = e.PlakaNo;
             $scope.kabul.Dara = e.Dara;
             $scope.kabul.AracId = e.AracId;
+            $scope.kabul.AracCinsi = e.AracCinsi;
+            $scope.kabul.AracCinsiId = e.AracCinsiId;
+
+            if ($scope.kabul.AracCinsiId == 30) {
+                $scope.kabul.BarkodNo = "EVSELATIK";
+                $scope.kabul.BelgeNo = "EVSELATIK";
+                $scope.kabul.Tur = "EVSELATIK";
+            }
 
             $scope.kabul.Hesapla();
 
@@ -692,63 +717,64 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     var tempSpark = [];
 
     mySerialPort(function (data) {
+
+
+        //TODO : KANTARDAN GELEN VERİ SETİNE GÖRE AYARLAMALAR YAPILACAK
+        if (!data) return;
+        if (data == "") return;
+        var number = parseInt(data.replace(" ", ""));
+        if (isNaN(number)) return;
+        if (number < $rootScope.app.options.MinTonaj) return;
+        // console.log(number);
+
+
+
+        tempSpark.push(number);
+        if (tempSpark.length >= 100) {
+            tempSpark.splice(0, 1);
+        }
         $rootScope.$apply(function () {
-
-            //TODO : KANTARDAN GELEN VERİ SETİNE GÖRE AYARLAMALAR YAPILACAK
-
-            var number = parseInt(data.replace(" ", ""));
-            if (isNaN(number)) return;
-            if (number < $rootScope.app.options.MinTonaj) return;
-            // console.log(number);
-
-
-
-            tempSpark.push(number);
-            if (tempSpark.length >= 100) {
-                tempSpark.splice(0, 1);
-            }
-
             $scope.weather = new kendo.data.DataSource({
                 data: tempSpark
             });
-
-
-
-
-
-
-            $scope.tempGelenTonaj = number;
-            tempTonaj.push(number);
-            $scope.i = tempTonaj.length * 2;
-
-            if (tempTonaj.length >= 50) {
-
-                $scope.kabul.Tonaj = 0;
-
-                var gelenTonaj = $linq.Enumerable().From(tempTonaj)
-                    .GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }")
-                    .OrderByDescending(function (x) {
-                        return x.Count
-                    })
-                    .FirstOrDefault();
-
-                $scope.kabul.Tonaj = gelenTonaj.Tonaj;
-
-                $scope.kabul.Hesapla();
-
-                $scope.Kaydet();
-
-                tempTonaj = [];
-            }
-
-
-
-
-
-
-
-
         });
+
+
+
+
+
+        $scope.tempGelenTonaj = number;
+        tempTonaj.push(number);
+        $scope.i = tempTonaj.length * 2;
+
+        if (tempTonaj.length >= 50) {
+
+            $scope.kabul.Tonaj = 0;
+
+            var gelenTonaj = $linq.Enumerable().From(tempTonaj)
+                .GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }")
+                .OrderByDescending(function (x) {
+                    return x.Count
+                })
+                .FirstOrDefault();
+
+            $scope.kabul.Tonaj = gelenTonaj.Tonaj;
+
+            $scope.kabul.Hesapla();
+
+            $scope.Kaydet();
+
+            tempTonaj = [];
+        }
+
+
+
+
+
+
+
+
+
 
     });
 

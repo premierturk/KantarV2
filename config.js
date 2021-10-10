@@ -3,12 +3,13 @@
 var config = {
     UsePrinter: false,
     TcpPort: 5555,//anten remote pc port
-    OgsEtiketStart: "1001",
+    OgsEtiketStart: "1261",
     MinTonaj: 1000,
     WebApiUrl: "http://localhost:2023/HYS.WebApi/",
-    // WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
+    //WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
     SignalR: {
         host: 'http://localhost:2023/HYS.SingnalR/signalr'
+        //host: 'http://hybs.diyarbakir.bel.tr/HYS.SingnalR/signalr'
     },
     SerialPort: {//serial porttan veri okumak için gerekli parametreler
         portName: "COM3",
@@ -20,7 +21,7 @@ var config = {
     },
     SerialPortToTcp: {//serial porttan veriyi alıp tcp den yayınlamak için kullanılıyor
         tcpName: "KANTAR 1",
-        host: '10.210.210.27',//localhost
+        host: '192.168.1.131',//localhost
         port: 6632
     },
     mongodb: {

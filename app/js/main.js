@@ -66,22 +66,9 @@ angular.module('app')
         // save settings to local storage
         if (angular.isDefined($localStorage.settings)) {
             $scope.app.settings = $localStorage.settings;
-        }
-        else {
+        } else {
             $localStorage.settings = $scope.app.settings;
         }
-
-
-
-        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-
-
-        });
-
-        $scope.$on('$stateChangeSuccess',
-            function () {
-
-            })
 
 
 
@@ -112,6 +99,7 @@ angular.module('app')
             });
 
             modalInstance.result.then(function (e) {
+                Notiflix.Loading.remove();
                 $rootScope.loginIsOpen = false;
                 location.reload();
             });
@@ -140,21 +128,21 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
             IsMobile: false
         }
 
-
         var url = $rootScope.app.options.WebApiUrl + 'api/User/CheckUser';
 
-
+        Notiflix.Loading.standard();
         $http.post(url, data)
             .then(function (response) {
-                if (response.data == "Unauthorized") {
 
+
+                if (response.data == "Unauthorized") {
+                    Notiflix.Loading.remove();
                     SweetAlert.swal("Giriş", 'Kullanici adi veya şifre dogru degil.', "error");
 
                 } else if (response.data == "Locked") {
+                    Notiflix.Loading.remove();
                     SweetAlert.swal("Giriş", 'Kullanici kilitlendi 10 dk bekleyiniz.', "error");
                 } else {
-
-
 
                     if ($scope.user.DepolamaAlani.BirimFiyat.length == 0) {
 
@@ -162,8 +150,6 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
                         return;
                     }
 
-
-                    // AuthenticationService.SetCredentials($scope.user.username, $scope.user.password);
                     var enummerable = $linq.Enumerable().From(response.data.usergroup);
 
                     var loginuser = {
@@ -203,10 +189,14 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
                         'Authorization': 'Basic ' + $localStorage.user.authtoken
                     };
 
+                    setTimeout(function () {
+                        $modalInstance.close('ok');
+                    }, 1000);
 
-                    $modalInstance.close('ok');
+
                 }
             }, function (x) {
+                Notiflix.Loading.remove();
                 SweetAlert.swal("Giriş", 'Server Error ' + x.data.ExceptionMessage, "error");
             });
     };

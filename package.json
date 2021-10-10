@@ -4,9 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "rebuild": "electron-rebuild",
+    "start": "electron-rebuild && electron .",
     "tcp": "node serialport_to_tcp.js",
-    "build": "electron-packager . HYBS --platform win32  --out dist/ --overwrite=true",
+    "build": "electron-packager . HYBS --platform win32  --out dist/ --overwrite=true && electron-builder",
     "setup": "electron-builder"
   },
   "author": "Premierturk",
@@ -15,7 +16,8 @@
     "electron": "^15.1.0",
     "electron-builder": "^22.11.7",
     "electron-installer-windows": "^3.0.0",
-    "electron-packager": "^15.4.0"
+    "electron-packager": "^15.4.0",
+    "electron-rebuild": "^3.2.3"
   },
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
