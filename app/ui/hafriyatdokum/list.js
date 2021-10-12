@@ -6,7 +6,26 @@ const { base64encode, base64decode } = require('nodejs-base64');
 const { ipcRenderer: ipc } = require('electron');
 
 
+
+
+
+
+
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
+
+    $scope.online = true;
+    window.addEventListener('online', function () {
+        $scope.$apply(function () {
+            $scope.online = true;
+        });
+    });
+    window.addEventListener('offline', function () {
+        $scope.$apply(function () {
+            $scope.online = false;
+        });
+    });
+
+
 
     if (!angular.isDefined($localStorage.user)) {
         $rootScope.login();
@@ -140,6 +159,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     var birimfiyat = $localStorage.user.depolamaalani.BirimFiyat.find(function (item) {
         return item.IlId == $localStorage.user.ilid
     });
+
     if (!angular.isDefined(birimfiyat)) {
         Notiflix.Notify.warning('Birim fiyat tanımlaması yapınız.');
         return;
@@ -190,18 +210,22 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             if ($localStorage.user.depolamaalani.KantarVarMi == false) {
 
-
                 var aracBirimFiyat = $localStorage.user.depolamaalani.AracFiyat.find(function (item) {
                     return item.AracCinsiId == $scope.kabul.AracCinsiId
                 });
 
-
                 $scope.kabul.Net = parseInt(aracBirimFiyat.Fiyat / $scope.kabul.BirimFiyat);
                 $scope.kabul.Tonaj = $scope.kabul.Net + $scope.kabul.Dara;
                 $scope.kabul.Tutar = aracBirimFiyat.Fiyat;
-
             }
 
+            if ($scope.kabul.Response.TasinacakAtikMiktari) {
+                var indirim = $localStorage.user.depolamaalani.Indirim.find(function (item) {
+                    return $scope.kabul.Response.TasinacakAtikMiktari >= item.Mkup1 && $scope.kabul.Response.TasinacakAtikMiktari <= item.Mkup2
+                });
+                if (indirim)
+                    $scope.kabul.Tutar = $scope.kabul.Tutar - ($scope.kabul.Tutar * indirim.Yuzde / 100);
+            }
         },
         Temizle: function () {
             $scope.kabul.Response = {};
@@ -281,10 +305,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.uyari = "Plaka seçiniz!";
             return;
         }
-        if (Dara == 0) {
-            $scope.uyari = "Plaka seçiniz!";
-            return;
-        }
+
+        if (Tur != "SANAYİ ATIĞI")
+            if (Dara == 0) {
+                $scope.uyari = "Plaka seçiniz!";
+                return;
+            }
+
         if (Tonaj == 0) {
             $scope.uyari = "Kantar verisi bekleyiniz!";
             return;
@@ -295,11 +322,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             return;
         }
 
-        if (Tonaj <= Dara) {
-            $scope.uyari = "Dara tonajdan küçük olamaz!";
-            return;
-        }
-        //$scope.kabul.Temizle();
+        if (Tur != "SANAYİ ATIĞI")
+            if (Tonaj <= Dara) {
+                $scope.uyari = "Dara tonajdan küçük olamaz!";
+                return;
+            }
+
+
 
         var data = {
             AracId: AracId,
@@ -361,23 +390,10 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         kendoExt.Get("api/kantar/araclistesi?EtiketNo=" + EtiketNo, function (response) {
             var arac = response.data;
-
-            $scope.kabul.PlakaNo = arac.PlakaNo;
-            $scope.kabul.Dara = arac.Dara;
-            $scope.kabul.AracId = arac.AracId;
-            $scope.kabul.AracCinsi = arac.AracCinsi;
-            $scope.kabul.AracCinsiId = arac.AracCinsiId;
-
-            if ($scope.kabul.AracCinsiId == 30) {
-                $scope.kabul.BarkodNo = "EVSELATIK";
-                $scope.kabul.BelgeNo = "EVSELATIK";
-                $scope.kabul.Tur = "EVSELATIK";
-            }
-
-            $scope.kabul.Hesapla();
-
-            $scope.Kaydet();
-
+            if (arac == null)
+                Notiflix.Notify.warning('Tanımsız OGS ETiketi : ' + EtiketNo);
+            else
+                AracBulundu(arac);
         });
 
     }
@@ -414,28 +430,13 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                         return item.OGSEtiket == $scope.kabul.Ogs
                     });
 
+                    if (arac == null) {
+                        PlakaBul($scope.kabul.Ogs);
+                    } else
+                        AracBulundu(arac);
 
-                    if (arac == null) PlakaBul($scope.kabul.Ogs);
-
-                    $scope.kabul.PlakaNo = arac.PlakaNo;
-                    $scope.kabul.Dara = arac.Dara;
-                    $scope.kabul.AracId = arac.AracId;
-                    $scope.kabul.AracCinsi = arac.AracCinsi;
-                    $scope.kabul.AracCinsiId = arac.AracCinsiId;
-
-                    if ($scope.kabul.AracCinsiId == 30) {
-                        $scope.kabul.BarkodNo = "EVSELATIK";
-                        $scope.kabul.BelgeNo = "EVSELATIK";
-                        $scope.kabul.Tur = "EVSELATIK";
-                    }
-
-                    $scope.kabul.Hesapla();
-
-                    $scope.Kaydet();
                 } else {
-
                     PlakaBul($scope.kabul.Ogs);
-
                 }
 
             }
@@ -444,6 +445,27 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
 
     });
+
+
+    var AracBulundu = function (arac) {
+
+        $scope.kabul.PlakaNo = arac.PlakaNo;
+        $scope.kabul.Dara = arac.Dara;
+        $scope.kabul.AracId = arac.AracId;
+        $scope.kabul.AracCinsi = arac.AracCinsi;
+        $scope.kabul.AracCinsiId = arac.AracCinsiId;
+
+        if ($scope.kabul.AracCinsiId == 30) {
+            $scope.kabul.BarkodNo = "EVSELATIK";
+            $scope.kabul.BelgeNo = "EVSELATIK";
+            $scope.kabul.Tur = "EVSELATIK";
+        }
+
+        $scope.kabul.Hesapla();
+
+        $scope.Kaydet();
+
+    }
 
     var readBarkod = "";
     $('#mainDiv').bind('keydown', function (event) {
@@ -462,7 +484,19 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
         if (event.keyCode == 13) {
             console.log(readBarkod);
 
-            if (readBarkod.indexOf("KF-") > -1 && readBarkod.indexOf("-KF") > -1) {//KAMUFİŞ
+            if (readBarkod.indexOf("ş") > -1 && readBarkod.indexOf("-") > -1) {//BURSA SANAYİ ATIK
+
+
+                var belgeNo = readBarkod.split("ş")[0];
+                $scope.$apply(function () {
+                    $scope.kabul.Tur = "SANAYİ ATIĞI";
+                    $scope.kabul.BarkodNo = angular.copy(readBarkod);
+                    $scope.kabul.BelgeNo = angular.copy(belgeNo);
+                });
+
+                SanayiAtikBelgesi(belgeNo);
+
+            } else if (readBarkod.indexOf("KF-") > -1 && readBarkod.indexOf("-KF") > -1) {//KAMUFİŞ
 
                 var belgeNo = readBarkod.replace("KF-", "").replace("-KF", "");
                 $scope.$apply(function () {
@@ -492,17 +526,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
                 var belgeNo = readBarkod;
                 TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
-
-            } else if (readBarkod.indexOf(";") > -1) {//BURSA SANAYİ ATIK
-
-                // var belgeNo = readBarkod;
-                // $scope.$apply(function () {
-                //     $scope.kabul.Tur = "SANAYİ ATIĞI";
-                //     $scope.kabul.BarkodNo = angular.copy(belgeNo);
-                //     $scope.kabul.BelgeNo = angular.copy(belgeNo);
-                // });
-
-                //TasimaKabuBelgesi(belgeNo);
 
             }
 
@@ -712,6 +735,66 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     }
 
+    var SanayiAtikBelgesi = function (Barkod, BelgeNo) {
+
+        var data = {
+            BelgeNo: BelgeNo
+        };
+        kendoExt.post("api/kantar/SanayiAtikKontrol", data, function (response) {
+
+            var data = response.data;
+
+            if (data === null)
+                swal("Uyarı", "Hatalı belge no", "error");
+            else {
+
+                if (data.Aktif === false) {
+                    swal("Uyarı", "Belge aktif değil", "error");
+                    return;
+                }
+
+                $scope.kabul.Tur = "SANAYİ ATIĞI";
+                $scope.kabul.BarkodNo = angular.copy(Barkod);
+                $scope.kabul.BelgeNo = angular.copy(BelgeNo);
+                $scope.kabul.PlakaNo = data.PlakaNo;
+                $scope.kabul.AracId = 0;
+                $scope.kabul.Dara = 0;
+
+                $scope.kabul.Response = response.data;
+
+                //SAHA SEÇİMİ
+                if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
+                    var modalInstance = $modal.open({
+                        keyboard: true,
+                        animation: false,
+                        templateUrl: 'sahaModal',
+                        controller: 'sahaCtrl',
+                        size: 'lg',
+                        resolve: {
+                            SahaListesi: function () {
+                                return $localStorage.user.depolamaalani.Sahalar;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function (e) {
+                        $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
+                    });
+                }
+
+                $scope.Kaydet();
+
+
+
+            }
+
+
+
+        })
+
+
+    }
+
 
     var tempTonaj = [];
     var tempSpark = [];
@@ -766,14 +849,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             tempTonaj = [];
         }
-
-
-
-
-
-
-
-
 
 
     });
@@ -905,7 +980,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 footerTemplate: "#= kendo.toString(sum, 'C2') #",
                 //footerTemplate: "{{Total_Tutar | currency:'₺ ':3 }}"
             },
-
             {
                 field: "IslemYapan",
                 title: "İşlem Yapan",
@@ -935,7 +1009,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 //footerTemplate: "#= kendo.toString(sum, 'C2') #",
                 //footerTemplate: "{{Total_Tutar | currency:'₺ ':3 }}"
             },
-
         ];
 
     var aggregate = [{ field: "Tutar", aggregate: "sum" }, { field: "Tonaj", aggregate: "sum" }, { field: "min", aggregate: "average" }]
@@ -967,8 +1040,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     $scope.mainGridOptions = kendoExt.datasource("api/ParaYukleme/GetRapor?q=" + $base64.encode(query),
         $scope.col, null, null, onDataBinding, aggregate);
-
-
 
 
     function onDataBinding(e) {

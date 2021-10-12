@@ -47,16 +47,12 @@ function createWindow() {
     pathname: path.join(__dirname, 'app/index.html'),
     protocol: 'file:',
     slashes: true
-  }))
-
-
+  }));
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     app.allowRendererProcessReuse = false;
-  })
-
-
+  });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -64,8 +60,7 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
-  })
-
+  });
 
   var shortcut = new Shortcut('Ctrl+F12', function (e) {
 
@@ -80,14 +75,13 @@ function createWindow() {
     if (err) {
       return console.log('Error opening port: ', err.message)
     }
-  })
+  });
   port.on('open', function () {
     return console.log('SERIAL PORT OPEN :', port);
-  })
-
+  });
   port.on('data', function (data) {
 
-    console.log('SERIAL PORT DATA : ', ab2str(data));
+    //console.log('SERIAL PORT DATA : ', ab2str(data));
 
     var d = {
       Name: config.SerialPortToTcp.tcpName,
@@ -97,9 +91,11 @@ function createWindow() {
     //ipc.send(d);
     mainWindow.webContents.send("comport", JSON.stringify(d));
 
-  })
+  });
 
 
+  window.addEventListener('online', function () { alert("online") });
+  window.addEventListener('offline', function () { alert("offline") });
 
 }
 

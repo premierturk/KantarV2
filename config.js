@@ -3,7 +3,7 @@
 var config = {
     UsePrinter: false,
     TcpPort: 5555,//anten remote pc port
-    OgsEtiketStart: "1261",
+    OgsEtiketStart: "1001",//"1261",
     MinTonaj: 1000,
     WebApiUrl: "http://localhost:2023/HYS.WebApi/",
     //WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",

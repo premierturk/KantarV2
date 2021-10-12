@@ -50,8 +50,8 @@ angular.module('app')
                 "asideDock": false,
                 "container": false,
             },
-            options: config,
-        }
+            options: config        }
+
 
         $rootScope.app = $scope.app;
 

@@ -45,7 +45,7 @@ exports.start = function () {
 
     port.on('data', function (data) {
 
-        console.log('SERIAL PORT DATA : ', ab2str(data));
+        //console.log('SERIAL PORT DATA : ', ab2str(data));
 
         var d = {
             Name: config.SerialPortToTcp.tcpName,
