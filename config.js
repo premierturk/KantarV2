@@ -1,9 +1,14 @@
 'use strict';
 
+var OGS_SERI = [{ Il: "DİYARBAKIR", Seri: 1001 }, { Il: "BURSA", Seri: 1261 }];
+
 var config = {
+    GirisCikis: "Giriş",//Giriş|Çıkış
+    KantarVarMi: false,
     UsePrinter: false,
+    UseOffline: false,
     TcpPort: 5555,//anten remote pc port
-    OgsEtiketStart: "1001",//"1261",
+    OgsEtiketStart: OGS_SERI[1].Seri,
     MinTonaj: 1000,
     WebApiUrl: "http://localhost:2023/HYS.WebApi/",
     //WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
@@ -27,7 +32,7 @@ var config = {
     mongodb: {
         server: '10.100.8.58:27017',
         database: 'HYBS',
-    },
+    }
 };
 
 module.exports = config;

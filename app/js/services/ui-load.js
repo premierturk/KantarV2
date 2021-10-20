@@ -222,7 +222,7 @@ angular.module('ui.load', [])
                 //ignoreCase: false,
                 //filter: "gte",
                 excel: {
-                    filterable: true,
+                    filterable: false,
                     allPages: true,
                     fileName: "Export.xlsx"
                 },
@@ -230,18 +230,13 @@ angular.module('ui.load', [])
                     allPages: true
                 },
                 columnMenu: true,
-                filterable: {
-                    mode: "row",
-                    extra: false,
-                    operators: {
-                        string: {
-                            contains: "Contains"
-                        }
-                    }
-                },
+                filterable: false,
                 height: $(window).height() - 100,
                 change: onChange,
                 dataBound: function (e) {
+                    // for (var i = 0; i < this.columns.length; i++)
+                    //     this.autoFitColumn(i);
+
                     if (typeof onDataBound === "function")
                         onDataBound(e, this.table);
 

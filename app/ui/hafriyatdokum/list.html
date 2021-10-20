@@ -2,6 +2,8 @@
 app.settings.asideFolded = true; 
 app.settings.asideDock = true;
 app.settings.container = false;
+app.settings.hideFooter = true;
+app.hideFooter = true;
 app.hideAside = true">
 
     <div class="col item">
@@ -81,6 +83,8 @@ app.hideAside = true">
                     <span ng-if="online" class="label bg-success">Online</span>
 
                     <button class="btn btn-warning" type="button" ng-click="Restart()">Yeniden Başlat</button>
+                    <button class="btn btn-primary" type="button" ng-show="AntenDurumu == 'Anten Bağlandı'"
+                        ng-click="BariyerAc()">Bariyer Aç</button>
 
                 </div>
                 <div class="panel-body">
@@ -158,8 +162,12 @@ app.hideAside = true">
                             </progressbar>
 
                             <div class="col-md-4">
-                                <button class="btn btn-info" type="button" ng-disabled="OgsAktif || !kabul.BelgeNo"
+                                <button class="btn btn-info" type="button" ng-if="kabul.Tur!='NAKİT DÖKÜM'"
+                                    ng-disabled="OgsAktif || !kabul.BelgeNo" ng-click="PlakaSec()">PLAKA.NO</button>
+
+                                <button class="btn btn-info" type="button" ng-if="kabul.Tur=='NAKİT DÖKÜM'"
                                     ng-click="PlakaSec()">PLAKA.NO</button>
+
                             </div>
                             <div class="col-md-8">
                                 <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"

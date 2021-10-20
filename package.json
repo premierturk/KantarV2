@@ -4,17 +4,16 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "rebuild": "electron-rebuild",
-    "start": "electron-rebuild && electron .",
-    "tcp": "node serialport_to_tcp.js",
-    "build": "electron-packager . HYBS --platform win32  --out dist/ --overwrite=true && electron-builder",
-    "setup": "electron-builder"
+    "rebuild": "electron-rebuild -f -w kantarv2",
+    "start": "npm rebuild && electron-rebuild -f -w kantarv2 && electron .",
+    "build": "npm rebuild  &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true && electron-builder",
+    "serialport": "electron-rebuild -f -w serialport"
   },
   "author": "Premierturk",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^15.1.0",
-    "electron-builder": "^22.11.7",
+    "electron": "^13.1.6",
+    "electron-builder": "^22.13.1",
     "electron-installer-windows": "^3.0.0",
     "electron-packager": "^15.4.0",
     "electron-rebuild": "^3.2.3"
@@ -31,6 +30,6 @@
     "node-signalr": "^2.0.6",
     "nodejs-base64": "^1.0.3",
     "notiflix": "^3.1.0",
-    "serialport": "^9.2.4"
+    "serialport": "^9.0.2"
   }
 }

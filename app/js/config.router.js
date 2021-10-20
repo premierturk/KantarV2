@@ -37,9 +37,9 @@ angular.module('app')
                             '': {
                                 templateUrl: 'ui/hafriyatdokum/list.html'
                             },
-                            'footer': {
-                                templateUrl: 'tpl/layout_footer_fullwidth.html'
-                            }
+                            // 'footer': {
+                            //     templateUrl: 'tpl/layout_footer_fullwidth.html'
+                            // }
                         },
                         resolve: {
                             deps: ['$ocLazyLoad',
