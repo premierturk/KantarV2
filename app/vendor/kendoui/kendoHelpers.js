@@ -444,7 +444,60 @@ kendoHelpers = {
 			kendoGrid.options.pdf = pdf;
 
 			kendoGrid.saveAsPDF();
+		},
+		filter: function (kendoGrid, field, operator, value) {
+
+
+
+		
+		
+			//var filter = kendoGrid.dataSource.filter();
+
+			//if (filter === undefined)
+			//	filter = { filters:[]};
+
+			//filter.filters.push({
+			//	field: field,
+			//	operator: "eq",
+			//	value: value,
+			//	FilterName: field
+			//});
+			//kendoGrid.dataSource.filter(filters);
+
+
+
+
+			var newFilter = { field: field, operator: operator, value: value };
+			var dataSource = kendoGrid.dataSource;
+			var filters = null;
+			if (dataSource.filter() !== null) {
+				filters = dataSource.filter().filters;
+			}
+			if (filters === null) {
+				filters = [newFilter];
+			}
+			else {
+				var isNew = true;
+				var index = 0;
+				for (index = 0; index < filters.length; index++) {
+					if (filters[index].field === field) {
+						isNew = false;
+						break;
+					}
+				}
+				if (isNew) {
+					filters.push(newFilter);
+				}
+				else {
+					filters[index] = newFilter;
+				}
+			}
+			dataSource.filter(filters);
+
 		}
+
+
+
 	},
 	tabstrip: {
 		displayLoading: function (tabstrip) {
