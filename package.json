@@ -1,22 +1,22 @@
 {
   "name": "kantarv2",
+  "productName": "hybs kantar app",
   "version": "0.0.1",
-  "description": "",
+  "description": "hybs kantar app",
   "main": "main.js",
-  "scripts": {
-    "rebuild": "electron-rebuild -f -w kantarv2",
-    "start": "npm rebuild && electron-rebuild -f -w Kantarv2 && electron .",
-    "build": "npm rebuild  && electron-rebuild -f -w Kantarv2 &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
-    "win": "npm rebuild  && electron-rebuild -f -w Kantarv2 && electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName='Electron Tutorial App'"
-  },
   "author": "Premierturk",
   "license": "CC0-1.0",
+  "scripts": {
+    "rebuild": "electron-rebuild --force -m ./",
+    "start": "npm rebuild && electron-rebuild -f -w Kantarv2 && electron .",
+    "build": "npm rebuild  && electron-rebuild -f -w Kantarv2 &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
+    "setup": "electron-installer-windows --src dist/HYBS-win32-ia32/ --dest dist/installers/"
+  },
   "devDependencies": {
-    "electron": "^13.1.6",
+    "electron": "^15.3.0",
     "electron-builder": "^22.13.1",
-    "electron-installer-windows": "^3.0.0",
     "electron-packager": "^15.4.0",
-    "electron-rebuild": "^3.2.3"
+    "electron-rebuild": "^3.2.4"
   },
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
@@ -30,6 +30,6 @@
     "node-signalr": "^2.0.6",
     "nodejs-base64": "^1.0.3",
     "notiflix": "^3.1.0",
-    "serialport": "^9.0.2"
+    "serialport": "^9.2.5"
   }
 }
