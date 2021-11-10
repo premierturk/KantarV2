@@ -71,10 +71,19 @@ function createWindow() {
   });
 
 
-
-
   //SERIALPORT-------
   if (config.KantarVarMi) {
+
+    var KantarVeri = function (data) {
+
+      console.log("KANTAR TONAJ : " + data)
+
+      //BURSA
+      //var myArray = data.split(" ");
+      //var tonaj = myArray[1]
+      return data;
+    }
+
     const port = new serialport(config.SerialPort.portName, config.SerialPort);
     const parser = port.pipe(new Readline({ delimiter: '\n' }))
     port.open(function (err) {
@@ -87,15 +96,12 @@ function createWindow() {
     });
     port.on('data', function (data) {
 
-      console.log('SERIAL PORT DATA : ', ab2str(data));
+      var tonaj = KantarVeri(ab2str(data));
 
-      var d = {
-        Name: config.SerialPortToTcp.tcpName,
-        Data: ab2str(data)
-      };
+      console.log('SERIAL PORT DATA : ', tonaj);
 
       //ipc.send(d);
-      mainWindow.webContents.send("comport", JSON.stringify(d));
+      mainWindow.webContents.send("comport", tonaj);
 
     });
   }

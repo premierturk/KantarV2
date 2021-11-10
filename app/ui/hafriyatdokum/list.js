@@ -32,11 +32,10 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     $scope.OgsAktif = $localStorage.user.depolamaalani.OgsAktif;
 
-    var mySerialPort = function name(run) {
+    var mySerialPort = function (run) {
 
         ipc.on("comport", (event, data) => {
-            var d = JSON.parse(data);
-            run(d.Data);
+            run(data);
         });
 
     };
@@ -962,9 +961,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                     data: tempSpark
                 });
             });
-
-
-
 
 
             $scope.tempGelenTonaj = number;

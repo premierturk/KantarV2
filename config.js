@@ -26,15 +26,10 @@ var config = {
         stopBits: 1,
         parity: 'none'
     },
-    SerialPortToTcp: {//serial porttan veriyi alıp tcp den yayınlamak için kullanılıyor
-        tcpName: "KANTAR 1",
-        host: '192.168.1.131',//localhost
-        port: 6632
-    },
-    mongodb: {
-        server: '10.100.8.58:27017',
-        database: 'HYBS',
-    }
+    // mongodb: {
+    //     server: '10.100.8.58:27017',
+    //     database: 'HYBS',
+    // }
 };
 
 module.exports = config;
