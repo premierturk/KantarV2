@@ -299,7 +299,6 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     $scope.BariyerAc = function () {
 
         console.log("BariyerAc...");
-
         if (client_anten)
             client_anten.write("0100000111040D12CA\r");
         else
@@ -407,31 +406,35 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             console.log("SAVING..." + JSON.stringify(data));
 
-            kendoExt.post("api/kantar/hafriyatkabul/SanayiAtikOnayla", data, function (response) {
+            if (Tur == "SANAYİ ATIĞI") {
 
-                console.log("SAVING SUCCESS");
-                $scope.kabul.Temizle();
+                kendoExt.post("api/kantar/hafriyatkabul/SanayiAtikOnayla", data, function (response) {
 
-                if (client_anten)
-                    client_anten.write("0100000111040D12CA\r");
+                    console.log("SAVING SUCCESS");
+                    $scope.kabul.Temizle();
 
-                Notiflix.Notify.success('Kaydedildi.');
+                    if (client_anten)
+                        client_anten.write("0100000111040D12CA\r");
 
-                $scope.Filter();
+                    Notiflix.Notify.success('Kaydedildi.');
 
-                if ($rootScope.app.options.UsePrinter)
-                    ipc.send('onprint', response.data);
+                    $scope.Filter();
+
+                    if ($rootScope.app.options.UsePrinter)
+                        ipc.send('onprint', response.data);
 
 
-            }, function (err) {
+                }, function (err) {
 
-                console.log("SAVING failure :");
-                Notiflix.Notify.failure(err.data);
-                $scope.kabul.Temizle();
-                $scope.kabul.BelgeNo = "";
-                $scope.kabul.BarkodNo = "";
+                    console.log("SAVING failure :");
+                    Notiflix.Notify.failure(err.data);
+                    $scope.kabul.Temizle();
+                    $scope.kabul.BelgeNo = "";
+                    $scope.kabul.BarkodNo = "";
 
-            });
+                });
+
+            }
 
         }
     }
@@ -520,9 +523,19 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             $scope.kabul.Tur = "EVSELATIK";
         }
 
-        $scope.kabul.Hesapla();
+        var GirisCikis = $rootScope.app.options.GirisCikis;
 
-        $scope.Kaydet();
+        if (GirisCikis == "Çıkış") {
+            if (client_anten)
+                client_anten.write("0100000111040D12CA\r");
+
+            return;
+        }
+
+        if (GirisCikis == "Giris") {
+            $scope.kabul.Hesapla();
+            $scope.Kaydet();
+        }
 
     }
 
@@ -922,15 +935,9 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 }
 
                 $scope.Kaydet();
-
-
-
             }
 
-
-
         })
-
 
     };
 

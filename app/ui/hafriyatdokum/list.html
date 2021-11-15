@@ -77,15 +77,12 @@ app.hideAside = true">
             <div class="panel">
                 <div class="panel-heading m-n">
                     <!-- <h4 class="m-n font-thin h3">Hafriyat Kabul</h4> -->
-
-
                     <span ng-if="!online" class="label bg-danger">Offline</span>
                     <span ng-if="online" class="label bg-success">Online</span>
 
                     <button class="btn btn-warning" type="button" ng-click="Restart()">Yeniden Başlat</button>
                     <button class="btn btn-primary" type="button" ng-show="AntenDurumu == 'Anten Bağlandı'"
                         ng-click="BariyerAc()">Bariyer Aç</button>
-
                 </div>
                 <div class="panel-body">
 
