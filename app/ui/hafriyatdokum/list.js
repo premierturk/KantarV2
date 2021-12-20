@@ -3,7 +3,11 @@ const electron = require('electron');
 const net = require('net');
 const _ = require('lodash');
 const { base64encode, base64decode } = require('nodejs-base64');
+const ab2str = require('arraybuffer-to-string');
 const { ipcRenderer: ipc } = require('electron');
+// const { config } = require('process');
+
+
 
 
 app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, $linq, $timeout, $localStorage, $base64, $modal) {
@@ -34,8 +38,62 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
     var mySerialPort = function (run) {
 
+        var temp = [];
         ipc.on("comport", (event, data) => {
-            run(data);
+
+            //console.log(data);
+
+            var d = ab2str(data);
+            //console.log(d);
+
+
+            if ($rootScope.app.options.GirisCikis == "Çıkış") {
+
+
+                d = d.replaceAll(" ", "");
+                d = d.replace("\r", "");
+                d = d.replace("A", "");
+                d = d.replace("B", "");
+                d = d.replace("C", "");
+                d = d.replace("D", "");
+
+                if (d != "") {
+                    var tonaj = parseInt(d);
+
+                    run(tonaj);
+                }
+
+
+            }
+            else {
+
+                if ((data[0] == 2 && data[1] == 41) || (data[0] == 2 && data[1] == 33))
+                    temp = [];
+
+
+                for (let i = 0; i < data.length; i++)
+                    temp.push(data[i]);
+
+
+
+                //console.log("temp :" + temp);
+
+                if (((temp[0] == 2 && temp[1] == 41) || (temp[0] == 2 && temp[1] == 33)) && temp[temp.length - 1] == 13) {
+                    d = ab2str(temp);
+                    //console.log("SONC :" + d);
+                    var ddd = d.split(" ");
+                    if (ddd.length == 3) {
+                        var x = ddd[1];
+                        run(parseInt(x));
+                    }
+                }
+
+
+            }
+
+
+
+
         });
 
     };
@@ -264,6 +322,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
             //$scope.kabul.BirimFiyat = 0
             $scope.kabul.IlDisiBirimFiyat = 0;
             $scope.kabul.SahaId = null;
+            $scope.kabul.Tonaj = 0;
         },
         UserId: $localStorage.user.userid,
         DepolamaAlaniId: $localStorage.user.depolamaalani.DepolamaAlanId,
@@ -465,7 +524,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
         $scope.$apply(function () {
 
-            if (data.toString().substring(0, 4) != $rootScope.app.options.OgsEtiketStart) return;
+            if (data.toString().substring(0, 3) != $rootScope.app.options.OgsEtiketStart) return;
 
 
             var number = parseInt(data);
@@ -948,11 +1007,16 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
     if ($localStorage.user.depolamaalani.KantarVarMi)
         mySerialPort(function (data) {
 
+            //console.log("KANTAR TONAJ : " + data)
+
+            //BURSA
+            //var myArray = data.split(" ");
+            //var tonaj = myArray[1]
 
             //TODO : KANTARDAN GELEN VERİ SETİNE GÖRE AYARLAMALAR YAPILACAK
             if (!data) return;
             if (data == "") return;
-            var number = parseInt(data.replace(" ", ""));
+            var number = data;;
             if (isNaN(number)) return;
             if (number < $rootScope.app.options.MinTonaj) return;
             // console.log(number);
@@ -960,7 +1024,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
 
             tempSpark.push(number);
-            if (tempSpark.length >= 100) {
+            if (tempSpark.length >= 20) {
                 tempSpark.splice(0, 1);
             }
             $rootScope.$apply(function () {
@@ -972,9 +1036,9 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
             $scope.tempGelenTonaj = number;
             tempTonaj.push(number);
-            $scope.i = tempTonaj.length * 2;
+            $scope.i = tempTonaj.length * 5;
 
-            if (tempTonaj.length >= 50) {
+            if (tempTonaj.length >= 20) {
 
                 $scope.kabul.Tonaj = 0;
 
@@ -988,6 +1052,8 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
                 $scope.$apply(function () {
                     $scope.kabul.Tonaj = gelenTonaj.Tonaj;
 
+                    console.log($scope.kabul.Tonaj);
+
                     $scope.kabul.Hesapla();
 
                     $scope.Kaydet();
@@ -996,6 +1062,7 @@ app.controller('hafriyatdokumlistCtrl', function ($scope, $rootScope, kendoExt, 
 
 
                 tempTonaj = [];
+                tempSpark = [];
             }
 
 

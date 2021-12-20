@@ -12,6 +12,7 @@ const config = require("./config");
 
 const serialport = require('serialport');
 const Readline = require('@serialport/parser-readline');
+const { isNumber, parseInt } = require('lodash');
 
 const app = electron.app
 app.allowRendererProcessReuse = false;
@@ -74,18 +75,11 @@ function createWindow() {
   //SERIALPORT-------
   if (config.KantarVarMi) {
 
-    var KantarVeri = function (data) {
-
-      console.log("KANTAR TONAJ : " + data)
-
-      //BURSA
-      //var myArray = data.split(" ");
-      //var tonaj = myArray[1]
-      return data;
-    }
-
     const port = new serialport(config.SerialPort.portName, config.SerialPort);
-    const parser = port.pipe(new Readline({ delimiter: '\n' }))
+
+
+
+    //const parser = port.pipe(new Readline({ delimiter: '\n' }))
     port.open(function (err) {
       if (err) {
         return console.log('Error opening port: ', err.message)
@@ -94,21 +88,38 @@ function createWindow() {
     port.on('open', function () {
       return console.log('SERIAL PORT OPEN :', port);
     });
+
     port.on('data', function (data) {
-
-      var tonaj = KantarVeri(ab2str(data));
-
-      console.log('SERIAL PORT DATA : ', tonaj);
-
-      //ipc.send(d);
-      mainWindow.webContents.send("comport", tonaj);
-
+      mainWindow.webContents.send("comport", data);
     });
   }
 
 
 }
 
+
+var int_try_parse = function (val, default_val, radix) {
+  try {
+    radix = radix || 10;
+    default_val = default_val || 0;
+
+    //validate this object is not null
+    if (val != null) {
+      //convert to string
+      var that = JSON.stringify(val);
+      if (that.length > 0) {
+        //check to see the string is not NaN, if not parse
+        if (!isNaN(that))
+          return parseInt(that, radix);
+      }
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+  //this is not a number
+  return default_val;
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
