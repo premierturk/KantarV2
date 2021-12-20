@@ -8,8 +8,8 @@
   "license": "CC0-1.0",
   "scripts": {
     "rebuild": "electron-rebuild --force -m ./",
-    "start": "npm rebuild && electron-rebuild -f -w Kantarv2 && electron .",
-    "build": "npm rebuild  && electron-rebuild -f -w Kantarv2 &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
+    "start": "npm rebuild && electron-rebuild -f -w HYBS && electron .",
+    "build": "npm rebuild  && electron-rebuild -f -w HYBS &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
     "setup": "electron-installer-windows --src dist/HYBS-win32-ia32/ --dest dist/installers/"
   },
   "devDependencies": {
