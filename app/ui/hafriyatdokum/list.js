@@ -393,6 +393,9 @@ app.controller(
         $scope.kabul.IlDisiBirimFiyat = 0;
         $scope.kabul.SahaId = null;
         $scope.kabul.Tonaj = 0;
+        tempEtiketNo = [];
+        tempTonaj = [];
+        tempSpark = [];
       },
       UserId: $localStorage.user.userid,
       DepolamaAlaniId: $localStorage.user.depolamaalani.DepolamaAlanId,
@@ -509,7 +512,8 @@ app.controller(
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
 
-            if (client_anten) client_anten.write("0100000111040D12CA\r");
+            //if (client_anten) client_anten.write("0100000111040D12CA\r");
+            $scope.BariyerAc();
 
             Notiflix.Notify.success("Kaydedildi.");
             $scope.Filter();
@@ -535,9 +539,9 @@ app.controller(
             function (response) {
               console.log("SAVING SUCCESS");
               $scope.kabul.Temizle();
-
-              if (client_anten) client_anten.write("0100000111040D12CA\r");
-
+              
+              //if (client_anten) client_anten.write("0100000111040D12CA\r");
+              $scope.BariyerAc();
               Notiflix.Notify.success("Kaydedildi.");
 
               $scope.Filter();
