@@ -453,6 +453,9 @@ app.controller(
 
       if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null)
         return;
+
+      $scope.uyari = "";
+
       if (BelgeNo == "") {
         $scope.uyari = "Belge no okutunuz/giriniz!";
         return;
@@ -1382,7 +1385,7 @@ app.controller(
       autoBind: false,
       dataSource: kendoExt.getDs(
         "api/DepolamaAlani/Saha?DepolamaAlaniId=" +
-          $localStorage.user.depolamaalani.DepolamaAlanId
+        $localStorage.user.depolamaalani.DepolamaAlanId
       ),
     };
 

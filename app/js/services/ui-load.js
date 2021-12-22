@@ -432,7 +432,7 @@ angular.module('ui.load', [])
             if (history == null)
                 return;
 
-            Notiflix.Loading.standard();
+            // Notiflix.Loading.standard();
 
             $http({
                 method: "POST",
@@ -441,7 +441,7 @@ angular.module('ui.load', [])
             }).then(
                 function (response) {
                     successSessionHistory(history);
-                    Notiflix.Loading.remove();
+                    //Notiflix.Loading.remove();
 
                     $timeout(function () {
                         success(response);
@@ -449,7 +449,7 @@ angular.module('ui.load', [])
 
                 },
                 function (errorPl) {
-                    Notiflix.Loading.remove();
+                    //Notiflix.Loading.remove();
                     errorSessionHistory(history);
                     $log.info(errorPl);
 

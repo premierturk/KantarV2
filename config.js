@@ -24,7 +24,7 @@ var config = {
   },
   SerialPort: {
     //serial porttan veri okumak için gerekli parametreler
-    portName: "COM4",
+    portName: "COM1",
     autoOpen: false,
     baudRate: 9600,
     // dataBits: 8,

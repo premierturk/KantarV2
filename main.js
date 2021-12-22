@@ -94,6 +94,7 @@ function createWindow() {
     });
   }
 
+  //electron.setZoomFactor(5)
 
 }
 
