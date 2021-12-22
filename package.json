@@ -1,16 +1,16 @@
 {
   "name": "kantarv2",
   "productName": "hybs kantar app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "hybs kantar app",
   "main": "main.js",
   "author": "Premierturk",
   "license": "CC0-1.0",
   "scripts": {
     "rebuild": "electron-rebuild --force -m ./",
-    "start": "npm rebuild && electron-rebuild -f -w HYBS && electron .",
-    "build": "npm rebuild  && electron-rebuild -f -w HYBS &&  electron-packager . HYBS --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
-    "setup": "electron-installer-windows --src dist/HYBS-win32-ia32/ --dest dist/installers/"
+    "start": "npm rebuild && electron-rebuild -f -w kantarv2 && electron .",
+    "build": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
+    "setup": "npm run build && electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/"
   },
   "devDependencies": {
     "electron": "^15.3.0",
