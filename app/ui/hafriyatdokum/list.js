@@ -542,7 +542,7 @@ app.controller(
             function (response) {
               console.log("SAVING SUCCESS");
               $scope.kabul.Temizle();
-              
+
               //if (client_anten) client_anten.write("0100000111040D12CA\r");
               $scope.BariyerAc();
               Notiflix.Notify.success("Kaydedildi.");
@@ -712,7 +712,7 @@ app.controller(
         readBarkod = readBarkod + key;
 
       if (event.keyCode == 13) {
-        readBarkod = readBarkod.replace("Control", "");
+        readBarkod = readBarkod.replace("Control", "").replace("QR", "");
 
         console.log(readBarkod);
 
@@ -1121,7 +1121,7 @@ app.controller(
         field: "Tur",
         title: "Tür",
         attributes: { style: "white-space:nowrap" },
-        width: "90px",
+        width: "100px",
         filterable: {
           cell: {
             operator: "contains",
@@ -1145,13 +1145,13 @@ app.controller(
         title: "İşlem Tarihi",
         type: "date",
         format: "{0:dd.MM.yyyy HH:mm:ss}",
-        width: "140px",
+        width: "150px",
       },
       {
         field: "BelgeNo",
         title: "BelgeNo",
         attributes: { style: "white-space:nowrap" },
-        width: "100px",
+        width: "120px",
         filterable: {
           cell: {
             operator: "contains",
@@ -1389,7 +1389,7 @@ app.controller(
       autoBind: false,
       dataSource: kendoExt.getDs(
         "api/DepolamaAlani/Saha?DepolamaAlaniId=" +
-        $localStorage.user.depolamaalani.DepolamaAlanId
+          $localStorage.user.depolamaalani.DepolamaAlanId
       ),
     };
 
@@ -1414,7 +1414,7 @@ app.controller(
       var gridElement = $("#grid");
 
       if (gridElement.data("kendoGrid")) {
-        gridElement.height($(window).height() - 240 + "px");
+        gridElement.height($(window).height() - 250 + "px");
         gridElement.data("kendoGrid").resize();
       }
     }
