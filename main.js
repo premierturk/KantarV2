@@ -78,6 +78,8 @@ function createWindow() {
     mainWindow = null;
   });
 
+ 
+
   var shortcut = new Shortcut("Ctrl+F12", function (e) {
     console.log("openDevTools");
     // Open the DevTools.

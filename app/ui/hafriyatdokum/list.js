@@ -30,6 +30,12 @@ app.controller(
         $scope.online = false;
       });
     });
+    $(window).blur(function () {
+      Notiflix.Loading.standard("UYGUMA AKTİF DEĞİL");
+    });
+    $(window).focus(function () {
+      Notiflix.Loading.remove(100);
+    });
 
     if (!angular.isDefined($localStorage.user)) {
       $rootScope.login();
@@ -625,6 +631,8 @@ app.controller(
           } else {
             PlakaBul($scope.kabul.Ogs);
           }
+
+          $scope.kabul.AracId = null;
         }
       });
     });
@@ -1063,9 +1071,10 @@ app.controller(
         // console.log(number);
 
         tempSpark.push(number);
-        if (tempSpark.length >= 20) {
+        if (tempSpark.length >= 100) {
           tempSpark.splice(0, 1);
         }
+
         $rootScope.$apply(function () {
           $scope.weather = new kendo.data.DataSource({
             data: tempSpark,
@@ -1074,9 +1083,9 @@ app.controller(
 
         $scope.tempGelenTonaj = number;
         tempTonaj.push(number);
-        $scope.i = tempTonaj.length * 5;
+        $scope.i = tempTonaj.length;
 
-        if (tempTonaj.length >= 20) {
+        if (tempTonaj.length >= 100) {
           $scope.kabul.Tonaj = 0;
 
           var gelenTonaj = $linq
@@ -1116,24 +1125,97 @@ app.controller(
     $scope.Total_Tonaj = 0;
     $scope.Total_Arac = 0;
 
-    $scope.col = [
+    var col = [
+      {
+        width: "100px",
+        command: [
+          {
+            field: "Tur",
+            text: "Tahakkuk",
+            visible: function (dataItem) {
+              return dataItem.OwnerId == 999 && dataItem.Dara > 0;
+            },
+            click: function (e) {
+              e.preventDefault();
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+              var data = {
+                AracId: null,
+                FirmaId: null,
+                Dara: null,
+                SahaId: null,
+                UserId: null,
+                BelgeNo: dataItem.BelgeNo,
+                BarkodNo: dataItem.BarkodNo,
+                DepolamaAlanId: null,
+                Tonaj: 0,
+                Tarih: new Date(),
+                GirisCikis: $rootScope.app.options.GirisCikis,
+              };
+
+              kendoExt.post(
+                "api/kantar/hafriyatkabul/SanayiAtikOnaylaReplay",
+                data,
+                function (response) {
+                  console.log("SAVING SUCCESS");
+
+                  Notiflix.Notify.success("Kaydedildi.");
+
+                  $scope.Filter();
+                },
+                function (err) {
+                  console.log("SAVING failure :");
+                  Notiflix.Notify.failure(err.data);
+                  $scope.kabul.Temizle();
+                  $scope.kabul.BelgeNo = "";
+                  $scope.kabul.BarkodNo = "";
+                }
+              );
+            },
+            title: " ",
+            width: "40px",
+          },
+          {
+            field: "Tur",
+            text: "SORUN",
+            className: "k-error-colored",
+            visible: function (dataItem) {
+              var r =
+                dataItem.OwnerId == 998 &&
+                dataItem.Tutar <= 0 &&
+                dataItem.Dara > 0;
+              return r;
+            },
+            click: function (e) {
+              e.preventDefault();
+
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+              kendo.alert(dataItem.Aciklama);
+            },
+          },
+        ],
+      },
       {
         field: "Tur",
         title: "Tür",
         attributes: { style: "white-space:nowrap" },
-        width: "100px",
+        width: "150px",
         filterable: {
           cell: {
-            operator: "contains",
             template: function (args) {
-              args.element
-                .css("width", "90%")
-                .addClass("k-textbox")
-                .keydown(function (e) {
-                  setTimeout(function () {
-                    $(e.target).trigger("change");
-                  });
-                });
+              args.element.kendoDropDownList({
+                dataSource: [
+                  "Özel Döküm",
+                  "Döküm Fişi",
+                  "Kamu Fiş",
+                  "Nakit Döküm",
+                  "Nakit Döküm",
+                  "Sanayi Atığı",
+                  "Evsel Atık",
+                ],
+                valuePrimitive: true,
+              });
             },
             showOperators: false,
           },
@@ -1301,9 +1383,9 @@ app.controller(
 
       var ops = kendoExt.datasource(
         "api/ParaYukleme/GetRapor?q=" + $base64.encode(query),
-        $scope.col,
+        col,
         null,
-        null,
+        onBound,
         onDataBinding,
         aggregate
       );
@@ -1329,7 +1411,7 @@ app.controller(
 
     $scope.mainGridOptions = kendoExt.datasource(
       "api/ParaYukleme/GetRapor?q=" + $base64.encode(query),
-      $scope.col,
+      col,
       null,
       onBound,
       onDataBinding,
@@ -1339,11 +1421,16 @@ app.controller(
     function onBound(e) {
       var grid = e.sender;
       var rows = grid.items();
+
       $(rows).each(function (e) {
         var row = $(this);
         var dataItem = grid.dataItem(row);
 
-        if (dataItem.OwnerId == 999) row.addClass("bg-yellow-gradient");
+        if (dataItem.OwnerId == 999 && dataItem.Dara > 0) {
+          row.addClass("bg-red-gradient");
+        } else if (dataItem.OwnerId == 999) {
+          row.addClass("bg-yellow-gradient");
+        }
       });
     }
 

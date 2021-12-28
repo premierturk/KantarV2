@@ -6,11 +6,11 @@ app.settings.hideFooter = true;
 app.hideFooter = true;
 app.hideAside = true">
 
-    <div class="col item">
+    <div class="col item ">
         <div class="wrapper-xs">
             <div class="panel panel-danger m-b-xxs">
-                <div class="panel-body">
-                    <div class="form-group">
+                <div class="panel-body wrapper-xs">
+                    <div class="row">
                         <div class="col-md-8">
                             <div class="row m-b">
                                 <div class="col-sm-12">
@@ -58,11 +58,11 @@ app.hideAside = true">
                         </div>
 
                     </div>
-                    <div class="row">
-                        <div kendo-sparkline
+                    <!-- <div class="row">                     
+                            <div kendo-sparkline
                             k-series="[{ type: 'area',field: 'TMax',color: '#ff0000', negativeColor: '#0099ff'}]"
-                            k-tooltip="{ visible: true }" k-data-source="weather" style="height: 50px;"></div>
-                    </div>
+                            k-tooltip="{ visible: true }" k-data-source="weather" style="height: 50px;"></div>                                             
+                    </div> -->
 
                 </div>
             </div>
@@ -76,17 +76,15 @@ app.hideAside = true">
 
             <div class="panel">
                 <div class="panel-heading m-n">
-                    <!-- <h4 class="m-n font-thin h3">Hafriyat Kabul</h4> -->
                     <span ng-if="!online" class="label bg-danger">Offline</span>
                     <span ng-if="online" class="label bg-success">Online</span>
-
                     <button class="btn btn-warning" type="button" ng-click="Restart()">Yeniden Başlat</button>
                     <button class="btn btn-primary" type="button" ng-show="AntenDurumu == 'Anten Bağlandı'"
                         ng-click="BariyerAc()">Bariyer Aç</button>
                 </div>
-                <div class="panel-body">
+                <div class="panel-body wrapper-xs">
 
-                    <div class="bg-red-gradient wrapper-md m-l-n m-r-n m-b r r-2x" ng-show="uyari">
+                    <div class="bg-red-gradient wrapper-xs m-l-n m-r-n m-b r r-2x" ng-show="uyari">
                         <i class="glyphicon glyphicon-info-sign"></i> {{uyari}}
                     </div>
 
@@ -154,7 +152,7 @@ app.hideAside = true">
                         </div>
 
                         <div class="form-group">
-                            <small class="text-muted">{{AntenDurumu}}</small>
+                            <small class="text-muted m-l-md">{{AntenDurumu}}</small>
                             <progressbar animate="true" value="iOgs" type="succes" class="progress-xs">
                             </progressbar>
 
