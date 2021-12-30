@@ -14,6 +14,8 @@ const serialport = require("serialport");
 const Readline = require("@serialport/parser-readline");
 const { isNumber, parseInt } = require("lodash");
 
+const { killPortProcess } = require("kill-port-process");
+
 const app = electron.app;
 app.allowRendererProcessReuse = false;
 const BrowserWindow = electron.BrowserWindow;
@@ -78,8 +80,6 @@ function createWindow() {
     mainWindow = null;
   });
 
- 
-
   var shortcut = new Shortcut("Ctrl+F12", function (e) {
     console.log("openDevTools");
     // Open the DevTools.
@@ -129,15 +129,15 @@ var int_try_parse = function (val, default_val, radix) {
   return default_val;
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on("ready", createWindow);
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+
+  killPortProcess(config.TcpPort).then(console.log).catch(console.log);
+
   app.quit();
 });
 

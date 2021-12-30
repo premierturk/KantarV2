@@ -10,7 +10,7 @@
     "rebuild": "electron-rebuild --force -m ./",
     "start": "npm rebuild && electron-rebuild -f -w kantarv2 && electron .",
     "build": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
-    "setup": "npm run build && electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/"
+    "setup": "electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/"
   },
   "devDependencies": {
     "electron": "^15.3.0",
@@ -21,9 +21,10 @@
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
     "data-table": "^2.0.0",
-    "electron-pdf-window": "^1.0.12",
+    "electron-pdf-window": "^1.0.0",
     "electron-reload": "^1.5.0",
     "electron-shortcut": "^0.5.0",
+    "kill-port-process": "^3.0.1",
     "lodash": "^4.17.21",
     "node-abi": "^3.2.0",
     "node-run-cmd": "^1.0.1",
@@ -31,5 +32,11 @@
     "nodejs-base64": "^1.0.3",
     "notiflix": "^3.1.0",
     "serialport": "^9.2.5"
-  }
+  },
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "http://<Your server IP>:5080/"
+    }
+  ]
 }

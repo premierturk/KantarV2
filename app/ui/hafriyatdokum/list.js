@@ -442,7 +442,10 @@ app.controller(
       else Notiflix.Notify.failure("Anten bağlı değil");
     };
 
+    var isSend = true;
     $scope.Kaydet = function () {
+      if (!isSend) return;
+
       console.log("Kaydet start...");
 
       if (!angular.isDefined($localStorage.user)) {
@@ -518,8 +521,15 @@ app.controller(
           "api/kantar/hafriyatkabul/KabulBelgesi",
           data,
           function (response) {
+            isSend = false;
+
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
+
+            setTimeout(function () {
+              $scope.kabul.Temizle();
+              isSend = true;
+            }, 1000);
 
             //if (client_anten) client_anten.write("0100000111040D12CA\r");
             $scope.BariyerAc();
@@ -546,8 +556,15 @@ app.controller(
             "api/kantar/hafriyatkabul/SanayiAtikOnayla",
             data,
             function (response) {
+              isSend = false;
+
               console.log("SAVING SUCCESS");
               $scope.kabul.Temizle();
+
+              setTimeout(function () {
+                $scope.kabul.Temizle();
+                isSend = true;
+              }, 1000);
 
               //if (client_anten) client_anten.write("0100000111040D12CA\r");
               $scope.BariyerAc();
@@ -632,7 +649,7 @@ app.controller(
             PlakaBul($scope.kabul.Ogs);
           }
 
-          $scope.kabul.AracId = null;
+          //$scope.kabul.AracId = null;
         }
       });
     });
@@ -720,7 +737,10 @@ app.controller(
         readBarkod = readBarkod + key;
 
       if (event.keyCode == 13) {
-        readBarkod = readBarkod.replace("Control", "").replace("QR", "");
+        readBarkod = readBarkod
+          .replace("Control", "")
+          .replace("QR", "")
+          .replace("qr", "");
 
         console.log(readBarkod);
 
@@ -833,7 +853,7 @@ app.controller(
         var data = response.data;
 
         if (data === null) {
-          swal("Uyarı", "Hatalı belge no", "error");
+          swal("Uyarı", "NakitDokumKontrol Hatalı belge no", "error");
 
           //$scope.kabul.Temizle();
         } else {
@@ -884,7 +904,7 @@ app.controller(
           var data = response.data;
 
           if (data === null) {
-            swal("Uyarı", "Hatalı belge no", "error");
+            swal("Uyarı", "KabulBelgesiKontrol Hatalı belge no", "error");
 
             //$scope.kabul.Temizle();
           } else {
@@ -940,7 +960,7 @@ app.controller(
         var data = response.data;
 
         if (data === null) {
-          swal("Uyarı", "Hatalı belge no", "error");
+          swal("Uyarı", "KamuFisKontrol Hatalı belge no", "error");
 
           //$scope.kabul.Temizle();
         } else {
@@ -1009,8 +1029,13 @@ app.controller(
       kendoExt.post("api/kantar/SanayiAtikKontrol", data, function (response) {
         var data = response.data;
 
-        if (data === null) swal("Uyarı", "Hatalı belge no", "error");
-        else {
+        if (data === null) {
+          swal(
+            "Uyarı",
+            "SanayiAtikKontrol Hatalı belge no :" + BelgeNo,
+            "error"
+          );
+        } else {
           if (data.Aktif === false) {
             swal("Uyarı", "Belge aktif değil", "error");
             return;
@@ -1097,18 +1122,20 @@ app.controller(
             })
             .FirstOrDefault();
 
-          $scope.$apply(function () {
-            $scope.kabul.Tonaj = gelenTonaj.Tonaj;
+          if (gelenTonaj.Count > 30) {
+            $scope.$apply(function () {
+              $scope.kabul.Tonaj = gelenTonaj.Tonaj;
 
-            console.log($scope.kabul.Tonaj);
+              console.log($scope.kabul.Tonaj);
 
-            $scope.kabul.Hesapla();
+              $scope.kabul.Hesapla();
 
-            $scope.Kaydet();
-          });
+              $scope.Kaydet();
+            });
 
-          tempTonaj = [];
-          tempSpark = [];
+            tempTonaj = [];
+            tempSpark = [];
+          }
         }
       });
 
@@ -1181,9 +1208,8 @@ app.controller(
             className: "k-error-colored",
             visible: function (dataItem) {
               var r =
-                dataItem.OwnerId == 998 &&
-                dataItem.Tutar <= 0 &&
-                dataItem.Dara > 0;
+                dataItem.Aciklama.indexOf("Hata") != -1 ||
+                dataItem.Aciklama.indexOf("Basarisiz") != -1;
               return r;
             },
             click: function (e) {
@@ -1501,7 +1527,7 @@ app.controller(
       var gridElement = $("#grid");
 
       if (gridElement.data("kendoGrid")) {
-        gridElement.height($(window).height() - 250 + "px");
+        gridElement.height($(window).height() + 60 + "px");
         gridElement.data("kendoGrid").resize();
       }
     }
