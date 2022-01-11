@@ -19,6 +19,7 @@
     "electron-rebuild": "^3.2.4"
   },
   "dependencies": {
+    "electron-updater": "^4.6.1",
     "arraybuffer-to-string": "^1.0.2",
     "data-table": "^2.0.0",
     "electron-pdf-window": "^1.0.0",
