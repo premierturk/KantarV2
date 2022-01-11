@@ -20,6 +20,7 @@ function createWindow () {
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
   });
+  mainWindow.webContents.openDevTools()
 }
 
 app.on('ready', () => {
@@ -50,6 +51,15 @@ autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('update_downloaded');
 });
 
+autoUpdater.on('error', message => {
+  console.error('There was a problem updating the application')
+  console.error(message)
+})
+
 ipcMain.on('restart_app', () => {
   autoUpdater.quitAndInstall();
 });
+
+setInterval(() => {
+  autoUpdater.checkForUpdatesAndNotify();
+}, 60000)
