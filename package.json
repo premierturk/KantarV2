@@ -1,7 +1,7 @@
 {
   "name": "autoupdate",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.3",
+  "description": "description description description",
   "main": "main.js",
   "repository": {
     "type" : "git",
@@ -9,11 +9,11 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder build --mac --win --publish never",
-    "deploy": "electron-builder build --mac --win --publish always"
+    "build": "electron-builder build --win --publish never",
+    "deploy": "electron-builder build --win --publish always"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "premierturk",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^16.0.6",
     "electron-builder": "^22.14.5"
