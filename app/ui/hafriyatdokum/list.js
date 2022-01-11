@@ -738,6 +738,7 @@ app.controller(
 
       if (event.keyCode == 13) {
         readBarkod = readBarkod
+          .replace("Alt", "")
           .replace("Control", "")
           .replace("QR", "")
           .replace("qr", "");
@@ -746,6 +747,7 @@ app.controller(
 
         if (readBarkod.indexOf("ş") > -1 && readBarkod.indexOf("-") > -1) {
           //BURSA SANAYİ ATIK
+
 
           var belgeNo = readBarkod.split("ş")[0];
           $scope.$apply(function () {
@@ -1125,11 +1127,7 @@ app.controller(
           if (gelenTonaj.Count > 30) {
             $scope.$apply(function () {
               $scope.kabul.Tonaj = gelenTonaj.Tonaj;
-
-              console.log($scope.kabul.Tonaj);
-
               $scope.kabul.Hesapla();
-
               $scope.Kaydet();
             });
 

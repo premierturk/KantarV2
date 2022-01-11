@@ -3,10 +3,7 @@ const { ipcMain: ipc } = require("electron");
 const path = require("path");
 const url = require("url");
 const Shortcut = require("electron-shortcut");
-//const PDFWindow = require('electron-pdf-window');
 var nrc = require("node-run-cmd");
-//const { base64encode, base64decode } = require('nodejs-base64');
-
 const ab2str = require("arraybuffer-to-string");
 const config = require("./config");
 
@@ -107,27 +104,6 @@ function createWindow() {
 
   //electron.setZoomFactor(5)
 }
-
-var int_try_parse = function (val, default_val, radix) {
-  try {
-    radix = radix || 10;
-    default_val = default_val || 0;
-
-    //validate this object is not null
-    if (val != null) {
-      //convert to string
-      var that = JSON.stringify(val);
-      if (that.length > 0) {
-        //check to see the string is not NaN, if not parse
-        if (!isNaN(that)) return parseInt(that, radix);
-      }
-    }
-  } catch (err) {
-    console.log(err);
-  }
-  //this is not a number
-  return default_val;
-};
 
 app.on("ready", createWindow);
 
