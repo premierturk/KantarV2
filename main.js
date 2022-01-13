@@ -12,6 +12,7 @@ const Readline = require("@serialport/parser-readline");
 const { isNumber, parseInt } = require("lodash");
 
 const { killPortProcess } = require("kill-port-process");
+const { autoUpdater } = require("electron-updater");
 
 const app = electron.app;
 app.allowRendererProcessReuse = false;
@@ -58,13 +59,15 @@ function createWindow() {
   );
 
   mainWindow.once("ready-to-show", () => {
+    autoUpdater.checkForUpdatesAndNotify();
+
     setTimeout(function () {
       splash.close();
 
       mainWindow.maximize();
       mainWindow.show();
-      mainWindow.alwaysOnTop(true);
-    }, 2000);
+      // mainWindow.alwaysOnTop(true);
+    }, 1000);
 
     app.allowRendererProcessReuse = false;
   });
@@ -101,8 +104,6 @@ function createWindow() {
       mainWindow.webContents.send("comport", data);
     });
   }
-
-  //electron.setZoomFactor(5)
 }
 
 app.on("ready", createWindow);
@@ -122,6 +123,48 @@ app.on("activate", function () {
   // dock icon is clicked and there are no other windows open.
 
   if (mainWindow === null) createWindow();
+});
+
+
+function replaceAll(find, replace, str) {
+  while (str.indexOf(find) > -1) {
+    str = str.replace(find, replace);
+  }
+  return str;
+}
+
+process.on("uncaughtException", (err) => {
+  console.log("uncaughtException" + err);
+});
+process.on("warning", (warning) => {
+  console.warn(warning.name); // Print the warning name
+  console.warn(warning.message); // Print the warning message
+  console.warn(warning.stack); // Print the stack trace
+});
+
+
+
+autoUpdater.on("update-available", () => {
+  mainWindow.webContents.send("update_available");
+  alert("update-available");
+});
+
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send("update_downloaded");
+  alert("update-downloaded");
+});
+
+autoUpdater.on("error", (message) => {
+  console.error("There was a problem updating the application");
+  console.error(message);
+});
+
+ipc.on("app_version", (event) => {
+  event.sender.send("app_version", { version: app.getVersion() });
+});
+
+ipc.on("restart_app", () => {
+  autoUpdater.quitAndInstall();
 });
 
 ipc.on("restart", async (event, data) => {
@@ -189,18 +232,7 @@ ipc.on("onprint", async (event, data) => {
   );
 });
 
-function replaceAll(find, replace, str) {
-  while (str.indexOf(find) > -1) {
-    str = str.replace(find, replace);
-  }
-  return str;
-}
 
-process.on("uncaughtException", (err) => {
-  console.log("uncaughtException");
-});
-process.on("warning", (warning) => {
-  console.warn(warning.name); // Print the warning name
-  console.warn(warning.message); // Print the warning message
-  console.warn(warning.stack); // Print the stack trace
-});
+setInterval(() => {
+  autoUpdater.checkForUpdatesAndNotify();
+}, 60000);

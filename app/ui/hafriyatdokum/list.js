@@ -748,7 +748,6 @@ app.controller(
         if (readBarkod.indexOf("ş") > -1 && readBarkod.indexOf("-") > -1) {
           //BURSA SANAYİ ATIK
 
-
           var belgeNo = readBarkod.split("ş")[0];
           $scope.$apply(function () {
             $scope.kabul.Tur = "SANAYİ ATIĞI";
