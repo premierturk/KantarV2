@@ -125,7 +125,6 @@ app.on("activate", function () {
   if (mainWindow === null) createWindow();
 });
 
-
 function replaceAll(find, replace, str) {
   while (str.indexOf(find) > -1) {
     str = str.replace(find, replace);
@@ -142,16 +141,13 @@ process.on("warning", (warning) => {
   console.warn(warning.stack); // Print the stack trace
 });
 
-
-
 autoUpdater.on("update-available", () => {
   mainWindow.webContents.send("update_available");
-  alert("update-available");
 });
 
 autoUpdater.on("update-downloaded", () => {
+  
   mainWindow.webContents.send("update_downloaded");
-  alert("update-downloaded");
 });
 
 autoUpdater.on("error", (message) => {
@@ -232,7 +228,6 @@ ipc.on("onprint", async (event, data) => {
   );
 });
 
-
-setInterval(() => {
-  autoUpdater.checkForUpdatesAndNotify();
-}, 60000);
+// setInterval(() => {
+//   autoUpdater.checkForUpdatesAndNotify();
+// }, 60000);

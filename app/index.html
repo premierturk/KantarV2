@@ -186,12 +186,7 @@
 
       ipcRenderer.on("update_available", () => {
         ipcRenderer.removeAllListeners("update_available");
-
-        Notiflix.Notify.info("Yeni versiyon indiriliyor...", {
-          ID: "MKA",
-          timeout: 1923,
-          showOnlyTheLastOne: true,
-        });
+        Notiflix.Notify.info("Yeni versiyon indiriliyor...");
       });
 
       ipcRenderer.on("update_downloaded", () => {
@@ -203,9 +198,10 @@
           "Tamam",
           () => {
             ipcRenderer.send("restart_app");
-          }
-        );
+          });
+
       });
+
     </script>
   </body>
 </html>
