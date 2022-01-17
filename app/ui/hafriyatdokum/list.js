@@ -31,7 +31,7 @@ app.controller(
       });
     });
     $(window).blur(function () {
-      Notiflix.Loading.standard("UYGUMA AKTİF DEĞİL");
+      //Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
     });
     $(window).focus(function () {
       Notiflix.Loading.remove(100);
@@ -725,7 +725,11 @@ app.controller(
       }
     };
 
-    var readBarkod = "";
+    $scope.readBarkodTemizle = function () {
+      $scope.readBarkod = "";
+    };
+
+    $scope.readBarkod = "";
     $("#mainDiv").bind("keydown", function (event) {
       //console.log(event.key + " - " + event.keyCode);
 
@@ -734,28 +738,35 @@ app.controller(
       if (event.keyCode == 223) key = "-";
 
       if (!(event.keyCode == 16 || event.keyCode == 13))
-        readBarkod = readBarkod + key;
+        $scope.readBarkod = $scope.readBarkod + key;
+
+      $scope.$apply();
+
+      console.log($scope.readBarkod);
 
       if (event.keyCode == 13) {
-        readBarkod = readBarkod
+        $scope.readBarkod = $scope.readBarkod
           .replace("Alt", "")
           .replace("Control", "")
           .replace("QR", "")
           .replace("qr", "");
 
-        console.log(readBarkod);
+        console.log($scope.readBarkod);
 
-        if (readBarkod.indexOf("ş") > -1 && readBarkod.indexOf("-") > -1) {
+        if (
+          $scope.readBarkod.indexOf("ş") > -1 &&
+          $scope.readBarkod.indexOf("-") > -1
+        ) {
           //BURSA SANAYİ ATIK
 
-          var belgeNo = readBarkod.split("ş")[0];
+          var belgeNo = $scope.readBarkod.split("ş")[0];
           $scope.$apply(function () {
             $scope.kabul.Tur = "SANAYİ ATIĞI";
-            $scope.kabul.BarkodNo = angular.copy(readBarkod);
+            $scope.kabul.BarkodNo = angular.copy($scope.readBarkod);
             $scope.kabul.BelgeNo = angular.copy(belgeNo);
           });
 
-          var belgeTar = parseInt(readBarkod.split("ş")[2]);
+          var belgeTar = parseInt($scope.readBarkod.split("ş")[2]);
 
           var tar = moment(belgeTar * 1000);
           var belgeTar = tar.toDate();
@@ -765,48 +776,60 @@ app.controller(
             return;
           }
 
-          SanayiAtikBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
+          SanayiAtikBelgesi(
+            angular.copy($scope.readBarkod),
+            angular.copy(belgeNo)
+          );
         } else if (
-          readBarkod.indexOf("KF-") > -1 &&
-          readBarkod.indexOf("-KF") > -1
+          $scope.readBarkod.indexOf("KF-") > -1 &&
+          $scope.readBarkod.indexOf("-KF") > -1
         ) {
           //KAMUFİŞ
 
-          var belgeNo = readBarkod.replace("KF-", "").replace("-KF", "");
+          var belgeNo = $scope.readBarkod.replace("KF-", "").replace("-KF", "");
           $scope.$apply(function () {
             $scope.kabul.Tur = "KAMU FİŞİ";
-            $scope.kabul.BarkodNo = angular.copy(readBarkod);
+            $scope.kabul.BarkodNo = angular.copy($scope.readBarkod);
             $scope.kabul.BelgeNo = angular.copy(belgeNo);
           });
 
           KamuFisBelgesi(belgeNo);
         } else if (
-          readBarkod.indexOf("A") > -1 &&
-          readBarkod.indexOf("-") > -1
+          $scope.readBarkod.indexOf("A") > -1 &&
+          $scope.readBarkod.indexOf("-") > -1
         ) {
           //KABUL BELGESİ
 
-          var belgeNo = readBarkod.split("A")[1];
-          TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
-        } else if (readBarkod.indexOf("A") > -1) {
+          var belgeNo = $scope.readBarkod.split("A")[1];
+          TasimaKabuBelgesi(
+            angular.copy($scope.readBarkod),
+            angular.copy(belgeNo)
+          );
+        } else if ($scope.readBarkod.indexOf("A") > -1) {
           //NAKİT
 
-          var belgeNo = readBarkod.split("A")[1];
+          var belgeNo = $scope.readBarkod.split("A")[1];
           $scope.$apply(function () {
             $scope.kabul.Tur = "NAKİT DÖKÜM";
-            $scope.kabul.BarkodNo = angular.copy(readBarkod);
+            $scope.kabul.BarkodNo = angular.copy($scope.readBarkod);
             $scope.kabul.BelgeNo = angular.copy(belgeNo);
           });
 
-          NakitDokumBelgesi(angular.copy(belgeNo), angular.copy(readBarkod));
-        } else if (readBarkod.indexOf("-") > -1) {
+          NakitDokumBelgesi(
+            angular.copy(belgeNo),
+            angular.copy($scope.readBarkod)
+          );
+        } else if ($scope.readBarkod.indexOf("-") > -1) {
           //FİRMA BARKOD
 
-          var belgeNo = readBarkod;
-          TasimaKabuBelgesi(angular.copy(readBarkod), angular.copy(belgeNo));
+          var belgeNo = $scope.readBarkod;
+          TasimaKabuBelgesi(
+            angular.copy($scope.readBarkod),
+            angular.copy(belgeNo)
+          );
         }
 
-        readBarkod = "";
+        $scope.readBarkod = "";
       }
     });
 
@@ -823,7 +846,7 @@ app.controller(
         size: "lg",
         resolve: {
           PlakaListesi: function () {
-            return $scope.kabul.Response.Araclar;
+            return $scope.TumAracListesi;
           },
         },
       });
@@ -1499,7 +1522,7 @@ app.controller(
       autoBind: false,
       dataSource: kendoExt.getDs(
         "api/DepolamaAlani/Saha?DepolamaAlaniId=" +
-          $localStorage.user.depolamaalani.DepolamaAlanId
+        $localStorage.user.depolamaalani.DepolamaAlanId
       ),
     };
 
@@ -1552,33 +1575,77 @@ app.controller(
     $scope.AracId = null;
 
     $timeout(function () {
-      $("#txtSearch").focus();
-      if (PlakaListesi && PlakaListesi.length > 0) {
-        $scope.TumPlakalar = angular.copy(PlakaListesi);
-        if ($scope.TumPlakalar.length > 0) {
-          $scope.AracId = $scope.TumPlakalar[0].AracId;
-          $scope.PlakaNo = " | " + $scope.TumPlakalar[0].PlakaNo;
-        }
-      }
+      $("#gridAraclar").kendoGrid({
+        dataSource: {
+          data: $scope.PlakaListesi,
+          pageSize: 20,
+        },
+        height: 850,
+        scrollable: true,
+        sortable: true,
+        filterable: true,
+        pageable: {
+          alwaysVisible: false,
+          pageSizes: [5, 10, 20, 100]
+        },
+        toolbar: ["search"],
+        columns: [
+          { field: "PlakaNo", title: "Plaka No", width: "130px" },
+          {
+            field: "FirmaAdi",
+            title: "Firma",
+            width: "130px",
+            attributes: { style: "white-space:nowrap" },
+          },
+          { field: "Dara", title: "Dara", width: "130px" },
+          { field: "AracCinsi", title: "Araç Cinsi", width: "130px" },
+        ],
+        selectable: "row",
+        change: function (e) {
+          var selectedRows = this.select();
+
+          var selectedDataItems = [];
+          for (var i = 0; i < selectedRows.length; i++) {
+            var dataItem = this.dataItem(selectedRows[i]);
+            selectedDataItems.push(dataItem);
+          }
+
+          var data = selectedDataItems[0];
+
+
+          $scope.setSelected(data);
+        },
+      });
     }, 200);
+
+    // $timeout(function () {
+    //   $("#txtSearch").focus();
+    //   if (PlakaListesi && PlakaListesi.length > 0) {
+    //     $scope.TumPlakalar = angular.copy(PlakaListesi);
+    //     if ($scope.TumPlakalar.length > 0) {
+    //       $scope.AracId = $scope.TumPlakalar[0].AracId;
+    //       $scope.PlakaNo = " | " + $scope.TumPlakalar[0].PlakaNo;
+    //     }
+    //   }
+    // }, 200);
 
     $scope.setSelected = function (item) {
       $scope.AracId = item.AracId;
       $scope.PlakaNo = " | " + item.PlakaNo;
     };
 
-    $scope.$watch("filter", function () {
-      $scope.TumPlakalar = $linq
-        .Enumerable()
-        .From($scope.PlakaListesi)
-        .Where(function (x) {
-          return x.PlakaNo.startsWith($scope.filter);
-        })
-        .ToArray();
+    // $scope.$watch("filter", function () {
+    //   $scope.TumPlakalar = $linq
+    //     .Enumerable()
+    //     .From($scope.PlakaListesi)
+    //     .Where(function (x) {
+    //       return x.PlakaNo.startsWith($scope.filter);
+    //     })
+    //     .ToArray();
 
-      if ($scope.TumPlakalar.length > 0)
-        $scope.AracId = $scope.TumPlakalar[0].AracId;
-    });
+    //   if ($scope.TumPlakalar.length > 0)
+    //     $scope.AracId = $scope.TumPlakalar[0].AracId;
+    // });
 
     $scope.Enter = function (e) {
       if (e.which === 13) {
