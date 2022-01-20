@@ -31,7 +31,7 @@ app.controller(
       });
     });
     $(window).blur(function () {
-      //Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
+      Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
     });
     $(window).focus(function () {
       Notiflix.Loading.remove(100);
@@ -402,6 +402,9 @@ app.controller(
         tempEtiketNo = [];
         tempTonaj = [];
         tempSpark = [];
+        $scope.readBarkod = "";
+        $scope.i = 0;
+        $scope.iOgs = 0;
       },
       UserId: $localStorage.user.userid,
       DepolamaAlaniId: $localStorage.user.depolamaalani.DepolamaAlanId,
@@ -620,9 +623,9 @@ app.controller(
         var number = parseInt(data);
 
         tempEtiketNo.push(number);
-        $scope.iOgs = tempEtiketNo.length * 10;
+        $scope.iOgs = tempEtiketNo.length * 2;
 
-        if (tempEtiketNo.length >= 10) {
+        if (tempEtiketNo.length >= 50) {
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNo)
@@ -631,6 +634,8 @@ app.controller(
               return x.Count;
             })
             .FirstOrDefault();
+
+          if (gelen.Count < 30) return;
 
           $scope.kabul.Ogs = gelen.EtiketNo;
 
@@ -666,9 +671,8 @@ app.controller(
         var number = parseInt(data);
 
         tempEtiketNoDirekCikis.push(number);
-        $scope.iOgs = tempEtiketNoDirekCikis.length * 10;
 
-        if (tempEtiketNoDirekCikis.length >= 10) {
+        if (tempEtiketNoDirekCikis.length >= 50) {
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNoDirekCikis)
@@ -678,15 +682,17 @@ app.controller(
             })
             .FirstOrDefault();
 
-          $scope.kabul.Ogs = gelen.EtiketNo;
+          if (gelen.Count < 30)
+            return;
+
+          var etiket = gelen.EtiketNo;
 
           tempEtiketNoDirekCikis = [];
 
           if ($scope.TumAracListesi != null) {
             var arac = $scope.TumAracListesi.find(function (item) {
-              return item.OGSEtiket == $scope.kabul.Ogs;
+              return item.OGSEtiket == etiket;
             });
-
             if (arac != null) {
               if (client_anten_direk_cikis) {
                 client_anten_direk_cikis.write("0100000111040D12CA\r");
@@ -706,6 +712,15 @@ app.controller(
       $scope.kabul.AracCinsiId = arac.AracCinsiId;
 
       if ($scope.kabul.AracCinsiId == 30) {
+
+        $scope.kabul.Tutar = 0;
+        $scope.kabul.Tonaj = 0;
+        $scope.kabul.Dara = 0;
+        $scope.kabul.Net = 0;
+        $scope.readBarkod = "";
+        $scope.i = 0;
+        $scope.iOgs = 0;
+
         $scope.kabul.BarkodNo = "EVSELATIK";
         $scope.kabul.BelgeNo = "EVSELATIK";
         $scope.kabul.Tur = "EVSELATIK";
@@ -723,10 +738,6 @@ app.controller(
         $scope.kabul.Hesapla();
         $scope.Kaydet();
       }
-    };
-
-    $scope.readBarkodTemizle = function () {
-      $scope.readBarkod = "";
     };
 
     $scope.readBarkod = "";
@@ -859,6 +870,15 @@ app.controller(
         $scope.kabul.AracCinsiId = e.AracCinsiId;
 
         if ($scope.kabul.AracCinsiId == 30) {
+
+          $scope.kabul.Tutar = 0;
+          $scope.kabul.Tonaj = 0;
+          $scope.kabul.Dara = 0;
+          $scope.kabul.Net = 0;
+          $scope.readBarkod = "";
+          $scope.i = 0;
+          $scope.iOgs = 0;
+
           $scope.kabul.BarkodNo = "EVSELATIK";
           $scope.kabul.BelgeNo = "EVSELATIK";
           $scope.kabul.Tur = "EVSELATIK";
@@ -1103,13 +1123,27 @@ app.controller(
     var tempTonaj = [];
     var tempSpark = [];
 
+
+
+    // var isClear = false;
+    // setInterval(function () {
+    //   if (isClear)
+    //     $scope.kabul.Temizle();
+    // }, 1200);
+
+
+
     if ($localStorage.user.depolamaalani.KantarVarMi)
       mySerialPort(function (data) {
-        //console.log("KANTAR TONAJ : " + data)
 
-        //BURSA
-        //var myArray = data.split(" ");
-        //var tonaj = myArray[1]
+        // isClear = false;
+        // setTimeout(function () {
+        //   isClear = true;
+        // }, 1000);
+
+
+
+        //console.log("KANTAR TONAJ : " + data)
 
         //TODO : KANTARDAN GELEN VERİ SETİNE GÖRE AYARLAMALAR YAPILACAK
         if (!data) return;
@@ -1134,7 +1168,11 @@ app.controller(
         tempTonaj.push(number);
         $scope.i = tempTonaj.length;
 
-        if (tempTonaj.length >= 100) {
+
+        var len = 100;
+        if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
+
+        if (tempTonaj.length >= len) {
           $scope.kabul.Tonaj = 0;
 
           var gelenTonaj = $linq

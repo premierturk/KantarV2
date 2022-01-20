@@ -1,0 +1,19 @@
+{
+    "GirisCikis": "Giris", 
+    "KantarVarMi": true,
+    "UsePrinter": false,
+    "UseOffline": false,
+    "TcpPort": 5555, 
+    "TcpPortAntenCikis": 5554, 
+    "OgsEtiketStart": 126,
+    "MinTonaj": 1000,
+    "WebApiUrl": "http://bursa.premierturk.com/HYS.WebApi/",
+    "SignalR": {
+      "host": "http://bursa.premierturk.com/HYS.SingnalR/signalr"
+    },
+    "SerialPort": {
+      "portName": "COM1",
+      "autoOpen": false,
+      "baudRate": 9600
+    }
+  }

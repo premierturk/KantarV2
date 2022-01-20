@@ -1,17 +1,11 @@
-﻿<div
-  id="mainDiv"
-  tabindex="0"
-  ng-controller="hafriyatdokumlistCtrl"
-  class="hbox hbox-auto-xs bg-ligh"
-  style="width: 99.5% !important"
-  ng-init="
+﻿<div id="mainDiv" tabindex="0" ng-controller="hafriyatdokumlistCtrl" class="hbox hbox-auto-xs bg-ligh"
+  style="width: 99.5% !important" ng-init="
 app.settings.asideFolded = true; 
 app.settings.asideDock = true;
 app.settings.container = false;
 app.settings.hideFooter = true;
 app.hideFooter = true;
-app.hideAside = true"
->
+app.hideAside = true">
   <div class="col item">
     <div class="wrapper-xs">
       <div class="panel panel-danger m-b-xxs">
@@ -20,81 +14,48 @@ app.hideAside = true"
             <div class="col-md-8">
               <div class="row m-b">
                 <div class="col-sm-12">
-                  <select
-                    kendo-multi-select
-                    k-options="selectOptionsFirma"
-                    k-on-change="Filter()"
-                    k-ng-model="filtre.FirmaId"
-                    style="width: 100%"
-                  ></select>
+                  <select kendo-multi-select k-options="selectOptionsFirma" k-on-change="Filter()"
+                    k-ng-model="filtre.FirmaId" style="width: 100%"></select>
                 </div>
               </div>
               <div class="row m-b">
                 <div class="col-sm-6">
-                  <input
-                    name="txtBarkod"
-                    type="text"
-                    ng-model="kabul.DepolamaAlaniAdi"
-                    disabled
-                    class="form-control input-md"
-                  />
+                  <input name="txtBarkod" type="text" ng-model="kabul.DepolamaAlaniAdi" disabled
+                    class="form-control input-md" />
                 </div>
 
                 <div class="col-sm-6">
-                  <select
-                    kendo-multi-select
-                    k-rebind="filtre.DepolamaAlanId"
-                    k-options="selectOptionsSaha"
-                    k-on-change="Filter()"
-                    k-ng-model="filtre.DepolamaAlaniSahaId"
-                    style="width: 100%"
-                  ></select>
+                  <select kendo-multi-select k-rebind="filtre.DepolamaAlanId" k-options="selectOptionsSaha"
+                    k-on-change="Filter()" k-ng-model="filtre.DepolamaAlaniSahaId" style="width: 100%"></select>
                 </div>
               </div>
               <div class="row m-b">
                 <div class="col-sm-6">
-                  <input
-                    kendo-date-picker
-                    k-on-change="Filter()"
-                    k-ng-model="filtre.BasTarih"
-                    k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']"
-                    style="width: 100%"
-                  />
+                  <input kendo-date-picker k-on-change="Filter()" k-ng-model="filtre.BasTarih"
+                    k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']" style="width: 100%" />
                 </div>
 
                 <div class="col-sm-6">
-                  <input
-                    kendo-date-picker
-                    k-on-change="Filter()"
-                    k-ng-model="filtre.BitTarih"
-                    k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']"
-                    style="width: 100%"
-                  />
+                  <input kendo-date-picker k-on-change="Filter()" k-ng-model="filtre.BitTarih"
+                    k-parse-formats="['yyyy-MM-ddTHH:mm:sszzz']" style="width: 100%" />
                 </div>
               </div>
             </div>
 
-            <div
-              class="col-md-2 text-center m-r-n b-r bg-red-gradient padder-v"
-            >
-              <span class="text-white font-thin h3 block"
-                >{{Total_Tutar | currency : "₺"}}</span
-              >
+            <div class="col-md-2 text-center m-r-n b-r bg-green-gradient padder-v">
+              <span class="text-white font-thin h3 block">{{Total_Tutar | currency : "₺"}}</span>
               <span class="text-xs">Toplam Tutar (₺)</span>
             </div>
 
-            <div
-              class="col-md-2 text-center m-l-n b-l bg-red-gradient padder-v"
-            >
+            <div class="col-md-2 text-center m-l-n b-l bg-green-gradient padder-v">
               <span class="text-white font-thin h3 block">{{Total_Arac}}</span>
               <span class="text-xs">Adet</span>
             </div>
           </div>
-          <!-- <div class="row">                     
-                            <div kendo-sparkline
-                            k-series="[{ type: 'area',field: 'TMax',color: '#ff0000', negativeColor: '#0099ff'}]"
-                            k-tooltip="{ visible: true }" k-data-source="weather" style="height: 50px;"></div>                                             
-                    </div> -->
+          <div class="bg-red-gradient wrapper-xs  r-2x" ng-show="uyari">
+            <i class="glyphicon glyphicon-info-sign text-2x"></i> <span class="text-2x">{{uyari}}</span>
+          </div>
+
         </div>
       </div>
       <div data-kendo-grid id="grid" options="mainGridOptions"></div>
@@ -103,258 +64,166 @@ app.hideAside = true"
   <div class="col item w-xxl b-l">
     <div class="wrapper-xs">
       <div class="panel">
-        <div class="panel-heading m-n">
-          <span ng-if="!online" class="label bg-danger">Offline</span>
-          <span ng-if="online" class="label bg-success">Online</span>
-          <button class="btn btn-warning" type="button" ng-click="Restart()">
-            Yeniden Başlat
-          </button>
-          <button
-            class="btn btn-primary"
-            type="button"
-            ng-show="AntenDurumu == 'Anten Bağlandı'"
-            ng-click="BariyerAc()"
-          >
-            Bariyer Aç
-          </button>
+        <div class="panel-heading m-n wrapper-xs">
+          <h3>İŞLEMLER</h3>
+          <ul class="list-group no-radius m-b-n-sm">
+
+            <li class="list-group-item" ng-if="!online">
+              <i class="fa fa-wifi fa-fw"></i>
+              <span class="text-black">OFFLINE</span>
+            </li>
+
+            <li class="list-group-item" ng-if="online">
+              <i class="fa fa-wifi fa-fw"></i>
+              <span class="text-black">ONLINE</span>
+            </li>
+
+            <a href="" class="list-group-item" ng-click="BariyerAc()" ng-show="AntenDurumu == 'Anten Bağlandı'">
+              <i class="fa fa-openid fa-fw"></i>
+              <span class="text-black">Bariyer Aç</span>
+            </a>
+
+            <a href="" class="list-group-item" ng-click="Restart()">
+              <i class="fa fa-star fa-fw"></i>
+              <span class="text-black"> Yeniden Başlat</span>
+            </a>
+
+            <!-- <a href="" class="list-group-item bg-info" ng-click="HgsEtiketi()">
+              <span class="text-white">HGS Etiketi</span>  
+            </a> -->
+
+            <a href="" class="list-group-item" ng-click="kabul.Temizle()">
+              <i class="fa fa-close fa-fw"></i>
+              <span class="text-black">Temizle</span>
+            </a>
+
+          </ul>
         </div>
         <div class="panel-body wrapper-xs">
-          <div
-            class="bg-red-gradient wrapper-xs m-l-n m-r-n m-b r r-2x"
-            ng-show="uyari"
-          >
-            <i class="glyphicon glyphicon-info-sign"></i> {{uyari}}
-          </div>
-
           <form name="myForm" class="form-horizontal">
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label text-danger">OKUNAN</label>
-              <div class="col-md-5">
-                <input
-                  type="text"
-                  placeholder="Okunan"
-                  ng-model="readBarkod"
-                  disabled
-                  class="form-control input-md"
-                />
-              </div>
-              <div class="col-md-3">
-                <button
-                  class="btn btn-warning"
-                  type="button"
-                  ng-if="kabul.Tur!='NAKİT DÖKÜM'"
-                  ng-click="readBarkodTemizle()"
-                >
-                  Temizle
-                </button>
+              <div class="col-md-8">
+                <input type="text" placeholder="Okunan" ng-model="readBarkod" disabled class="form-control input-md" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label text-danger">TÜR</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Barkod okutunuz"
-                  ng-model="kabul.Tur"
-                  disabled
-                  class="form-control input-md"
-                />
+                <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.Tur" disabled
+                  class="form-control input-md" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label text-danger">BARKOD</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Barkod okutunuz"
-                  ng-model="kabul.BarkodNo"
-                  disabled
-                  class="form-control input-md"
-                />
+                <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BarkodNo" disabled
+                  class="form-control input-md" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label text-danger">BELGE NO</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Barkod okutunuz"
-                  ng-model="kabul.BelgeNo"
-                  disabled
-                  class="form-control input-md"
-                />
+                <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BelgeNo" disabled
+                  class="form-control input-md" />
               </div>
             </div>
 
             <div class="form-group">
               <label class="col-md-4 control-label text-danger">OGS</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Plaka seçiniz"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Ogs"
-                />
+                <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
+                  ng-model="kabul.Ogs" />
               </div>
             </div>
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">BELGE MİK.</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Response.TasinacakAtikMiktari"
-                />
+                <input type="text" disabled class="form-control input-md"
+                  ng-model="kabul.Response.TasinacakAtikMiktari" />
               </div>
             </div>
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">DÖKÜM MİK.</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Response.DokumMiktari"
-                />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.DokumMiktari" />
               </div>
             </div>
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">KALAN MİK.</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Response.KalanMiktar"
-                />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.KalanMiktar" />
               </div>
             </div>
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">FİRMA BAK.</label>
               <div class="col-md-8">
-                <input
-                  kendo-numeric-text-box
-                  disabled
-                  k-format="'c2'"
-                  ng-model="kabul.Response.GuncelBakiye"
-                  k-spinners="false"
-                  style="width: 100%"
-                />
+                <input kendo-numeric-text-box disabled k-format="'c2'" ng-model="kabul.Response.GuncelBakiye"
+                  k-spinners="false" style="width: 100%" />
               </div>
             </div>
 
             <div class="form-group">
               <small class="text-muted m-l-md">{{AntenDurumu}}</small>
-              <progressbar
-                animate="true"
-                value="iOgs"
-                type="succes"
-                class="progress-xs"
-              >
+              <progressbar animate="true" value="iOgs" type="succes" class="progress-xs">
               </progressbar>
 
               <div class="col-md-4">
-                <button
-                  class="btn btn-info"
-                  type="button"
-                  ng-if="kabul.Tur!='NAKİT DÖKÜM'"
-                  ng-disabled="kabul.BelgeNo"
-                  ng-click="PlakaSec()"
-                >
+                <button class="btn btn-info" type="button" ng-if="kabul.Tur!='NAKİT DÖKÜM'" ng-disabled="kabul.BelgeNo"
+                  ng-click="PlakaSec()">
                   PLAKA.NO
                 </button>
 
-                <button
-                  class="btn btn-info"
-                  type="button"
-                  ng-if="kabul.Tur=='NAKİT DÖKÜM'"
-                  ng-click="PlakaSec()"
-                >
+                <button class="btn btn-info" type="button" ng-if="kabul.Tur=='NAKİT DÖKÜM'" ng-click="PlakaSec()">
                   PLAKA.NO
                 </button>
               </div>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Plaka seçiniz"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.PlakaNo"
-                />
+                <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
+                  ng-model="kabul.PlakaNo" />
               </div>
             </div>
 
             <div class="form-group">
               <label class="col-md-4 control-label">ARAÇ CİNSİ</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  placeholder="Plaka seçiniz"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.AracCinsi"
-                />
+                <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
+                  ng-model="kabul.AracCinsi" />
               </div>
             </div>
 
             <div class="form-group">
-              <progressbar
-                max="100"
-                animate="true"
-                value="i"
-                type="danger"
-                class="progress-striped active progress-md"
-                ><span style="white-space: nowrap"
-                  >{{tempGelenTonaj}}</span
-                ></progressbar
-              >
+              <progressbar max="100" animate="true" value="i" type="danger" class="progress-striped active progress-md">
+                <span style="white-space: nowrap">{{tempGelenTonaj}}</span>
+              </progressbar>
 
               <label class="col-md-4 control-label text-danger">TONAJ</label>
               <div class="col-md-8 m-r-n">
-                <input
-                  type="text"
-                  placeholder="..."
-                  disabled
-                  ng-model="kabul.Tonaj"
-                  class="form-control input-md"
-                />
+                <input type="text" placeholder="..." disabled ng-model="kabul.Tonaj" class="form-control input-md" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">DARA</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Dara"
-                />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Dara" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">NET</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Net"
-                />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Net" />
               </div>
             </div>
 
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">TUTAR</label>
               <div class="col-md-8">
-                <span class="form-control disabled"
-                  >{{kabul.Tutar | currency : "₺"}}
+                <span class="form-control disabled">{{kabul.Tutar | currency : "₺"}}
                 </span>
               </div>
             </div>
@@ -364,12 +233,7 @@ app.hideAside = true"
             <div class="form-group m-b-sm">
               <label class="col-md-4 control-label">FİRMA</label>
               <div class="col-md-8">
-                <input
-                  type="text"
-                  disabled
-                  class="form-control input-md"
-                  ng-model="kabul.Response.FirmaAdi"
-                />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.FirmaAdi" />
               </div>
             </div>
           </form>

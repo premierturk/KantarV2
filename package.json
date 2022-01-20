@@ -1,7 +1,7 @@
 {
   "name": "kantarv2",
   "productName": "HybsKantarV2",
-  "version": "1.0.2",
+  "version": "1.0.9",
   "description": "HybsKantarV2",
   "main": "main.js",
   "author": "Premierturk",
@@ -9,7 +9,7 @@
   "scripts": {
     "rebuild": "electron-rebuild --force -m ./",
     "start": "npm rebuild && electron-rebuild -f -w kantarv2 && electron .",
-    "build1:old": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
+    "buildpack": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
     "setup": "electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/",
     "deploy": "npm rebuild  && electron-rebuild && electron-builder build --win --publish always",
     "build": "npm rebuild  && electron-rebuild && electron-builder build --win --publish never"
