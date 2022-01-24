@@ -80,6 +80,9 @@ function createWindow() {
     mainWindow = null;
   });
 
+
+
+
   var shortcut = new Shortcut("Ctrl+F12", function (e) {
     console.log("openDevTools");
     // Open the DevTools.
@@ -146,7 +149,7 @@ autoUpdater.on("update-available", () => {
 });
 
 autoUpdater.on("update-downloaded", () => {
-  
+
   mainWindow.webContents.send("update_downloaded");
 });
 

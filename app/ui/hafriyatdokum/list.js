@@ -19,6 +19,8 @@ app.controller(
     $base64,
     $modal
   ) {
+
+
     $scope.online = true;
     window.addEventListener("online", function () {
       $scope.$apply(function () {
@@ -562,7 +564,7 @@ app.controller(
               isSend = false;
 
               console.log("SAVING SUCCESS");
-              $scope.kabul.Temizle();
+              //$scope.kabul.Temizle();
 
               setTimeout(function () {
                 $scope.kabul.Temizle();
@@ -581,9 +583,9 @@ app.controller(
             function (err) {
               console.log("SAVING failure :");
               Notiflix.Notify.failure(err.data);
-              $scope.kabul.Temizle();
-              $scope.kabul.BelgeNo = "";
-              $scope.kabul.BarkodNo = "";
+              // $scope.kabul.Temizle();
+              // $scope.kabul.BelgeNo = "";
+              // $scope.kabul.BarkodNo = "";
             }
           );
         }
@@ -705,11 +707,7 @@ app.controller(
     });
 
     var AracBulundu = function (arac) {
-      $scope.kabul.PlakaNo = arac.PlakaNo;
-      $scope.kabul.Dara = arac.Dara;
-      $scope.kabul.AracId = arac.AracId;
-      $scope.kabul.AracCinsi = arac.AracCinsi;
-      $scope.kabul.AracCinsiId = arac.AracCinsiId;
+
 
       if ($scope.kabul.AracCinsiId == 30) {
 
@@ -726,6 +724,12 @@ app.controller(
         $scope.kabul.Tur = "EVSELATIK";
       }
 
+      $scope.kabul.PlakaNo = arac.PlakaNo;
+      $scope.kabul.Dara = arac.Dara;
+      $scope.kabul.AracId = arac.AracId;
+      $scope.kabul.AracCinsi = arac.AracCinsi;
+      $scope.kabul.AracCinsiId = arac.AracCinsiId;
+
       var GirisCikis = $rootScope.app.options.GirisCikis;
 
       if (GirisCikis == "Çıkış") {
@@ -740,26 +744,30 @@ app.controller(
       }
     };
 
+    // $("#mainDiv").bind("keypress", function (event) {
+    //   console.log(event.key + " - " + event.keyCode);
+    // });
+
     $scope.readBarkod = "";
-    $("#mainDiv").bind("keydown", function (event) {
-      //console.log(event.key + " - " + event.keyCode);
+    $(window).bind("keypress", function (event) {
+
+      console.log(event.key + " - " + event.keyCode);
 
       var key = event.key;
 
-      if (event.keyCode == 223) key = "-";
+      if (event.keyCode == 42) key = "-";
 
       if (!(event.keyCode == 16 || event.keyCode == 13))
-        $scope.readBarkod = $scope.readBarkod + key;
+        $scope.readBarkod = $scope.readBarkod + key.toLowerCase();
 
       $scope.$apply();
-
-      console.log($scope.readBarkod);
 
       if (event.keyCode == 13) {
         $scope.readBarkod = $scope.readBarkod
           .replace("Alt", "")
           .replace("Control", "")
           .replace("QR", "")
+          .replace("CapsLock", "")
           .replace("qr", "");
 
         console.log($scope.readBarkod);
@@ -863,11 +871,7 @@ app.controller(
       });
 
       modalInstance.result.then(function (e) {
-        $scope.kabul.PlakaNo = e.PlakaNo;
-        $scope.kabul.Dara = e.Dara;
-        $scope.kabul.AracId = e.AracId;
-        $scope.kabul.AracCinsi = e.AracCinsi;
-        $scope.kabul.AracCinsiId = e.AracCinsiId;
+
 
         if ($scope.kabul.AracCinsiId == 30) {
 
@@ -883,6 +887,12 @@ app.controller(
           $scope.kabul.BelgeNo = "EVSELATIK";
           $scope.kabul.Tur = "EVSELATIK";
         }
+
+        $scope.kabul.PlakaNo = e.PlakaNo;
+        $scope.kabul.Dara = e.Dara;
+        $scope.kabul.AracId = e.AracId;
+        $scope.kabul.AracCinsi = e.AracCinsi;
+        $scope.kabul.AracCinsiId = e.AracCinsiId;
 
         $scope.kabul.Hesapla();
         $scope.Kaydet();
@@ -1123,27 +1133,8 @@ app.controller(
     var tempTonaj = [];
     var tempSpark = [];
 
-
-
-    // var isClear = false;
-    // setInterval(function () {
-    //   if (isClear)
-    //     $scope.kabul.Temizle();
-    // }, 1200);
-
-
-
     if ($localStorage.user.depolamaalani.KantarVarMi)
       mySerialPort(function (data) {
-
-        // isClear = false;
-        // setTimeout(function () {
-        //   isClear = true;
-        // }, 1000);
-
-
-
-        //console.log("KANTAR TONAJ : " + data)
 
         //TODO : KANTARDAN GELEN VERİ SETİNE GÖRE AYARLAMALAR YAPILACAK
         if (!data) return;
@@ -1154,9 +1145,9 @@ app.controller(
         // console.log(number);
 
         tempSpark.push(number);
-        if (tempSpark.length >= 100) {
+        if (tempSpark.length >= 100) 
           tempSpark.splice(0, 1);
-        }
+        
 
         $rootScope.$apply(function () {
           $scope.weather = new kendo.data.DataSource({
@@ -1169,8 +1160,8 @@ app.controller(
         $scope.i = tempTonaj.length;
 
 
-        var len = 100;
-        if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
+        var len = 80;
+        //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
           $scope.kabul.Tonaj = 0;
