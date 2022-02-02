@@ -15,6 +15,7 @@ app.controller(
     kendoExt,
     $linq,
     $timeout,
+    $interval,
     $localStorage,
     $base64,
     $modal
@@ -625,9 +626,9 @@ app.controller(
         var number = parseInt(data);
 
         tempEtiketNo.push(number);
-        $scope.iOgs = tempEtiketNo.length * 2;
+        $scope.iOgs = tempEtiketNo.length * 3;
 
-        if (tempEtiketNo.length >= 50) {
+        if (tempEtiketNo.length >= 30) {
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNo)
@@ -637,7 +638,7 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelen.Count < 30) return;
+          if (gelen.Count < 15) return;
 
           $scope.kabul.Ogs = gelen.EtiketNo;
 
@@ -1145,9 +1146,9 @@ app.controller(
         // console.log(number);
 
         tempSpark.push(number);
-        if (tempSpark.length >= 100) 
+        if (tempSpark.length >= 100)
           tempSpark.splice(0, 1);
-        
+
 
         $rootScope.$apply(function () {
           $scope.weather = new kendo.data.DataSource({
@@ -1160,7 +1161,7 @@ app.controller(
         $scope.i = tempTonaj.length;
 
 
-        var len = 80;
+        var len = 40;
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
@@ -1175,7 +1176,7 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelenTonaj.Count > 30) {
+          if (gelenTonaj.Count > 15) {
             $scope.$apply(function () {
               $scope.kabul.Tonaj = gelenTonaj.Tonaj;
               $scope.kabul.Hesapla();
@@ -1267,6 +1268,73 @@ app.controller(
               var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
 
               kendo.alert(dataItem.Aciklama);
+            },
+          },
+          {
+            field: "Tur",
+            text: "ÇıkışYap",
+            className: "k-error-colored",
+            visible: function (dataItem) {
+              var r = (dataItem.OwnerId == 999 && dataItem.Tonaj > 0 && dataItem.Dara == null);
+              return r;
+            },
+            click: function (e) {
+              e.preventDefault();
+
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+
+              kendo.prompt("Giriş tonajı " + dataItem.Tonaj + " kg dır. Dara bilgisini giriniz.", "0").then(function (data) {
+
+
+
+                var tonaj = dataItem.Tonaj;
+                var dara = parseInt(data);
+                var net = tonaj - dara;
+
+                if (net <= 0) {
+                  Notiflix.Notify.failure("Net tonaj sıfır olamaz!");
+                  return;
+                }
+
+                if (dara <= 0) {
+                  Notiflix.Notify.failure("Dara sıfır olamaz!");
+                  return;
+                }
+
+                kendo.confirm("Dara :" + dara + "kg <br/> NetTonaj :" + net + "kg").done(function () {
+
+
+                  var data = {
+                    HafriyatDokumId: dataItem.HafriyatDokumId,
+                    Dara: dara
+                  };
+
+                  kendoExt.post(
+                    "api/kantar/SanayiAtikCikis",
+                    data,
+                    function (response) {
+
+                      Notiflix.Notify.success("Kaydedildi.");
+                      $scope.Filter();
+                    },
+                    function (err) {
+                      console.log("SAVING failure :");
+                      Notiflix.Notify.failure(err.data);
+                      $scope.kabul.Temizle();
+                    }
+                  );
+
+                });
+
+
+
+
+              }, function () {
+                //kendo.alert("Cancel entering value.");
+              })
+
+
             },
           },
         ],
@@ -1438,7 +1506,18 @@ app.controller(
       { field: "min", aggregate: "average" },
     ];
 
+
+    setInterval(function () {
+      if (moment(lastRefleshTime).add(10, "seconds") < moment().toDate())
+        $("#grid").data("kendoGrid").dataSource.read();
+    }, 20000);
+
+
+    var lastRefleshTime = Date.now();
     $scope.Filter = function () {
+
+      lastRefleshTime = Date.now();
+
       var query =
         1 +
         "#" +
@@ -1506,6 +1585,14 @@ app.controller(
         } else if (dataItem.OwnerId == 999) {
           row.addClass("bg-yellow-gradient");
         }
+
+
+        if (dataItem.OwnerId == 999 && dataItem.Tonaj > 0 && dataItem.Dara == null) {
+          row.addClass("bg-success");
+        }
+
+
+
       });
     }
 
@@ -1517,27 +1604,9 @@ app.controller(
       var data = this.dataSource.data();
       $scope.Total_Arac = data.length;
 
-      $scope.Total_Diff = 0;
-
-      var IslemTarihi;
       $(data).each(function () {
         $scope.Total_Tutar = $scope.Total_Tutar + this.Tutar;
         $scope.Total_Tonaj = $scope.Total_Tonaj + this.Tonaj;
-
-        if (IslemTarihi !== undefined) {
-          var now = moment(IslemTarihi); //todays date
-          var end = moment(this.IslemTarihi); // another date
-          var duration = moment.duration(now.diff(end));
-          var min = duration.asMinutes();
-
-          $scope.Total_Diff = $scope.Total_Diff + min;
-
-          this.min = min;
-        } else {
-          this.min = 0;
-        }
-
-        IslemTarihi = this.IslemTarihi;
       });
 
       $scope.Total_Tonaj = parseInt($scope.Total_Tonaj / 1000);
@@ -1570,6 +1639,27 @@ app.controller(
 
     $scope.pdf = function () {
       $("#grid").getKendoGrid().saveAsPDF();
+    };
+
+    $scope.HgsEtiketi = function () {
+
+      var modalInstance = $modal.open({
+        keyboard: true,
+        animation: false,
+        templateUrl: "hgsModal",
+        controller: "hgsCtrl",
+        size: "lg",
+        resolve: {
+          TumAracListesi: function () {
+            return $scope.TumAracListesi;
+          },
+        },
+      });
+
+      modalInstance.result.then(function (e) {
+        $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
+      });
+
     };
 
     function resizeGrid() {
@@ -1735,6 +1825,173 @@ app.controller(
 
       $modalInstance.close(selected);
     };
+  }
+);
+
+app.controller(
+  "hgsCtrl",
+  function (
+    $scope,
+    $rootScope,
+    kendoExt,
+    $linq,
+    $timeout,
+    $localStorage,
+    $base64,
+    $modalInstance,
+    TumAracListesi
+  ) {
+
+
+    var araclar = $linq
+      .Enumerable()
+      .From(TumAracListesi)
+      .Where(function (x) {
+        return x.AracCinsiId == 30;
+      })
+      .ToArray();
+
+
+    $timeout(function () {
+      $("#gridAraclar").kendoGrid({
+        dataSource: {
+          data: araclar,
+          pageSize: 20,
+        },
+        height: 850,
+        scrollable: true,
+        sortable: true,
+        filterable: true,
+        pageable: {
+          alwaysVisible: false,
+          pageSizes: [5, 10, 20, 100]
+        },
+        toolbar: ["search"],
+        columns: [
+          {
+            command: [
+              {
+                field: "Tur",
+                text: "HGS Değiştir",
+                click: function (e) {
+                  e.preventDefault();
+
+                  var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+                  kendo.prompt(dataItem.PlakaNo + " için HGS No giriniz.", dataItem.OGSEtiket).then(function (data) {
+
+                    if (!data) {
+                      Notiflix.Notify.failure("HGS No giriniz.");
+                      return;
+                    }
+
+                    var aracId = dataItem.AracId;
+
+
+                    var data = {
+                      AracId: aracId,
+                      HgsNo: data
+                    };
+
+                    kendoExt.post(
+                      "api/kantar/HGSNoDegisimi",
+                      data,
+                      function (response) {
+
+                        Notiflix.Notify.success("Kaydedildi.");
+
+                        $scope.Iptal();
+                      },
+                      function (err) {
+                        console.log("SAVING failure :");
+                        Notiflix.Notify.failure(err.data);
+                        $scope.kabul.Temizle();
+                      }
+                    );
+
+
+
+                  }, function () {
+                    //kendo.alert("Cancel entering value.");
+                  })
+
+
+                },
+              },
+              {
+                field: "Tur",
+                text: "Dara Değiştir",
+                click: function (e) {
+                  e.preventDefault();
+
+                  var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+                  kendo.prompt(dataItem.PlakaNo + " için Dara giriniz.", dataItem.Dara).then(function (data) {
+
+                    if (!data) {
+                      Notiflix.Notify.failure("Dara giriniz!");
+                      return;
+                    }
+                    if (parseInt(data)) {
+                      Notiflix.Notify.failure("Dara giriniz.!");
+                      return;
+                    }
+
+                    var aracId = dataItem.AracId;
+
+                    var data = {
+                      AracId: aracId,
+                      Dara: parseInt(data)
+                    };
+
+                    kendoExt.post(
+                      "api/kantar/DaraDegisimi",
+                      data,
+                      function (response) {
+
+                        Notiflix.Notify.success("Kaydedildi.");
+
+                        $scope.Iptal();
+                      },
+                      function (err) {
+                        console.log("SAVING failure :");
+                        Notiflix.Notify.failure(err.data);
+                        $scope.kabul.Temizle();
+                      }
+                    );
+
+
+
+                  }, function () {
+                    //kendo.alert("Cancel entering value.");
+                  })
+
+
+                },
+              }
+            ]
+
+          },
+          { field: "PlakaNo", title: "Plaka No", width: "130px" },
+          {
+            field: "FirmaAdi",
+            title: "Firma",
+            width: "130px",
+            attributes: { style: "white-space:nowrap" },
+          },
+          { field: "Dara", title: "Dara", width: "130px" },
+          { field: "AracCinsi", title: "Araç Cinsi", width: "130px" },
+          { field: "OGSEtiket", title: "OGSEtiket", width: "130px" },
+        ],
+        selectable: "row"
+      });
+    }, 200);
+
+
+    $scope.Iptal = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
   }
 );
 

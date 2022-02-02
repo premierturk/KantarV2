@@ -88,9 +88,10 @@ app.hideAside = true">
               <span class="text-black"> Yeniden Başlat</span>
             </a>
 
-            <!-- <a href="" class="list-group-item bg-info" ng-click="HgsEtiketi()">
-              <span class="text-white">HGS Etiketi</span>  
-            </a> -->
+            <a href="" class="list-group-item" ng-click="HgsEtiketi()">
+              <i class="fa fa-star fa-adn"></i>
+              <span class="text-black">HGS&Dara Değişimi</span>
+            </a>
 
             <a class="list-group-item" ng-click="kabul.Temizle()">
               <i class="fa fa-close fa-fw"></i>
@@ -248,46 +249,13 @@ app.hideAside = true">
       <h4>PLAKA SEÇİNİZ {{PlakaNo + " | (" + AracId + ")"}}</h2>
   </div>
   <div class="modal-body">
-
-    <!-- <div class="row wrapper">
-        <div class="col-sm-12">
-            <div class="input-group">
-                <input id="txtSearch" type="text" class="input-sm form-control" placeholder="Plaka/Firma ara" ng-model="filter" capitalize ng-keydown="Enter($event)">
-                <span class="input-group-btn">
-                    <button class="btn btn-sm btn-default" type="button">ARA</button>
-                </span>
-            </div>
-        </div>
-    </div> -->
-
-
-    <div id="gridAraclar"></div>
-
-    <!-- <table class="table table-bordered table-success ">
-          <thead>
-              <tr>
-                  <th width="1%"></th>
-                  <th nowrap width="20%">PLAKA NO</th>
-                  <th >FİRMA</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr ng-repeat="item in TumPlakalar" ng-class="{'bg-success' : item.AracId == AracId}" ng-click="setSelected(item)">
-                  <td  >{{$index+1}}</td>
-                  <td style="white-space:nowrap; "><strong>{{item.PlakaNo}}</strong></td>
-                  <td style="white-space:nowrap; " >{{item.FirmaAdi}}</td>
-              </tr>
-          </tbody>
-      </table>
-    </div> -->
-
-
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-info w-full"  ng-click="Sec()" >
-            <span class="text">SEÇ {{PlakaNo}}</span>
-        </button>
-    </div>
+    <div id="gridAraclar"></div>  
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-info w-full"  ng-click="Sec()" >
+        <span class="text">SEÇ {{PlakaNo}}</span>
+    </button>
+</div>
 </script>
 
 <script type="text/ng-template" id="sahaModal">
@@ -320,6 +288,19 @@ app.hideAside = true">
               </button>
       </div>
 </script>
+
+<script type="text/ng-template" id="hgsModal">
+  <div class="modal-header">
+    <h4>HGS</h2>
+  </div>
+  <div class="modal-body"> 
+    <div id="gridAraclar"></div>
+  </div>
+  <div class="modal-footer">
+    .
+  </div>
+</script>
+
 
 <style>
   .k-grid .k-header .k-grid-search {

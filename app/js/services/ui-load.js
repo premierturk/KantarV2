@@ -500,6 +500,10 @@ angular
             if (typeof error == "function") {
               error(errorPl);
             } else SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
+
+            if (errorPl.status == "401") $rootScope.login();
+
+            
           }
         );
       };
