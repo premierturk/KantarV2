@@ -8,6 +8,7 @@ var nrc = require("node-run-cmd");
 const config = require("./config");
 
 const serialport = require("serialport");
+
 // const Readline = require("@serialport/parser-readline");
 // const { isNumber, parseInt } = require("lodash");
 
