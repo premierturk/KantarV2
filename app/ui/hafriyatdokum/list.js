@@ -312,18 +312,24 @@ app.controller(
       return;
     }
 
-    if ($localStorage.user.depolamaalani.OgsAktif) {
-      swal({
-        title: "...",
-        text: "Araç listesi yükleniyor",
-        imageUrl: "./img/loading.gif",
-        showConfirmButton: false,
-      });
-      kendoExt.Get("api/kantar/araclistesi?EtiketNo=", function (response) {
-        $scope.TumAracListesi = response.data;
-        swal.close();
-      });
+    var aracListesiYukle = function () {
+
+      if ($localStorage.user.depolamaalani.OgsAktif) {
+        swal({
+          title: "...",
+          text: "Araç listesi yükleniyor",
+          imageUrl: "./img/loading.gif",
+          showConfirmButton: false,
+        });
+        kendoExt.Get("api/kantar/araclistesi?EtiketNo=", function (response) {
+          $scope.TumAracListesi = response.data;
+          swal.close();
+        });
+      }
+
     }
+    aracListesiYukle();
+
     $scope.AntenDurumu = "Anten Bağlı Değil";
     $scope.kabul = {
       Tur: "",
@@ -448,6 +454,7 @@ app.controller(
       else Notiflix.Notify.failure("Anten bağlı değil");
     };
 
+
     var isSend = true;
     $scope.Kaydet = function () {
       if (!isSend) return;
@@ -519,6 +526,8 @@ app.controller(
         GirisCikis: $rootScope.app.options.GirisCikis,
       };
 
+
+
       if (data.GirisCikis == "Giriş") {
         //BELGE ONAY
         console.log("SAVING..." + JSON.stringify(data));
@@ -528,6 +537,7 @@ app.controller(
           data,
           function (response) {
             isSend = false;
+            requestSanayiAtikBelgesi = "";
 
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
@@ -537,7 +547,6 @@ app.controller(
               isSend = true;
             }, 1000);
 
-            //if (client_anten) client_anten.write("0100000111040D12CA\r");
             $scope.BariyerAc();
 
             Notiflix.Notify.success("Kaydedildi.");
@@ -547,6 +556,7 @@ app.controller(
               ipc.send("onprint", response.data);
           },
           function (err) {
+            requestSanayiAtikBelgesi = "";
             console.log("SAVING failure :");
             Notiflix.Notify.failure(err.data);
             $scope.kabul.Temizle();
@@ -563,9 +573,9 @@ app.controller(
             data,
             function (response) {
               isSend = false;
+              requestSanayiAtikBelgesi = "";
 
               console.log("SAVING SUCCESS");
-              //$scope.kabul.Temizle();
 
               setTimeout(function () {
                 $scope.kabul.Temizle();
@@ -584,6 +594,7 @@ app.controller(
             function (err) {
               console.log("SAVING failure :");
               Notiflix.Notify.failure(err.data);
+              requestSanayiAtikBelgesi = "";
               // $scope.kabul.Temizle();
               // $scope.kabul.BelgeNo = "";
               // $scope.kabul.BarkodNo = "";
@@ -626,9 +637,9 @@ app.controller(
         var number = parseInt(data);
 
         tempEtiketNo.push(number);
-        $scope.iOgs = tempEtiketNo.length * 3;
+        $scope.iOgs = tempEtiketNo.length * 5;
 
-        if (tempEtiketNo.length >= 30) {
+        if (tempEtiketNo.length >= 20) {
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNo)
@@ -638,7 +649,7 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelen.Count < 15) return;
+          if (gelen.Count < 10) return;
 
           $scope.kabul.Ogs = gelen.EtiketNo;
 
@@ -733,11 +744,11 @@ app.controller(
 
       var GirisCikis = $rootScope.app.options.GirisCikis;
 
-      if (GirisCikis == "Çıkış") {
-        if (client_anten) client_anten.write("0100000111040D12CA\r");
+      // if (GirisCikis == "Çıkış") {
+      //   if (client_anten) client_anten.write("0100000111040D12CA\r");
 
-        return;
-      }
+      //   return;
+      // }
 
       if (GirisCikis == "Giris") {
         $scope.kabul.Hesapla();
@@ -1077,58 +1088,71 @@ app.controller(
       });
     };
 
+
+    var requestSanayiAtikBelgesi = "";
     var SanayiAtikBelgesi = function (Barkod, BelgeNo) {
       var data = {
         BelgeNo: BelgeNo,
       };
-      kendoExt.post("api/kantar/SanayiAtikKontrol", data, function (response) {
-        var data = response.data;
 
-        if (data === null) {
-          swal(
-            "Uyarı",
-            "SanayiAtikKontrol Hatalı belge no :" + BelgeNo,
-            "error"
-          );
-        } else {
-          if (data.Aktif === false) {
-            swal("Uyarı", "Belge aktif değil", "error");
-            return;
-          }
+      if (requestSanayiAtikBelgesi != Barkod) {
 
-          $scope.kabul.Tur = "SANAYİ ATIĞI";
-          $scope.kabul.BarkodNo = angular.copy(Barkod);
-          $scope.kabul.BelgeNo = angular.copy(BelgeNo);
-          $scope.kabul.PlakaNo = data.PlakaNo;
-          $scope.kabul.AracId = data.AracId;
-          $scope.kabul.FirmaId = data.FirmaId;
-          $scope.kabul.Dara = 0;
+        kendoExt.post("api/kantar/SanayiAtikKontrol", data, function (response) {
 
-          $scope.kabul.Response = response.data;
+          var data = response.data;
 
-          //SAHA SEÇİMİ
-          if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
-            var modalInstance = $modal.open({
-              keyboard: true,
-              animation: false,
-              templateUrl: "sahaModal",
-              controller: "sahaCtrl",
-              size: "lg",
-              resolve: {
-                SahaListesi: function () {
-                  return $localStorage.user.depolamaalani.Sahalar;
+          if (data === null) {
+            swal(
+              "Uyarı",
+              "SanayiAtikKontrol Hatalı belge no :" + BelgeNo,
+              "error"
+            );
+          } else {
+            if (data.Aktif === false) {
+              swal("Uyarı", "Belge aktif değil", "error");
+              return;
+            }
+
+            $scope.kabul.Tur = "SANAYİ ATIĞI";
+            $scope.kabul.BarkodNo = angular.copy(Barkod);
+            $scope.kabul.BelgeNo = angular.copy(BelgeNo);
+            $scope.kabul.PlakaNo = data.PlakaNo;
+            $scope.kabul.AracId = data.AracId;
+            $scope.kabul.FirmaId = data.FirmaId;
+            $scope.kabul.Dara = 0;
+
+            $scope.kabul.Response = response.data;
+
+            //SAHA SEÇİMİ
+            if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
+              var modalInstance = $modal.open({
+                keyboard: true,
+                animation: false,
+                templateUrl: "sahaModal",
+                controller: "sahaCtrl",
+                size: "lg",
+                resolve: {
+                  SahaListesi: function () {
+                    return $localStorage.user.depolamaalani.Sahalar;
+                  },
                 },
-              },
-            });
+              });
 
-            modalInstance.result.then(function (e) {
-              $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
-            });
+              modalInstance.result.then(function (e) {
+                $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
+              });
+            }
+
+            $scope.Kaydet();
           }
+        }, function (err) {
 
-          $scope.Kaydet();
-        }
-      });
+          requestSanayiAtikBelgesi = "";
+
+        });
+
+      }
+
     };
 
     var tempTonaj = [];
@@ -1143,25 +1167,17 @@ app.controller(
         var number = data;
         if (isNaN(number)) return;
         if (number < $rootScope.app.options.MinTonaj) return;
-        // console.log(number);
 
         tempSpark.push(number);
         if (tempSpark.length >= 100)
           tempSpark.splice(0, 1);
-
-
-        $rootScope.$apply(function () {
-          $scope.weather = new kendo.data.DataSource({
-            data: tempSpark,
-          });
-        });
 
         $scope.tempGelenTonaj = number;
         tempTonaj.push(number);
         $scope.i = tempTonaj.length;
 
 
-        var len = 40;
+        var len = 50;
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
@@ -1176,7 +1192,7 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelenTonaj.Count > 15) {
+          if (gelenTonaj.Count > 20) {
             $scope.$apply(function () {
               $scope.kabul.Tonaj = gelenTonaj.Tonaj;
               $scope.kabul.Hesapla();
@@ -1343,7 +1359,7 @@ app.controller(
         field: "Tur",
         title: "Tür",
         attributes: { style: "white-space:nowrap" },
-        width: "150px",
+        width: "200px",
         filterable: {
           cell: {
             template: function (args) {
@@ -1353,9 +1369,10 @@ app.controller(
                   "Döküm Fişi",
                   "Kamu Fiş",
                   "Nakit Döküm",
-                  "Nakit Döküm",
-                  "Sanayi Atığı",
-                  "Evsel Atık",
+                  "EVSEL NİTELİKLİ KALINTI ATIK",
+                  "SANAYİ ATIKLARI",
+                  "EVSEL ATIK",
+                  "ARITMA ÇAMURU",
                 ],
                 valuePrimitive: true,
               });
@@ -1506,11 +1523,11 @@ app.controller(
       { field: "min", aggregate: "average" },
     ];
 
-
-    setInterval(function () {
-      if (moment(lastRefleshTime).add(10, "seconds") < moment().toDate())
-        $("#grid").data("kendoGrid").dataSource.read();
-    }, 20000);
+    // outo reflesh
+    // setInterval(function () {
+    //   if (moment(lastRefleshTime).add(10, "seconds") < moment().toDate())
+    //     $("#grid").data("kendoGrid").dataSource.read();
+    // }, 20000);
 
 
     var lastRefleshTime = Date.now();
@@ -1657,7 +1674,8 @@ app.controller(
       });
 
       modalInstance.result.then(function (e) {
-        $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
+        aracListesiYukle();
+
       });
 
     };
@@ -1932,10 +1950,6 @@ app.controller(
                       Notiflix.Notify.failure("Dara giriniz!");
                       return;
                     }
-                    if (parseInt(data)) {
-                      Notiflix.Notify.failure("Dara giriniz.!");
-                      return;
-                    }
 
                     var aracId = dataItem.AracId;
 
@@ -1989,7 +2003,7 @@ app.controller(
 
 
     $scope.Iptal = function () {
-      $modalInstance.dismiss('cancel');
+      $modalInstance.close('OK');
     };
 
   }

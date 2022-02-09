@@ -4,15 +4,18 @@ const path = require("path");
 const url = require("url");
 const Shortcut = require("electron-shortcut");
 var nrc = require("node-run-cmd");
-const ab2str = require("arraybuffer-to-string");
+// const ab2str = require("arraybuffer-to-string");
 const config = require("./config");
 
 const serialport = require("serialport");
-const Readline = require("@serialport/parser-readline");
-const { isNumber, parseInt } = require("lodash");
+// const Readline = require("@serialport/parser-readline");
+// const { isNumber, parseInt } = require("lodash");
 
 const { killPortProcess } = require("kill-port-process");
 const { autoUpdater } = require("electron-updater");
+
+const screenshot = require('screenshot-desktop');
+const signalr = require('node-signalr');
 
 const app = electron.app;
 app.allowRendererProcessReuse = false;
@@ -80,9 +83,6 @@ function createWindow() {
     mainWindow = null;
   });
 
-
-
-
   var shortcut = new Shortcut("Ctrl+F12", function (e) {
     console.log("openDevTools");
     // Open the DevTools.
@@ -107,6 +107,40 @@ function createWindow() {
       mainWindow.webContents.send("comport", data);
     });
   }
+
+  var hub = "ScreenShut";
+  let client = new signalr.client(config.SignalR.host, [hub]);
+  client.qs = { "tip": "kantar" };
+  client.start();
+
+
+  var i = 0;
+  var b = 0;
+  setInterval(async function () {
+    i++;
+
+    var img = await screenshot({ format: 'png' });
+    b += img.length;
+
+    var imgStr = new Buffer(img).toString('base64');
+    client.connection.hub.invoke(hub, 'send', imgStr);
+
+    console.log(i + " - " + formatBytes(b));
+
+  }, 5000);
+
+}
+
+function formatBytes(bytes, decimals = 2) {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 app.on("ready", createWindow);
@@ -124,7 +158,6 @@ app.on("window-all-closed", function () {
 app.on("activate", function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-
   if (mainWindow === null) createWindow();
 });
 
@@ -231,6 +264,6 @@ ipc.on("onprint", async (event, data) => {
   );
 });
 
-// setInterval(() => {
-//   autoUpdater.checkForUpdatesAndNotify();
-// }, 60000);
+setInterval(() => {
+  autoUpdater.checkForUpdatesAndNotify();
+}, 60000);

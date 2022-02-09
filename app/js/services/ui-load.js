@@ -136,7 +136,7 @@ angular
           .FirstOrDefault();
 
         if (islem != null) {
-          Notiflix.Notify.failure('Bir önceki işlemin bitmesini bekleyiniz!');
+          //Notiflix.Notify.failure('Bir önceki işlemin bitmesini bekleyiniz!');
           console.log("Bir önceki işlemin bitmesini bekleyiniz!");
 
           return null;
@@ -503,7 +503,7 @@ angular
 
             if (errorPl.status == "401") $rootScope.login();
 
-            
+
           }
         );
       };
