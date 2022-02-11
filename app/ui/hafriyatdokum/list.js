@@ -637,9 +637,9 @@ app.controller(
         var number = parseInt(data);
 
         tempEtiketNo.push(number);
-        $scope.iOgs = tempEtiketNo.length * 5;
+        $scope.iOgs = tempEtiketNo.length * 10;
 
-        if (tempEtiketNo.length >= 20) {
+        if (tempEtiketNo.length >= 10) {
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNo)
@@ -649,7 +649,7 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelen.Count < 10) return;
+          if (gelen.Count < 5) return;
 
           $scope.kabul.Ogs = gelen.EtiketNo;
 
@@ -1177,7 +1177,7 @@ app.controller(
         $scope.i = tempTonaj.length;
 
 
-        var len = 50;
+        var len = 70;
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
@@ -1192,9 +1192,14 @@ app.controller(
             })
             .FirstOrDefault();
 
-          if (gelenTonaj.Count > 20) {
+          if (gelenTonaj.Count > 30) {
+
+            var tonaj = $linq
+              .Enumerable()
+              .From(tempTonaj).LastOrDefault();
+
             $scope.$apply(function () {
-              $scope.kabul.Tonaj = gelenTonaj.Tonaj;
+              $scope.kabul.Tonaj = tonaj;
               $scope.kabul.Hesapla();
               $scope.Kaydet();
             });
