@@ -129,7 +129,7 @@ function createWindow() {
 
     console.log(i + " - " + formatBytes(b));
 
-  }, 5000);
+  }, 4000);
 
 }
 

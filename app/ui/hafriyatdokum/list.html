@@ -65,34 +65,33 @@ app.hideAside = true">
     <div class="wrapper-xs">
       <div class="panel">
         <div class="panel-heading m-n wrapper-xs">
-          <h3>İŞLEMLER</h3>
+          <!-- <h3>İŞLEMLER</h3> -->
           <ul class="list-group no-radius m-b-n-sm">
 
             <li class="list-group-item" ng-if="!online">
               <i class="fa fa-wifi fa-fw"></i>
               <span class="text-black">OFFLINE</span>
             </li>
-
             <li class="list-group-item" ng-if="online">
               <i class="fa fa-wifi fa-fw"></i>
               <span class="text-black">ONLINE</span>
             </li>
-
             <a class="list-group-item" ng-click="BariyerAc()" ng-show="AntenDurumu == 'Anten Bağlandı'">
               <i class="fa fa-openid fa-fw"></i>
               <span class="text-black">Bariyer Aç</span>
             </a>
-
             <a class="list-group-item" ng-click="Restart()">
               <i class="fa fa-star fa-fw"></i>
               <span class="text-black"> Yeniden Başlat</span>
             </a>
-
             <a href="" class="list-group-item" ng-click="HgsEtiketi()">
               <i class="fa fa-star fa-adn"></i>
-              <span class="text-black">HGS&Dara Değişimi</span>
+              <span class="text-black">HGS & Dara Değişimi</span>
             </a>
-
+            <a href="" class="list-group-item" ng-click="AracEdit()">
+              <i class="fa fa-car fa-adn"></i>
+              <span class="text-black">Çöp Aracı Ekle</span>
+            </a>
             <a class="list-group-item" ng-click="kabul.Temizle()">
               <i class="fa fa-close fa-fw"></i>
               <span class="text-black">Temizle</span>
@@ -294,7 +293,7 @@ app.hideAside = true">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
     <h4>HGS</h2>         
   
-    </div>
+  </div>
   </div>
   <div class="modal-body"> 
     <div id="gridAraclar"></div>
@@ -304,6 +303,91 @@ app.hideAside = true">
   </div>
 </script>
 
+<script type="text/ng-template" id="aracedit">
+  <div class="modal-header">
+    <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
+    <h4>Araç Bilgileri</h4>         
+  
+  </div>
+  <div class="modal-body wrapper-md">
+      <div class="row">
+          <div class="col-sm-12 ">
+            
+
+              <form role="form">
+                  <div class="form-group">
+                      <alert type="danger" ng-show="aractakipiduyari"><i class="fa fa-exclamation"></i> {{aractakipiduyari}}</alert>
+                      <alert type="danger" ng-show="plakauyari"><i class="fa fa-exclamation"></i> {{plakauyari}}</alert>
+                      <div class="row">
+                          <div class="col-sm-12">
+
+                              <label>Firma</label>
+
+
+                              <select kendo-combo-box
+                                      required
+                                      ng-disabled="firma_disabled"
+                                      ng-model="arac.FirmaId"
+                                      k-placeholder="'Firma seçiniz'"
+                                      k-data-text-field="'FirmaAdi'"
+                                      k-data-value-field="'FirmaId'"
+                                      k-filter="'contains'"
+                                      k-data-source="dsFirma"
+                                      style="width: 100%"></select>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <div class="row">
+                          <div class="col-sm-3">
+                              <label>Plaka No</label>
+                              <input type="text" class="form-control text-uppercase" ng-keyup="PlakaEntry($event)" ng-model="arac.PlakaNo">
+                              <span class="help-block m-b-none">Örnek : 41 ABCD 4586</span>
+                          </div>
+                          <div class="col-sm-3">
+                              <label>Arac Takip Id <span class="text-danger" ng-show="AracTakipZorunlu">(zorunlu)</span></label>
+                              <input type="text" class="form-control" ng-model="arac.AracTakipId" readonly>
+                              <span class="help-block m-b-none">Otomatik bulunacak</span>
+                          </div>
+                          <div class="col-sm-4" ng-show="ilid==6 && arac.AracCinsiId==30">
+                              <label>HGS Etiket No<span class="text-danger" ng-show="HGSEtiketNoZorunlu">(zorunlu)</span></label>
+                              <input type="text" class="form-control" ng-model="arac.HGSEtiketNo" ng-change="HGSEtiketCtrl()">
+                          </div>
+                      </div>
+                  </div>                 
+
+                  <div class="form-group">
+                      <div class="row">
+                          <div class="col-sm-3">
+                              <label>Dara</label>
+                              <input type="text" class="form-control"  ng-model="arac.Dara" ng-change="onlyNumbers(arac.Dara,1)">
+                          </div>
+
+                          <div class="col-sm-3">
+                              <label>Azami Yüklü  Ağırlığı</label>
+                              <input type="text" class="form-control" ng-model="arac.Kapasitesi" ng-change="onlyNumbers(arac.Kapasitesi,0)">
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label>Açıklama</label>
+                      <textarea class="form-control" ng-model="arac.Aciklama"></textarea>
+                  </div>
+
+              </form>
+          </div>
+
+      </div>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-success" ng-disabled="aractakipiduyari || plakauyari" ng-click="Kaydet()">
+          <span class="text">Kaydet</span>
+      </button>
+      <button class="btn btn-danger" type="button" ng-click="Iptal()">Iptal</button>
+  </div>
+</script>
 
 <style>
   .k-grid .k-header .k-grid-search {
