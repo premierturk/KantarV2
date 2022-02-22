@@ -459,7 +459,7 @@ app.controller(
     $scope.Kaydet = function () {
       if (!isSend) return;
 
-      console.log("Kaydet start...");
+
 
       if (!angular.isDefined($localStorage.user)) {
         return;
@@ -512,6 +512,10 @@ app.controller(
           return;
         }
 
+
+      console.log("Kaydet start...");
+
+
       var data = {
         AracId: AracId,
         FirmaId: FirmaId,
@@ -538,6 +542,8 @@ app.controller(
           function (response) {
             isSend = false;
             requestSanayiAtikBelgesi = "";
+
+            ipcRenderer.send("port_restart");
 
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
@@ -574,6 +580,8 @@ app.controller(
             function (response) {
               isSend = false;
               requestSanayiAtikBelgesi = "";
+
+              ipcRenderer.send("port_restart");
 
               console.log("SAVING SUCCESS");
 
@@ -640,6 +648,10 @@ app.controller(
         $scope.iOgs = tempEtiketNo.length * 10;
 
         if (tempEtiketNo.length >= 10) {
+
+
+          $scope.sonOgsSaati = Date.now();
+
           var gelen = $linq
             .Enumerable()
             .From(tempEtiketNo)
@@ -657,6 +669,7 @@ app.controller(
 
           //TODO:arac boş ise online sorgula
           if ($scope.TumAracListesi != null) {
+
             var arac = $scope.TumAracListesi.find(function (item) {
               return item.OGSEtiket == $scope.kabul.Ogs;
             });
@@ -664,10 +677,10 @@ app.controller(
             if (arac == null) {
               PlakaBul($scope.kabul.Ogs);
             } else AracBulundu(arac);
+
           } else {
             PlakaBul($scope.kabul.Ogs);
           }
-
           //$scope.kabul.AracId = null;
         }
       });
@@ -756,9 +769,25 @@ app.controller(
       }
     };
 
-    // $("#mainDiv").bind("keypress", function (event) {
-    //   console.log(event.key + " - " + event.keyCode);
-    // });
+
+    var OgsTemizle = function () {
+
+      tempEtiketNo = [];
+
+      $scope.$apply(function () {
+
+        $scope.iOgs = 0;
+        $scope.kabul.Ogs = "";
+
+        $scope.kabul.PlakaNo = "";
+        $scope.kabul.Dara = 0;
+        $scope.kabul.AracId = null;
+        $scope.kabul.AracCinsi = "";
+        $scope.kabul.AracCinsiId = null;
+      });
+
+    }
+
 
     $scope.readBarkod = "";
     $(window).bind("keypress", function (event) {
@@ -1088,7 +1117,6 @@ app.controller(
       });
     };
 
-
     var requestSanayiAtikBelgesi = "";
     var SanayiAtikBelgesi = function (Barkod, BelgeNo) {
       var data = {
@@ -1155,6 +1183,37 @@ app.controller(
 
     };
 
+    //outo clean
+    setInterval(function () {
+
+      if (moment($scope.sonTartimSaati).add(5, "seconds") <= moment().toDate()) {
+        console.log("outo clean tartım")
+        kantarVeriTemizle();
+      }
+
+      if (moment($scope.sonOgsSaati).add(5, "seconds") <= moment().toDate()) {
+        console.log("outo clean OGS")
+        OgsTemizle();
+      }
+
+    }, 2000);
+
+
+    var kantarVeriTemizle = function () {
+
+      $scope.$apply(function () {
+        $scope.kabul.Tonaj = 0;
+        tempTonaj = [];
+        tempSpark = [];
+        $scope.i = 0;
+        $scope.tempGelenTonaj = 0;
+      });
+
+    }
+
+
+
+
     var tempTonaj = [];
     var tempSpark = [];
 
@@ -1168,35 +1227,37 @@ app.controller(
         if (isNaN(number)) return;
         if (number < $rootScope.app.options.MinTonaj) return;
 
+
+        $scope.sonTartimSaati = Date.now();
+
+
         tempSpark.push(number);
         if (tempSpark.length >= 100)
           tempSpark.splice(0, 1);
 
-        $scope.tempGelenTonaj = number;
         tempTonaj.push(number);
-        $scope.i = tempTonaj.length;
+        $scope.i = tempTonaj.length * 4;
 
+        $scope.$apply(function () {
+          $scope.tempGelenTonaj = number;
+        });
 
-        var len = 70;
+        var len = 25;
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
-          $scope.kabul.Tonaj = 0;
 
-          var gelenTonaj = $linq
-            .Enumerable()
-            .From(tempTonaj)
-            .GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }")
-            .OrderByDescending(function (x) {
-              return x.Count;
-            })
-            .FirstOrDefault();
 
-          if (gelenTonaj.Count > 30) {
+          var tempGelenTonaj2 = angular.copy(tempTonaj);
 
-            var tonaj = $linq
-              .Enumerable()
-              .From(tempTonaj).LastOrDefault();
+          var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(20).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
+
+          kantarVeriTemizle();
+
+
+          if (son5Tonaj.length == 1) { //son 5 olcum esit olmali  
+
+            var tonaj = son5Tonaj[0].Tonaj;
 
             $scope.$apply(function () {
               $scope.kabul.Tonaj = tonaj;
@@ -1204,9 +1265,8 @@ app.controller(
               $scope.Kaydet();
             });
 
-            tempTonaj = [];
-            tempSpark = [];
           }
+
         }
       });
 
@@ -1722,8 +1782,9 @@ app.controller(
     $(window).resize(function () {
       resizeGrid();
     });
-  }
-);
+
+
+  });
 
 app.controller(
   "plakasecCtrl",

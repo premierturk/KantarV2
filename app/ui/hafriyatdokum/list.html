@@ -196,11 +196,13 @@ app.hideAside = true">
             </div>
 
             <div class="form-group">
-              <progressbar max="100" animate="true" value="i" type="danger" class="progress-striped active progress-md">
-                <span style="white-space: nowrap">{{tempGelenTonaj}}</span>
+              <progressbar max="100" animate="true" value="i" type="danger" class="progress-striped active progress-xl">
+                <span style="white-space: nowrap">{{ i + "% " + tempGelenTonaj}} KG</span>
               </progressbar>
 
-              <label class="col-md-4 control-label text-danger">TONAJ</label>
+              <label class="col-md-4 control-label text-danger"> <span class="label text-base bg-danger pos-rlt "><i
+                    class="arrow right arrow-danger"></i>
+                  TONAJ</span></label>
               <div class="col-md-8 m-r-n">
                 <input type="text" placeholder="..." disabled ng-model="kabul.Tonaj" class="form-control input-md" />
               </div>

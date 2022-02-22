@@ -1,7 +1,7 @@
 {
   "name": "kantarv2",
   "productName": "HybsKantarV2",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "HybsKantarV2",
   "main": "main.js",
   "author": "Premierturk",
@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
-    "data-table": "^2.0.0",
     "electron-pdf-window": "^1.0.0",
     "electron-reload": "^1.5.0",
     "electron-shortcut": "^0.5.0",
@@ -36,11 +35,5 @@
     "notiflix": "^3.1.0",
     "screenshot-desktop": "^1.12.7",
     "serialport": "^9.2.8"
-  },
-  "publish": [
-    {
-      "provider": "generic",
-      "url": "http://<Your server IP>:5080/"
-    }
-  ]
+  }
 }

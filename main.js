@@ -1,4 +1,5 @@
 const electron = require("electron");
+const { dialog } = require('electron')
 const { ipcMain: ipc } = require("electron");
 const path = require("path");
 const url = require("url");
@@ -91,24 +92,59 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   });
 
-  //SERIALPORT-------
-  if (config.KantarVarMi) {
-    const port = new serialport(config.SerialPort.portName, config.SerialPort);
 
-    //const parser = port.pipe(new Readline({ delimiter: '\n' }))
+  const port = new serialport(config.SerialPort.portName, config.SerialPort);
+  var serial_port_open = function () {
+  
+    
     port.open(function (err) {
       if (err) {
+
+        const options = {
+          title: 'Uyarı',
+          message: config.SerialPort.portName + " port açılamadı.",
+          detail: err.message
+        };
+        dialog.showMessageBox(options);
+
         return console.log("Error opening port: ", err.message);
       }
     });
+
     port.on("open", function () {
       return console.log("SERIAL PORT OPEN :", port);
+    });
+
+    port.close(function (err) {
+      console.log('port closed', err);
     });
 
     port.on("data", function (data) {
       mainWindow.webContents.send("comport", data);
     });
+
+  
+
   }
+
+  var serial_port_close = function () {
+    if (port.isOpen) {
+      port.close();
+    }
+
+    setTimeout(serial_port_open, 3000);
+  }
+
+  //SERIALPORT-------
+  if (config.KantarVarMi)
+    serial_port_open();
+
+
+    ipc.on("port_restart", (event) => {
+      serial_port_close();
+    });
+
+
 
   var hub = "ScreenShut";
   let client = new signalr.client(config.SignalR.host, [hub]);
@@ -129,7 +165,7 @@ function createWindow() {
 
     console.log(i + " - " + formatBytes(b));
 
-  }, 4000);
+  }, 3000);
 
 }
 
@@ -184,7 +220,6 @@ autoUpdater.on("update-available", () => {
 });
 
 autoUpdater.on("update-downloaded", () => {
-
   mainWindow.webContents.send("update_downloaded");
 });
 
