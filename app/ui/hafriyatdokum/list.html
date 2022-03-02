@@ -76,7 +76,7 @@ app.hideAside = true">
               <i class="fa fa-wifi fa-fw"></i>
               <span class="text-black">ONLINE</span>
             </li>
-            <a class="list-group-item" ng-click="BariyerAc()" ng-show="AntenDurumu == 'Anten Bağlandı'">
+            <a class="list-group-item" ng-click="BariyerAcModal()">
               <i class="fa fa-openid fa-fw"></i>
               <span class="text-black">Bariyer Aç</span>
             </a>
@@ -101,14 +101,14 @@ app.hideAside = true">
         </div>
         <div class="panel-body wrapper-xs">
           <form name="myForm" class="form-horizontal">
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label text-danger">OKUNAN</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Okunan" ng-model="readBarkod" disabled class="form-control input-md" />
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label text-danger">TÜR</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.Tur" disabled
@@ -116,7 +116,7 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label text-danger">BARKOD</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BarkodNo" disabled
@@ -124,7 +124,7 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label text-danger">BELGE NO</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Barkod okutunuz" ng-model="kabul.BelgeNo" disabled
@@ -132,41 +132,48 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label text-danger">OGS</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
                   ng-model="kabul.Ogs" />
               </div>
             </div>
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">BELGE MİK.</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md"
                   ng-model="kabul.Response.TasinacakAtikMiktari" />
               </div>
             </div>
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">DÖKÜM MİK.</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.DokumMiktari" />
               </div>
             </div>
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">KALAN MİK.</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.KalanMiktar" />
               </div>
             </div>
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">FİRMA BAK.</label>
               <div class="col-md-8">
                 <input kendo-numeric-text-box disabled k-format="'c2'" ng-model="kabul.Response.GuncelBakiye"
                   k-spinners="false" style="width: 100%" />
               </div>
             </div>
+            <div class="form-group m-b-xs">
+              <label class="col-md-4 control-label">DEP.ALANI</label>
+              <div class="col-md-8">
+                <input disabled class="form-control input-md" ng-model="kabul.Response.DepolamaAlani"
+                  style="width: 100%" />
+              </div>
+            </div>
 
-            <div class="form-group">
+            <div class="form-group m-b-xs">
               <small class="text-muted m-l-md">{{AntenDurumu}}</small>
               <progressbar animate="true" value="iOgs" type="succes" class="progress-xs">
               </progressbar>
@@ -187,7 +194,7 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">ARAÇ CİNSİ</label>
               <div class="col-md-8">
                 <input type="text" placeholder="Plaka seçiniz" disabled class="form-control input-md"
@@ -195,7 +202,7 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group m-b-xs">
               <progressbar max="100" animate="true" value="i" type="danger" class="progress-striped active progress-xl">
                 <span style="white-space: nowrap">{{ i + "% " + tempGelenTonaj}} KG</span>
               </progressbar>
@@ -208,21 +215,28 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">DARA</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md" ng-model="kabul.Dara" />
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">NET</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md" ng-model="kabul.Net" />
               </div>
             </div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
+              <label class="col-md-4 control-label">KAPASİTE</label>
+              <div class="col-md-8">
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Kapasite" />
+              </div>
+            </div>
+
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">TUTAR</label>
               <div class="col-md-8">
                 <span class="form-control disabled">{{kabul.Tutar | currency : "₺"}}
@@ -230,9 +244,9 @@ app.hideAside = true">
               </div>
             </div>
 
-            <div class="line dker bg-red-100"></div>
+            <div class="line dker bg-red-100 m-b-xs"></div>
 
-            <div class="form-group m-b-sm">
+            <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">FİRMA</label>
               <div class="col-md-8">
                 <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.FirmaAdi" />
@@ -246,10 +260,11 @@ app.hideAside = true">
 </div>
 
 <script type="text/ng-template" id="araclarModal">
-  <div class="modal-header">
+  <div class="modal-header wrapper-xs">
+    <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
       <h4>PLAKA SEÇİNİZ {{PlakaNo + " | (" + AracId + ")"}}</h2>
   </div>
-  <div class="modal-body">
+  <div class="modal-body wrapper-xs">
     <div id="gridAraclar"></div>  
   </div>
   <div class="modal-footer">
@@ -291,13 +306,13 @@ app.hideAside = true">
 </script>
 
 <script type="text/ng-template" id="hgsModal">
-  <div class="modal-header">
+  <div class="modal-header wrapper-xs">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
     <h4>HGS</h2>         
   
   </div>
   </div>
-  <div class="modal-body"> 
+  <div class="modal-body wrapper-xs"> 
     <div id="gridAraclar"></div>
   </div>
   <div class="modal-footer">
@@ -306,18 +321,18 @@ app.hideAside = true">
 </script>
 
 <script type="text/ng-template" id="aracedit">
-  <div class="modal-header">
+  <div class="modal-header wrapper-xs">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
     <h4>Araç Bilgileri</h4>         
   
   </div>
-  <div class="modal-body wrapper-md">
+  <div class="modal-body wrapper-xs">
       <div class="row">
           <div class="col-sm-12 ">
             
 
               <form role="form">
-                  <div class="form-group">
+                  <div class="form-group m-b-xs">
                       <alert type="danger" ng-show="aractakipiduyari"><i class="fa fa-exclamation"></i> {{aractakipiduyari}}</alert>
                       <alert type="danger" ng-show="plakauyari"><i class="fa fa-exclamation"></i> {{plakauyari}}</alert>
                       <div class="row">
@@ -340,7 +355,7 @@ app.hideAside = true">
                       </div>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group m-b-xs">
                       <div class="row">
                           <div class="col-sm-3">
                               <label>Plaka No</label>
@@ -359,7 +374,7 @@ app.hideAside = true">
                       </div>
                   </div>                 
 
-                  <div class="form-group">
+                  <div class="form-group m-b-xs">
                       <div class="row">
                           <div class="col-sm-3">
                               <label>Dara</label>
@@ -373,7 +388,7 @@ app.hideAside = true">
                       </div>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group m-b-xs">
                       <label>Açıklama</label>
                       <textarea class="form-control" ng-model="arac.Aciklama"></textarea>
                   </div>
@@ -388,6 +403,40 @@ app.hideAside = true">
           <span class="text">Kaydet</span>
       </button>
       <button class="btn btn-danger" type="button" ng-click="Iptal()">Iptal</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="bariyer_open">
+  <div class="modal-header wrapper-xs">
+    <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
+    <h2>Bariyer Aç</h2>   
+  </div>
+  <div class="modal-body wrapper-xs">
+    <ul class="list-group no-radius m-b-n-sm">
+
+      <a href="" class="list-group-item bg-light-blue-50" ng-click="OK('Giriş')">
+        <i class="fa  fa-arrow-circle-o-right  text-2x"></i>
+        <span class="text-black text-2x "> Giriş</span>
+      </a>
+      <a href="" class="list-group-item bg-light-blue-50" ng-click="OK('Çıkış')">
+        <i class="fa fa-arrow-circle-o-left text-2x"></i>
+        <span class="text-black text-2x"> Çıkış</span>
+      </a>
+      <a href="" class="list-group-item bg-light-blue-100" ng-click="OK('yan_cikis')">
+        <i class="fa fa-arrow-circle-o-right  text-2x"></i>
+        <span class="text-black text-2x"> Yan Çıkış</span>
+      </a>
+      <a href="" class="list-group-item bg-light-blue-200" ng-click="OK('')">
+        <i class="fa fa-arrow-circle-o-right text-2x"></i>
+        <span class="text-black text-2x"> Misafir Giriş</span>
+      </a>
+      <a href="" class="list-group-item bg-light-blue-200" ng-click="OK('')">
+        <i class="fa fa-arrow-circle-o-left text-2x"></i>
+        <span class="text-black text-2x"> Misafir Çıkış</span>
+      </a>
+
+    </ul>
+    <br/>
   </div>
 </script>
 

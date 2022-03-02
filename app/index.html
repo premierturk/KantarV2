@@ -1,207 +1,176 @@
 ﻿<!DOCTYPE html>
 <html lang="tr" data-ng-app="app">
-  <head>
-    <title>Hafriyat Yönetim Bilgi Sistemi</title>
-    <!--<link rel="manifest" href="manifest.json">-->
 
-    <meta charset="utf-8" />
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta
-      name="google-site-verification"
-      content="r53z7CqWgWIa3VzkqSFQ2XJZ4PoSa8FfsG9ponHvvJE"
-    />
-    <meta name="description" content="Hafriyat Yönetim Bilgi Sistemi" />
-    <meta
-      name="keywords"
-      content="hafriyat , yönetim , bilgi , sistemi , arnetek , premierturk"
-    />
-    <meta name="subject" content="Hafriyat Yönetim Bilgi Sistemi" />
-    <meta name="copyright" content="Premierturk" />
-    <meta name="author" content="bahadir.bekec@premierturk.com" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+<head>
+  <title>Hafriyat Yönetim Bilgi Sistemi</title>
+  <!--<link rel="manifest" href="manifest.json">-->
 
-    <link rel="stylesheet" href="css/bootstrap.css" type="text/css" />
-    <link rel="stylesheet" href="css/animate.css" type="text/css" />
-    <link rel="stylesheet" href="css/animation.css" />
-    <link rel="stylesheet" href="css/hover.css" />
-    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/simple-line-icons.css" type="text/css" />
-    <link rel="stylesheet" href="css/font.css" type="text/css" />
-    <link rel="stylesheet" href="css/app.css" type="text/css" />
-    <link rel="stylesheet" href="css/colors.css" />
+  <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta name="google-site-verification" content="r53z7CqWgWIa3VzkqSFQ2XJZ4PoSa8FfsG9ponHvvJE" />
+  <meta name="description" content="Hafriyat Yönetim Bilgi Sistemi" />
+  <meta name="keywords" content="hafriyat , yönetim , bilgi , sistemi , arnetek , premierturk" />
+  <meta name="subject" content="Hafriyat Yönetim Bilgi Sistemi" />
+  <meta name="copyright" content="Premierturk" />
+  <meta name="author" content="bahadir.bekec@premierturk.com" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-    <link
-      href="vendor/kendoui/styles/kendo.bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="vendor/kendoui/styles/kendo.bootstrap.mobile.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="vendor/kendoui/styles/kendo.common-bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link href="vendor/kendoui/styles/kendo.common.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap.css" type="text/css" />
+  <link rel="stylesheet" href="css/animate.css" type="text/css" />
+  <link rel="stylesheet" href="css/animation.css" />
+  <link rel="stylesheet" href="css/hover.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/simple-line-icons.css" type="text/css" />
+  <link rel="stylesheet" href="css/font.css" type="text/css" />
+  <link rel="stylesheet" href="css/app.css" type="text/css" />
+  <link rel="stylesheet" href="css/colors.css" />
 
-    <link
-      href="vendor/modules/angularjs-loading-bar/loading-bar.css"
-      rel="stylesheet"
-    />
-    <link href="css/fullwidthimage.css" rel="stylesheet" />
-    <link href="vendor/jquery/swetalert/sweetalert.css" rel="stylesheet" />
-    <link
-      href="vendor/modules/angular-openlayers-directive/openlayers/ol.css"
-      rel="stylesheet"
-    />
-    <link
-      href="vendor/modules/angular-openlayers-directive/openlayers/ol3-geocoder.css"
-      rel="stylesheet"
-    />
+  <link href="vendor/kendoui/styles/kendo.bootstrap.min.css" rel="stylesheet" />
+  <link href="vendor/kendoui/styles/kendo.bootstrap.mobile.min.css" rel="stylesheet" />
+  <link href="vendor/kendoui/styles/kendo.common-bootstrap.min.css" rel="stylesheet" />
+  <link href="vendor/kendoui/styles/kendo.common.min.css" rel="stylesheet" />
 
-    <link
-      href="vendor/angular/angular-ui-notification/angular-ui-notification.min.css"
-      rel="stylesheet"
-    />
+  <link href="vendor/modules/angularjs-loading-bar/loading-bar.css" rel="stylesheet" />
+  <link href="css/fullwidthimage.css" rel="stylesheet" />
+  <link href="vendor/jquery/swetalert/sweetalert.css" rel="stylesheet" />
+  <link href="vendor/modules/angular-openlayers-directive/openlayers/ol.css" rel="stylesheet" />
+  <link href="vendor/modules/angular-openlayers-directive/openlayers/ol3-geocoder.css" rel="stylesheet" />
 
-    <!--tooltip-->
-    <link
-      href="vendor/tooltipster-master/dist/css/tooltipster.bundle.min.css"
-      rel="stylesheet"
-    />
-    <link href="vendor/notiflix/notiflix-2.7.0.min.css" rel="stylesheet" />
-  </head>
+  <link href="vendor/angular/angular-ui-notification/angular-ui-notification.min.css" rel="stylesheet" />
 
-  <body ng-controller="AppCtrl">
-    <div
-      class="app"
-      id="app"
-      ng-class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}"
-      ui-view
-    ></div>
+  <!--tooltip-->
+  <link href="vendor/tooltipster-master/dist/css/tooltipster.bundle.min.css" rel="stylesheet" />
+  <link href="vendor/notiflix/notiflix-2.7.0.min.css" rel="stylesheet" />
+  <link href="../node_modules/json.human/css/json.human.css" rel="stylesheet" />
+</head>
 
-    <!-- jQuery -->
-    <script>
-      window.$ = window.jQuery = require("./vendor/jquery/jquery.min.js");
-    </script>
+<body ng-controller="AppCtrl">
+  <div class="app" id="app"
+    ng-class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}"
+    ui-view></div>
 
-    <!-- Angular -->
-    <script src="vendor/angular/angular.js"></script>
-    <script src="vendor/angular/angular-locale_tr-tr.js"></script>
+  <!-- jQuery -->
+  <script>
+    window.$ = window.jQuery = require("./vendor/jquery/jquery.min.js");
+  </script>
 
-    <!--SingnalR-->
-    <script src="vendor/signalr/jquery.signalR-2.2.2.min.js"></script>
+  <!-- Angular -->
+  <script src="vendor/angular/angular.js"></script>
+  <script src="vendor/angular/angular-locale_tr-tr.js"></script>
 
-    <!--KendoUi-->
-    <script src="vendor/kendoui/js/kendo.all.min.js"></script>
-    <!-- <script src="https://kendo.cdn.telerik.com/2017.3.913/js/kendo.all.min.js"></script> -->
-    <script src="vendor/kendoui/js/cultures/kendo.culture.tr.min.js"></script>
-    <script src="vendor/kendoui/js/cultures/kendo.culture.tr-TR.min.js"></script>
-    <script src="vendor/kendoui/js/jszip.min.js"></script>
-    <script src="vendor/kendoui/js/messages/kendo.messages.tr-TR.min.js"></script>
-    <script src="vendor/kendoui/kendoHelpers.js"></script>
+  <!--SingnalR-->
+  <script src="vendor/signalr/jquery.signalR-2.2.2.min.js"></script>
 
-    <script src="vendor/angular/angular-animate/angular-animate.js"></script>
-    <script src="vendor/angular/angular-cookies/angular-cookies.js"></script>
-    <script src="vendor/angular/angular-resource/angular-resource.js"></script>
-    <script src="vendor/angular/angular-sanitize/angular-sanitize.js"></script>
-    <script src="vendor/angular/angular-touch/angular-touch.js"></script>
-    <!-- Vendor -->
-    <script src="vendor/angular/angular-ui-router/angular-ui-router.js"></script>
-    <script src="vendor/angular/ngstorage/ngStorage.js"></script>
-    <script src="vendor/angular/angular-base64.min.js"></script>
-    <script src="vendor/angular/angular-countup.min.js"></script>
-    <!-- bootstrap -->
-    <script src="vendor/angular/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <!-- lazyload -->
-    <script src="vendor/angular/oclazyload/ocLazyLoad.js"></script>
-    <!-- translate -->
-    <script src="vendor/angular/angular-translate/angular-translate.js"></script>
-    <script src="vendor/angular/angular-translate/loader-static-files.js"></script>
-    <script src="vendor/angular/angular-translate/storage-cookie.js"></script>
-    <script src="vendor/angular/angular-translate/storage-local.js"></script>
+  <!--KendoUi-->
+  <script src="vendor/kendoui/js/kendo.all.min.js"></script>
+  <!-- <script src="https://kendo.cdn.telerik.com/2017.3.913/js/kendo.all.min.js"></script> -->
+  <script src="vendor/kendoui/js/cultures/kendo.culture.tr.min.js"></script>
+  <script src="vendor/kendoui/js/cultures/kendo.culture.tr-TR.min.js"></script>
+  <script src="vendor/kendoui/js/jszip.min.js"></script>
+  <script src="vendor/kendoui/js/messages/kendo.messages.tr-TR.min.js"></script>
+  <script src="vendor/kendoui/kendoHelpers.js"></script>
 
-    <!--openlayers-->
-    <script src="vendor/modules/angular-openlayers-directive/openlayers/ol.js"></script>
-    <script src="vendor/modules/angular-openlayers-directive/openlayers/ol3-geocoder.js"></script>
-    <script src="vendor/modules/angular-openlayers-directive/angular-openlayers-directive.min.js"></script>
+  <script src="vendor/angular/angular-animate/angular-animate.js"></script>
+  <script src="vendor/angular/angular-cookies/angular-cookies.js"></script>
+  <script src="vendor/angular/angular-resource/angular-resource.js"></script>
+  <script src="vendor/angular/angular-sanitize/angular-sanitize.js"></script>
+  <script src="vendor/angular/angular-touch/angular-touch.js"></script>
+  <!-- Vendor -->
+  <script src="vendor/angular/angular-ui-router/angular-ui-router.js"></script>
+  <script src="vendor/angular/ngstorage/ngStorage.js"></script>
+  <script src="vendor/angular/angular-base64.min.js"></script>
+  <script src="vendor/angular/angular-countup.min.js"></script>
+  <!-- bootstrap -->
+  <script src="vendor/angular/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <!-- lazyload -->
+  <script src="vendor/angular/oclazyload/ocLazyLoad.js"></script>
+  <!-- translate -->
+  <script src="vendor/angular/angular-translate/angular-translate.js"></script>
+  <script src="vendor/angular/angular-translate/loader-static-files.js"></script>
+  <script src="vendor/angular/angular-translate/storage-cookie.js"></script>
+  <script src="vendor/angular/angular-translate/storage-local.js"></script>
 
-    <!--moment-->
-    <script src="vendor/jquery/moment/moment.js"></script>
-    <script src="vendor/jquery/moment/moment-with-locales.js"></script>
+  <!--openlayers-->
+  <script src="vendor/modules/angular-openlayers-directive/openlayers/ol.js"></script>
+  <script src="vendor/modules/angular-openlayers-directive/openlayers/ol3-geocoder.js"></script>
+  <script src="vendor/modules/angular-openlayers-directive/angular-openlayers-directive.min.js"></script>
 
-    <!--tooltip-->
-    <script src="vendor/tooltipster-master/dist/js/tooltipster.bundle.min.js"></script>
-    <script src="vendor/notiflix/notiflix-2.7.0.min.js"></script>
+  <!--moment-->
+  <script src="vendor/jquery/moment/moment.js"></script>
+  <script src="vendor/jquery/moment/moment-with-locales.js"></script>
 
-    <!-- App -->
-    <script src="js/app.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/config.lazyload.js"></script>
-    <script src="js/config.router.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/controllers/angular-linq.js"></script>
-    <script src="js/services/ui-load.js"></script>
-    <script src="js/directives/setnganimate.js"></script>
-    <script src="js/directives/ui-butterbar.js"></script>
-    <script src="js/directives/ui-focus.js"></script>
-    <script src="js/directives/ui-jq.js"></script>
-    <script src="js/directives/ui-module.js"></script>
-    <script src="js/directives/ui-nav.js"></script>
-    <script src="js/directives/ui-scroll.js"></script>
-    <script src="js/directives/ui-shift.js"></script>
-    <script src="js/directives/ui-toggleclass.js"></script>
-    <script src="js/directives/ui-validate.js"></script>
-    <script src="js/controllers/bootstrap.js"></script>
-    <script src="js/directives/angular-button.js"></script>
-    <script src="js/directives/angular-notification.js"></script>
-    <script src="vendor/modules/angularjs-loading-bar/loading-bar.js"></script>
+  <!--tooltip-->
+  <script src="vendor/tooltipster-master/dist/js/tooltipster.bundle.min.js"></script>
+  <script src="vendor/notiflix/notiflix-2.7.0.min.js"></script>
 
-    <!-- sweetalert -->
-    <script src="vendor/jquery/swetalert/sweetalert.js"></script>
-    <script src="vendor/angular/sweetalert/SweetAlert.js"></script>
-    <script src="vendor/angular/angular-ui-notification/angular-ui-notification.min.js"></script>
+  <!-- App -->
+  <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/config.lazyload.js"></script>
+  <script src="js/config.router.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/controllers/angular-linq.js"></script>
+  <script src="js/services/ui-load.js"></script>
+  <script src="js/directives/setnganimate.js"></script>
+  <script src="js/directives/ui-butterbar.js"></script>
+  <script src="js/directives/ui-focus.js"></script>
+  <script src="js/directives/ui-jq.js"></script>
+  <script src="js/directives/ui-module.js"></script>
+  <script src="js/directives/ui-nav.js"></script>
+  <script src="js/directives/ui-scroll.js"></script>
+  <script src="js/directives/ui-shift.js"></script>
+  <script src="js/directives/ui-toggleclass.js"></script>
+  <script src="js/directives/ui-validate.js"></script>
+  <script src="js/controllers/bootstrap.js"></script>
+  <script src="js/directives/angular-button.js"></script>
+  <script src="js/directives/angular-notification.js"></script>
+  <script src="vendor/modules/angularjs-loading-bar/loading-bar.js"></script>
 
-    <!-- Lazy loading -->
-    <script>
-      moment.locale("tr");
-      kendo.culture("tr-TR");
+  <!-- sweetalert -->
+  <script src="vendor/jquery/swetalert/sweetalert.js"></script>
+  <script src="vendor/angular/sweetalert/SweetAlert.js"></script>
+  <script src="vendor/angular/angular-ui-notification/angular-ui-notification.min.js"></script>
 
-      // Notiflix.Notify.Init({});
-      // Notiflix.Report.Init({ plainText: false });
-      // Notiflix.Confirm.Init({ plainText: false, messageMaxLength: 500 });
-      // Notiflix.Loading.Init({});
 
-      const { ipcRenderer } = require("electron");
 
-      ipcRenderer.send("app_version");
+  <!-- Lazy loading -->
+  <script>
+    moment.locale("tr");
+    kendo.culture("tr-TR");
 
-      ipcRenderer.on("app_version", (event, arg) => {
-        ipcRenderer.removeAllListeners("app_version");
-        Notiflix.Notify.success("Version " + arg.version);
-      });
+    Notiflix.Notify.init({});
+    Notiflix.Report.init({ plainText: false, messageMaxLength: 10000, width: '500px', });
+    Notiflix.Confirm.init({ lainText: false, messageMaxLength: 10000, width: '500px', });
+    Notiflix.Loading.init({});
 
-      ipcRenderer.on("update_available", () => {
-        ipcRenderer.removeAllListeners("update_available");
-        Notiflix.Notify.info("Yeni versiyon indiriliyor...");
-      });
+    const { ipcRenderer } = require("electron");
 
-      ipcRenderer.on("update_downloaded", () => {
-        ipcRenderer.removeAllListeners("update_downloaded");
+    ipcRenderer.send("app_version");
 
-        Notiflix.Report.success(
-          "Yeni veriyon indirildi",
-          "Yeniden başlatmak için Tamam tıklayınız.",
-          "Tamam",
-          () => {
-            ipcRenderer.send("restart_app");
-          });
+    ipcRenderer.on("app_version", (event, arg) => {
+      ipcRenderer.removeAllListeners("app_version");
+      Notiflix.Notify.success("Version " + arg.version);
+    });
 
-      });
+    ipcRenderer.on("update_available", () => {
+      ipcRenderer.removeAllListeners("update_available");
+      Notiflix.Notify.info("Yeni versiyon indiriliyor...");
+    });
 
-    </script>
-  </body>
+    ipcRenderer.on("update_downloaded", () => {
+      ipcRenderer.removeAllListeners("update_downloaded");
+
+      Notiflix.Report.success(
+        "Yeni veriyon indirildi",
+        "Yeniden başlatmak için Tamam tıklayınız.",
+        "Tamam",
+        () => {
+          ipcRenderer.send("restart_app");
+        });
+
+    });
+
+  </script>
+</body>
+
 </html>

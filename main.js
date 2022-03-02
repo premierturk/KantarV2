@@ -95,8 +95,8 @@ function createWindow() {
 
   const port = new serialport(config.SerialPort.portName, config.SerialPort);
   var serial_port_open = function () {
-  
-    
+
+
     port.open(function (err) {
       if (err) {
 
@@ -112,25 +112,22 @@ function createWindow() {
     });
 
     port.on("open", function () {
-      return console.log("SERIAL PORT OPEN :", port);
+      return console.log("SERIAL PORT OPEN");
     });
 
     port.close(function (err) {
-      console.log('port closed', err);
+      console.log('SERIAL PORT CLOSE', err);
     });
 
     port.on("data", function (data) {
       mainWindow.webContents.send("comport", data);
     });
 
-  
-
   }
 
   var serial_port_close = function () {
-    if (port.isOpen) {
+    if (port.isOpen)
       port.close();
-    }
 
     setTimeout(serial_port_open, 3000);
   }
@@ -140,32 +137,28 @@ function createWindow() {
     serial_port_open();
 
 
-    ipc.on("port_restart", (event) => {
-      serial_port_close();
-    });
+  ipc.on("port_restart", (event) => {
+    serial_port_close();
+  });
 
 
+  //todo : remote open/close
+  // var hub = "ScreenShut";
+  // let client = new signalr.client(config.SignalR.host, [hub]);
+  // client.qs = { "tip": "kantar" };
+  // client.start();
 
-  var hub = "ScreenShut";
-  let client = new signalr.client(config.SignalR.host, [hub]);
-  client.qs = { "tip": "kantar" };
-  client.start();
 
-
-  var i = 0;
-  var b = 0;
-  setInterval(async function () {
-    i++;
-
-    var img = await screenshot({ format: 'png' });
-    b += img.length;
-
-    var imgStr = new Buffer(img).toString('base64');
-    client.connection.hub.invoke(hub, 'send', imgStr);
-
-    console.log(i + " - " + formatBytes(b));
-
-  }, 3000);
+  // var i = 0;
+  // var b = 0;
+  // setInterval(async function () {
+  //   i++;
+  //   var img = await screenshot({ format: 'png' });
+  //   b += img.length;
+  //   var imgStr = new Buffer(img).toString('base64');
+  //   client.connection.hub.invoke(hub, 'send', imgStr);
+  //   console.log(i + " - " + formatBytes(b));
+  // }, 1000);
 
 }
 

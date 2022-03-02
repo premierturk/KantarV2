@@ -5,7 +5,10 @@ const _ = require("lodash");
 const { base64encode, base64decode } = require("nodejs-base64");
 const ab2str = require("arraybuffer-to-string");
 const { ipcRenderer: ipc } = require("electron");
+const JsonHuman = require("json.human");
+const signalr = require('node-signalr');
 // const { config } = require('process');
+
 
 app.controller(
   "hafriyatdokumlistCtrl",
@@ -34,7 +37,7 @@ app.controller(
       });
     });
     $(window).blur(function () {
-      Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
+      //Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
     });
     $(window).focus(function () {
       Notiflix.Loading.remove(100);
@@ -55,8 +58,8 @@ app.controller(
         var d = ab2str(data);
         //console.log(d);
 
-        //BursaCikis
-        if ($rootScope.app.options.GirisCikis == "Çıkış") {
+        if ($rootScope.app.options.GirisCikis == "Çıkış") {//BursaCikis
+
           d = d.replaceAll(" ", "");
           d = d.replace("\r", "");
           d = d.replace("A", "");
@@ -66,37 +69,78 @@ app.controller(
 
           if (d != "") {
             var tonaj = parseInt(d);
-
             run(tonaj);
           }
-        } else {
-          //BursaGiris
-          if (
-            (data[0] == 2 && data[1] == 41) ||
-            (data[0] == 2 && data[1] == 33)
-          )
+
+        } else {//BursaGiris
+
+          if ((data[0] == 2 && data[1] == 41) || (data[0] == 2 && data[1] == 33))
             temp = [];
 
           for (let i = 0; i < data.length; i++) temp.push(data[i]);
 
-          //console.log("temp :" + temp);
+          if (((temp[0] == 2 && temp[1] == 41) || (temp[0] == 2 && temp[1] == 33)) && temp[temp.length - 1] == 13) {
 
-          if (
-            ((temp[0] == 2 && temp[1] == 41) ||
-              (temp[0] == 2 && temp[1] == 33)) &&
-            temp[temp.length - 1] == 13
-          ) {
             d = ab2str(temp);
-            //console.log("SONC :" + d);
             var ddd = d.split(" ");
             if (ddd.length == 3) {
               var x = ddd[1];
               run(parseInt(x));
             }
           }
+
+
         }
       });
     };
+
+    var hub = "Bariyer";
+    var signalr_client;
+    var remote_bariyer = function (BariyerAdi) {
+
+      signalr_client = new signalr.client(config.SignalR.host, [hub]);
+      signalr_client.qs = { "BariyerAdi": BariyerAdi };
+
+      var opened = false;
+      signalr_client.connection.hub.on(hub, 'ac', (data) => {
+
+        if (!opened) {
+
+          Notiflix.Notify.info(data + " bariyeri açıldı");
+
+          if (data == $rootScope.app.options.GirisCikis) {
+            if (client_anten)
+              client_anten.write("0100000111040D12CA\r");
+          } else if (data == "yan_cikis") {
+            if (client_anten_direk_cikis)
+              client_anten_direk_cikis.write("0100000111040D12CA\r");
+          }
+
+          opened = true;
+
+          setTimeout(function () {
+            opened = false;
+          }, 1000);
+
+        }
+
+
+
+      })
+
+
+      signalr_client.on('connected', () => {
+        console.log('SignalR client connected.')
+      });
+
+      signalr_client.on('error', (code, ex) => {
+        console.log(`SignalR client connect error: ${code}.`)
+      });
+
+
+      signalr_client.start();
+
+    }
 
     var client_anten_direk_cikis;
     var myTcp_Direk_Cikis = function (e) {
@@ -104,9 +148,7 @@ app.controller(
         client_anten_direk_cikis = client;
         console.log("Direk Cikis Client connect : ", client);
 
-        // $scope.$apply(function () {
-        //   $scope.AntenDurumu = "Anten Bağlandı";
-        // });
+        remote_bariyer("yan_cikis");
 
         client.on("data", function (received) {
           if ($localStorage.user.ilid === 6) {
@@ -200,6 +242,8 @@ app.controller(
       var server = net.createServer(function (client) {
         client_anten = client;
         console.log("Client connect : ", client);
+
+        remote_bariyer($rootScope.app.options.GirisCikis);
 
         $scope.$apply(function () {
           $scope.AntenDurumu = "Anten Bağlandı";
@@ -344,6 +388,7 @@ app.controller(
       Tutar: 0,
       Tonaj: 0,
       Dara: 0,
+      Kapasite: 0,
       Net: 0,
       Hesapla: function () {
         if ($scope.kabul.AracId == null) return;
@@ -404,6 +449,7 @@ app.controller(
         $scope.kabul.Tonaj = 0;
         $scope.kabul.Dara = 0;
         $scope.kabul.Net = 0;
+        $scope.kabul.Kapasite = 0;
         //$scope.kabul.BirimFiyat = 0
         $scope.kabul.IlDisiBirimFiyat = 0;
         $scope.kabul.SahaId = null;
@@ -448,11 +494,7 @@ app.controller(
       $scope.Kaydet();
     });
 
-    $scope.BariyerAc = function () {
-      console.log("BariyerAc...");
-      if (client_anten) client_anten.write("0100000111040D12CA\r");
-      else Notiflix.Notify.failure("Anten bağlı değil");
-    };
+
 
 
     var isSend = true;
@@ -530,7 +572,7 @@ app.controller(
         GirisCikis: $rootScope.app.options.GirisCikis,
       };
 
-
+      console.log("kaydet start");
 
       if (data.GirisCikis == "Giriş") {
         //BELGE ONAY
@@ -590,7 +632,6 @@ app.controller(
                 isSend = true;
               }, 1000);
 
-              //if (client_anten) client_anten.write("0100000111040D12CA\r");
               $scope.BariyerAc();
               Notiflix.Notify.success("Kaydedildi.");
 
@@ -740,6 +781,7 @@ app.controller(
         $scope.kabul.Tonaj = 0;
         $scope.kabul.Dara = 0;
         $scope.kabul.Net = 0;
+        $scope.kabul.Kapasite = 0;
         $scope.readBarkod = "";
         $scope.i = 0;
         $scope.iOgs = 0;
@@ -754,6 +796,7 @@ app.controller(
       $scope.kabul.AracId = arac.AracId;
       $scope.kabul.AracCinsi = arac.AracCinsi;
       $scope.kabul.AracCinsiId = arac.AracCinsiId;
+      $scope.kabul.Kapasite = arac.Kapasitesi;
 
       var GirisCikis = $rootScope.app.options.GirisCikis;
 
@@ -769,7 +812,6 @@ app.controller(
       }
     };
 
-
     var OgsTemizle = function () {
 
       tempEtiketNo = [];
@@ -779,6 +821,7 @@ app.controller(
         $scope.iOgs = 0;
         $scope.kabul.Ogs = "";
 
+        $scope.kabul.Kapasite = "0";
         $scope.kabul.PlakaNo = "";
         $scope.kabul.Dara = 0;
         $scope.kabul.AracId = null;
@@ -787,7 +830,6 @@ app.controller(
       });
 
     }
-
 
     $scope.readBarkod = "";
     $(window).bind("keypress", function (event) {
@@ -913,7 +955,6 @@ app.controller(
 
       modalInstance.result.then(function (e) {
 
-
         if ($scope.kabul.AracCinsiId == 30) {
 
           $scope.kabul.Tutar = 0;
@@ -988,6 +1029,30 @@ app.controller(
       });
     };
 
+    var depolamaAlaniSor = function (data) {
+
+      return new Promise(resolve => {
+
+        Notiflix.Confirm.show(
+          'Farklı depolama alanı',
+          'Belge ' + data.DepolamaAlani + " için oluşturulmuş. <br/> " + data.DepolamaAlani + " alanı kapalı olması nedeniyle Mevcut sahaya kabul edilecektir!",
+          'Kabul Et',
+          'Hayır',
+          () => {
+            resolve(true)
+          },
+          () => {
+            resolve(false)
+          },
+          {
+          },
+        );
+
+      });
+
+
+    }
+
     var TasimaKabuBelgesi = function (Barkod, BelgeNo) {
       var data = {
         BelgeNo: BelgeNo,
@@ -995,7 +1060,7 @@ app.controller(
       kendoExt.post(
         "api/kantar/KabulBelgesiKontrol",
         data,
-        function (response) {
+        async function (response) {
           var data = response.data;
 
           if (data === null) {
@@ -1003,10 +1068,18 @@ app.controller(
 
             //$scope.kabul.Temizle();
           } else {
+
             if (data.Aktif === false) {
               swal("Uyarı", "Belge aktif değil", "error");
-              //$scope.kabul.Temizle();
               return;
+            }
+
+            //FARKLI DEPOLAMA ALANI SORGULAMA
+            if (data.DepolamaAlanId != $localStorage.user.depolamaalani.DepolamaAlanId) {
+
+              var res = await depolamaAlaniSor(data);
+              if (!res)
+                return;
             }
 
             $scope.kabul.Tur = "KABUL BELGESİ";
@@ -1018,6 +1091,7 @@ app.controller(
             $scope.kabul.Response.KalanMiktar =
               $scope.kabul.Response.TasinacakAtikMiktari -
               $scope.kabul.Response.DokumMiktari;
+
 
             //SAHA SEÇİMİ
             if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
@@ -1042,6 +1116,10 @@ app.controller(
             if (!$localStorage.user.depolamaalani.OgsAktif) {
               $scope.PlakaSec();
             } else $scope.Kaydet();
+
+
+            $scope.$apply();
+
           }
         }
       );
@@ -1196,7 +1274,7 @@ app.controller(
         OgsTemizle();
       }
 
-    }, 2000);
+    }, 3000);
 
 
     var kantarVeriTemizle = function () {
@@ -1210,8 +1288,6 @@ app.controller(
       });
 
     }
-
-
 
 
     var tempTonaj = [];
@@ -1285,7 +1361,7 @@ app.controller(
 
     var col = [
       {
-        width: "100px",
+        width: "200px",
         command: [
           {
             field: "Tur",
@@ -1367,8 +1443,6 @@ app.controller(
 
               kendo.prompt("Giriş tonajı " + dataItem.Tonaj + " kg dır. Dara bilgisini giriniz.", "0").then(function (data) {
 
-
-
                 var tonaj = dataItem.Tonaj;
                 var dara = parseInt(data);
                 var net = tonaj - dara;
@@ -1414,6 +1488,62 @@ app.controller(
               }, function () {
                 //kendo.alert("Cancel entering value.");
               })
+
+
+            },
+          },
+          {
+            field: "Tur",
+            text: "TahakSor",
+            className: "k-error-colored",
+            visible: function (dataItem) {
+              var r = (dataItem.OwnerId == 999 || dataItem.OwnerId == 998);
+              return r;
+            },
+            click: function (e) {
+              e.preventDefault();
+
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+              var data = {
+                BelgeNo: dataItem.BelgeNo,
+              };
+
+              kendoExt.post(
+                "api/kantar/SanayiAtikKontrol",
+                data,
+                function (response) {
+
+                  var data = response.data;
+
+                  if (data.TahakkukTonaji == null) data.TahakkukTonaji = 0;
+
+                  var html = JsonHuman.format(data).outerHTML;
+
+                  if (data.TahakkukTonaji == dataItem.Tonaj) {
+
+                    Notiflix.Report.success(
+                      "TAHAKKUK MİKTARI DOĞRU",
+                      html,
+                      'Tamam',
+                    );
+
+                  } else {
+
+                    Notiflix.Report.failure(
+                      "TAHAKKUK MİKTARI HATALI",
+                      html,
+                      'Tamam',
+                    );
+
+                  }
+
+
+                },
+                function (err) {
+                  Notiflix.Notify.failure(err.data);
+                }
+              );
 
 
             },
@@ -1654,6 +1784,7 @@ app.controller(
       aggregate
     );
 
+    var isBindDblClk = false;
     function onBound(e) {
       var grid = e.sender;
       var rows = grid.items();
@@ -1676,6 +1807,25 @@ app.controller(
 
 
       });
+
+      if (!isBindDblClk) {
+        isBindDblClk = true;
+        kendoHelpers.grid.eventRowDoubleClick(grid, function (item) {
+
+
+          var d = JSON.parse(JSON.stringify(item));
+          var html = JsonHuman.format(d).outerHTML;
+
+          Notiflix.Report.info(
+            "",
+            html,
+            'Tamam',
+          );
+
+        });
+      }
+
+
     }
 
     function onDataBinding(e) {
@@ -1746,6 +1896,34 @@ app.controller(
 
     };
 
+    $scope.BariyerAc = function () {
+      console.log("BariyerAc...");
+      if (client_anten) client_anten.write("0100000111040D12CA\r");
+      else Notiflix.Notify.failure("Anten bağlı değil");
+    };
+
+
+    $scope.BariyerAcModal = function () {
+
+      var modalInstance = $modal.open({
+        keyboard: true,
+        animation: false,
+        templateUrl: "bariyer_open",
+        controller: "bariyerCtrl",
+        size: "md",
+        resolve: {},
+      });
+
+      modalInstance.result.then(function (e) {
+        //bariyer acilacak
+        if (signalr_client)
+          signalr_client.connection.hub.invoke(hub, 'open', e);
+        else
+          Notiflix.Notify.warning("Anten bağlı değil");
+      });
+
+    };
+
     $scope.AracEdit = function () {
       var parameter = {
         tur: "aracid",
@@ -1774,7 +1952,7 @@ app.controller(
       var gridElement = $("#grid");
 
       if (gridElement.data("kendoGrid")) {
-        gridElement.height($(window).height() + 60 + "px");
+        gridElement.height($(window).height() + 100 + "px");
         gridElement.data("kendoGrid").resize();
       }
     }
@@ -2245,6 +2423,29 @@ app.controller('AracEditCtrl', function ($scope, $localStorage, $modalInstance, 
 
 });
 
+app.controller(
+  "bariyerCtrl",
+  function (
+    $scope,
+    $rootScope,
+    kendoExt,
+    $linq,
+    $timeout,
+    $localStorage,
+    $base64,
+    $modalInstance
+  ) {
+
+    $scope.OK = function (s) {
+      $modalInstance.close(s);
+    };
+
+    $scope.Iptal = function () {
+      $modalInstance.close('OK');
+    };
+
+  }
+);
 
 function byteToHex(byte) {
   // convert the possibly signed byte (-128 to 127) to an unsigned byte (0 to 255).
