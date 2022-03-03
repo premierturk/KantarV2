@@ -1318,7 +1318,7 @@ app.controller(
           $scope.tempGelenTonaj = number;
         });
 
-        var len = 60;
+        var len = 60; //flag
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
