@@ -1312,13 +1312,13 @@ app.controller(
           tempSpark.splice(0, 1);
 
         tempTonaj.push(number);
-        $scope.i = tempTonaj.length * 4;
+        $scope.i = tempTonaj.length * 2;
 
         $scope.$apply(function () {
           $scope.tempGelenTonaj = number;
         });
 
-        var len = 25;
+        var len = 60;
         //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
 
         if (tempTonaj.length >= len) {
@@ -1326,7 +1326,7 @@ app.controller(
 
           var tempGelenTonaj2 = angular.copy(tempTonaj);
 
-          var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(20).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
+          var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(10).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
 
           kantarVeriTemizle();
 
@@ -1554,7 +1554,7 @@ app.controller(
         field: "Tur",
         title: "Tür",
         attributes: { style: "white-space:nowrap" },
-        width: "200px",
+        width: "150px",
         filterable: {
           cell: {
             template: function (args) {
@@ -1630,7 +1630,7 @@ app.controller(
       {
         field: "PlakaNo",
         title: "Plaka No",
-        width: "110px",
+        width: "100px",
         filterable: {
           cell: {
             operator: "contains",
@@ -1648,16 +1648,17 @@ app.controller(
           },
         },
       },
-      {
-        field: "Dara",
-        title: "Dara (Kg)",
-        width: "100px",
-        type: "number",
-      },
+
       {
         field: "BirimFiyat",
         title: "Birim Fiyat (₺)",
         format: "{0:C5}",
+        width: "100px",
+        type: "number",
+      },
+      {
+        field: "Dara",
+        title: "Dara (Kg)",
         width: "100px",
         type: "number",
       },
@@ -1668,6 +1669,12 @@ app.controller(
         type: "number",
         footerTemplate: "#= kendo.toString(sum, 'N0') # kg",
         //footerTemplate: "{{Total_Tonaj}}"
+      },
+      {
+        field: "ToplamTonaj",
+        title: "TopTonaj(Kg)",
+        width: "110px",
+        type: "number"
       },
       {
         field: "Tutar",
@@ -1700,16 +1707,7 @@ app.controller(
           },
         },
       },
-      {
-        attributes: { style: "white-space:nowrap" },
-        field: "Bakiye",
-        title: "Bakiye (₺)",
-        width: "110px",
-        format: "{0:c5}",
-        type: "number",
-        //footerTemplate: "#= kendo.toString(sum, 'C2') #",
-        //footerTemplate: "{{Total_Tutar | currency:'₺ ':3 }}"
-      },
+
     ];
 
     var aggregate = [
@@ -1839,6 +1837,9 @@ app.controller(
       $(data).each(function () {
         $scope.Total_Tutar = $scope.Total_Tutar + this.Tutar;
         $scope.Total_Tonaj = $scope.Total_Tonaj + this.Tonaj;
+
+        if (this.Dara)
+          this.ToplamTonaj = this.Tonaj + this.Dara;
       });
 
       $scope.Total_Tonaj = parseInt($scope.Total_Tonaj / 1000);
