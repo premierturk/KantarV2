@@ -1323,13 +1323,10 @@ app.controller(
 
         if (tempTonaj.length >= len) {
 
-
           var tempGelenTonaj2 = angular.copy(tempTonaj);
-
           var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(10).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
 
           kantarVeriTemizle();
-
 
           if (son5Tonaj.length == 1) { //son olcum esit olmali  
 
