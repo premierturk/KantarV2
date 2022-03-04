@@ -1319,7 +1319,7 @@ app.controller(
         });
 
         var len = 60; //flag
-        //if ($rootScope.app.options.GirisCikis == "Çıkış") len = 50;
+        if ($rootScope.app.options.GirisCikis == "Çıkış") len = 100;
 
         if (tempTonaj.length >= len) {
 
@@ -1331,7 +1331,7 @@ app.controller(
           kantarVeriTemizle();
 
 
-          if (son5Tonaj.length == 1) { //son 5 olcum esit olmali  
+          if (son5Tonaj.length == 1) { //son olcum esit olmali  
 
             var tonaj = son5Tonaj[0].Tonaj;
 
