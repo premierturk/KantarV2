@@ -51,7 +51,20 @@ app.hideAside = true">
               <span class="text-white font-thin h3 block">{{Total_Arac}}</span>
               <span class="text-xs">Adet</span>
             </div>
+            <div class="col-md-4">
+              <br />
+              <div id="pr_download_div" class="progress" style="width: 95%;">
+                <div id="pr_download" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span id="pr_download_text"></span>
+                </div>
+              </div>
+
+            </div>
+
+
           </div>
+
+
           <div class="bg-red-gradient wrapper-xs  r-2x" ng-show="uyari">
             <i class="glyphicon glyphicon-info-sign text-2x"></i> <span class="text-2x">{{uyari}}</span>
           </div>
@@ -80,10 +93,10 @@ app.hideAside = true">
               <i class="fa fa-openid fa-fw"></i>
               <span class="text-black">Bariyer Aç</span>
             </a>
-            <a class="list-group-item" ng-click="Restart()">
+            <!-- <a class="list-group-item" ng-click="Restart()">
               <i class="fa fa-star fa-fw"></i>
               <span class="text-black"> Yeniden Başlat</span>
-            </a>
+            </a> -->
             <a href="" class="list-group-item" ng-click="HgsEtiketi()">
               <i class="fa fa-star fa-adn"></i>
               <span class="text-black">HGS & Dara Değişimi</span>

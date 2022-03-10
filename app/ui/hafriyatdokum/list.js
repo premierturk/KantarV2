@@ -8,6 +8,9 @@ const { ipcRenderer: ipc } = require("electron");
 const JsonHuman = require("json.human");
 const signalr = require('node-signalr');
 // const { config } = require('process');
+//const { ipcRender } = require("electron");
+
+
 
 
 app.controller(
@@ -25,6 +28,51 @@ app.controller(
   ) {
 
 
+
+    ipc.send("app_version");
+
+    ipc.on("app_version", (event, arg) => {
+      ipc.removeAllListeners("app_version");
+      Notiflix.Notify.success("Version " + arg.version);
+      $("#pr_download_div").hide();
+    });
+
+    ipc.on("update_available", () => {
+      ipc.removeAllListeners("update_available");
+      Notiflix.Notify.info("Yeni versiyon indiriliyor...");
+      $("#pr_download_div").show();
+    });
+
+    ipc.on("download-progress", (e, arg) => {
+      console.log(arg.data);
+
+      var percent = parseFloat(arg.data.percent).toFixed(2);
+
+      $("#pr_download_text").html(percent.toString() + "% indirildi");
+      $("#pr_download").attr("aria-valuenow", percent.toString());
+      $("#pr_download").css({ "width": percent + "%" });
+
+    });
+
+    ipc.on("update_downloaded", () => {
+      ipc.removeAllListeners("update_downloaded");
+
+      $("#pr_download_div").hide();
+
+      Notiflix.Report.success(
+        "Yeni veriyon indirildi",
+        "Yeniden başlatmak için Tamam tıklayınız.",
+        "Tamam",
+        () => {
+          ipc.send("restart_app");
+        });
+
+    });
+
+
+
+
+
     $scope.online = true;
     window.addEventListener("online", function () {
       $scope.$apply(function () {
@@ -37,7 +85,7 @@ app.controller(
       });
     });
     $(window).blur(function () {
-      //Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
+      Notiflix.Loading.standard("UYGULAMA AKTİF DEĞİL");
     });
     $(window).focus(function () {
       Notiflix.Loading.remove(100);
@@ -585,7 +633,7 @@ app.controller(
             isSend = false;
             requestSanayiAtikBelgesi = "";
 
-            ipcRenderer.send("port_restart");
+            ipc.send("port_restart");
 
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
@@ -623,7 +671,7 @@ app.controller(
               isSend = false;
               requestSanayiAtikBelgesi = "";
 
-              ipcRenderer.send("port_restart");
+              ipc.send("port_restart");
 
               console.log("SAVING SUCCESS");
 
@@ -689,7 +737,6 @@ app.controller(
         $scope.iOgs = tempEtiketNo.length * 10;
 
         if (tempEtiketNo.length >= 10) {
-
 
           $scope.sonOgsSaati = Date.now();
 
@@ -1312,19 +1359,19 @@ app.controller(
           tempSpark.splice(0, 1);
 
         tempTonaj.push(number);
-        $scope.i = tempTonaj.length * 2;
+        $scope.i = tempTonaj.length;
 
         $scope.$apply(function () {
           $scope.tempGelenTonaj = number;
         });
 
-        var len = 60; //flag
+        var len = 50; //flag
         if ($rootScope.app.options.GirisCikis == "Çıkış") len = 100;
 
         if (tempTonaj.length >= len) {
 
           var tempGelenTonaj2 = angular.copy(tempTonaj);
-          var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(10).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
+          var son5Tonaj = $linq.Enumerable().From(tempGelenTonaj2).Skip(len / 2).GroupBy("$", null, "{ Tonaj: $, Count: $$.Count() }").ToArray();
 
           kantarVeriTemizle();
 
@@ -1645,7 +1692,6 @@ app.controller(
           },
         },
       },
-
       {
         field: "BirimFiyat",
         title: "Birim Fiyat (₺)",
@@ -1792,7 +1838,12 @@ app.controller(
           row.addClass("bg-red-gradient");
         } else if (dataItem.OwnerId == 999) {
           row.addClass("bg-yellow-gradient");
+        } else if (dataItem.OwnerId == 998) {
+          row.addClass("bg-green-gradient");
         }
+        // else if (dataItem.BelgeNo == "EVSELATIK") {
+        //   row.addClass("bg-light-blue-gradient");
+        // }
 
 
         if (dataItem.OwnerId == 999 && dataItem.Tonaj > 0 && dataItem.Dara == null) {

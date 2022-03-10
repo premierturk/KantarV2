@@ -143,32 +143,7 @@
     Notiflix.Confirm.init({ lainText: false, messageMaxLength: 10000, width: '500px', });
     Notiflix.Loading.init({});
 
-    const { ipcRenderer } = require("electron");
 
-    ipcRenderer.send("app_version");
-
-    ipcRenderer.on("app_version", (event, arg) => {
-      ipcRenderer.removeAllListeners("app_version");
-      Notiflix.Notify.success("Version " + arg.version);
-    });
-
-    ipcRenderer.on("update_available", () => {
-      ipcRenderer.removeAllListeners("update_available");
-      Notiflix.Notify.info("Yeni versiyon indiriliyor...");
-    });
-
-    ipcRenderer.on("update_downloaded", () => {
-      ipcRenderer.removeAllListeners("update_downloaded");
-
-      Notiflix.Report.success(
-        "Yeni veriyon indirildi",
-        "Yeniden başlatmak için Tamam tıklayınız.",
-        "Tamam",
-        () => {
-          ipcRenderer.send("restart_app");
-        });
-
-    });
 
   </script>
 </body>

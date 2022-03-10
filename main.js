@@ -13,7 +13,7 @@ const serialport = require("serialport");
 // const Readline = require("@serialport/parser-readline");
 // const { isNumber, parseInt } = require("lodash");
 
-const { killPortProcess } = require("kill-port-process");
+//const { killPortProcess } = require("kill-port-process");
 const { autoUpdater } = require("electron-updater");
 
 const screenshot = require('screenshot-desktop');
@@ -181,9 +181,24 @@ app.on("window-all-closed", function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
 
-  killPortProcess(config.TcpPort).then(console.log).catch(console.log);
+  console.log("window-all-closed");
 
-  app.quit();
+  //killPortProcess(config.TcpPort).then(console.log).catch(console.log);
+  //const exePath = path.join(__dirname, "\HYBS_Kantar_V2.exe");
+
+  nrc.run("taskkill /im HYBS_Kantar_V2.exe /F ").then(
+    function (exitCodes) {
+      console.log("result " + exitCodes + " ");
+
+      app.quit();
+    },
+    function (err) {
+      console.log("Command failed to run with error: ", err);
+    }
+  );
+
+
+
 });
 
 app.on("activate", function () {
@@ -212,6 +227,13 @@ autoUpdater.on("update-available", () => {
   mainWindow.webContents.send("update_available");
 });
 
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Hız: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - İndirilen ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  mainWindow.webContents.send("download-progress", { text: log_message, data: progressObj });
+});
+
 autoUpdater.on("update-downloaded", () => {
   mainWindow.webContents.send("update_downloaded");
 });
@@ -230,8 +252,11 @@ ipc.on("restart_app", () => {
 });
 
 ipc.on("restart", async (event, data) => {
+
+
   app.exit();
   app.relaunch();
+
 });
 
 ipc.on("onprint", async (event, data) => {
