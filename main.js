@@ -19,6 +19,7 @@ const { autoUpdater } = require("electron-updater");
 const screenshot = require('screenshot-desktop');
 const signalr = require('node-signalr');
 
+
 const app = electron.app;
 app.allowRendererProcessReuse = false;
 const BrowserWindow = electron.BrowserWindow;
@@ -37,7 +38,9 @@ function createWindow() {
     height: 800,
     show: false,
     webPreferences: {
+      preload: path.join(app.getAppPath(), 'preload.js'),
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
       contextIsolation: false,
       enableRemoteModule: true,
       backgroundThrottling: false,
@@ -322,3 +325,5 @@ ipc.on("onprint", async (event, data) => {
 setInterval(() => {
   autoUpdater.checkForUpdatesAndNotify();
 }, 60000);
+
+

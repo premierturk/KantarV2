@@ -7,11 +7,67 @@ const ab2str = require("arraybuffer-to-string");
 const { ipcRenderer: ipc } = require("electron");
 const JsonHuman = require("json.human");
 const signalr = require('node-signalr');
-// const { config } = require('process');
+//const { config } = require('process');
 //const { ipcRender } = require("electron");
 
 
 
+
+// const { desktopCapturer } = require('electron');
+// desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
+//   for (const source of sources) {
+//     if (source.name === 'Screen 1') {
+
+//       startSteam(source);
+
+//     }
+//   }
+// })
+
+// var startSteam = async function (source) {
+
+//   var hub = "ScreenShut";
+//   let client = new signalr.client(config.SignalR.host, [hub]);
+//   client.qs = { "tip": "kantar" };
+//   client.start();
+
+
+//   navigator.mediaDevices.getUserMedia({
+//     audio: false,
+//     video: {
+//       mandatory: {
+//         chromeMediaSource: 'desktop',
+//         chromeMediaSourceId: source.id,
+//         minWidth: 1280,
+//         maxWidth: 1280,
+//         minHeight: 720,
+//         maxHeight: 720
+//       }
+//     }
+//   }).then((stream) => {
+
+//     var mediaRecorder = new MediaRecorder(stream);
+//     mediaRecorder.ondataavailable = function (data) {
+
+//       var blob = data.data;
+
+//       var reader = new FileReader();
+//       reader.readAsArrayBuffer(blob);
+
+//       //reader.readAsDataURL(blob);
+//       reader.onloadend = function () {
+//         var result = reader.result;
+
+//         var byteArray = new Uint8Array(result);
+
+//         // var imgStr = new Buffer(result).toString("base64");
+//         client.connection.hub.invoke(hub, 'send', byteArray);
+//         //console.log(imgStr);
+//       }
+//     };
+//     mediaRecorder.start(1000);
+//   });
+// }
 
 app.controller(
   "hafriyatdokumlistCtrl",
@@ -24,8 +80,17 @@ app.controller(
     $interval,
     $localStorage,
     $base64,
-    $modal
+    $modal,
+    $ocLazyLoad
   ) {
+
+    $ocLazyLoad.load([
+      'ui/hafriyatdokum/bariyerCTRL.js',
+      'ui/hafriyatdokum/aracEditCTRL.js',
+      'ui/hafriyatdokum/hgsCTRL.js',
+      'ui/hafriyatdokum/sahaCTRL.js',
+      'ui/hafriyatdokum/plakaSecCTRL.js',
+    ]);
 
 
 
@@ -101,24 +166,31 @@ app.controller(
     var mySerialPort = function (run) {
       var temp = [];
       ipc.on("comport", (event, data) => {
-        //console.log(data);
+        //console.log(data.toString('utf8', 0, 1));
 
         var d = ab2str(data);
         //console.log(d);
 
         if ($rootScope.app.options.GirisCikis == "Çıkış") {//BursaCikis
 
-          d = d.replaceAll(" ", "");
-          d = d.replace("\r", "");
-          d = d.replace("A", "");
-          d = d.replace("B", "");
-          d = d.replace("C", "");
-          d = d.replace("D", "");
 
-          if (d != "") {
-            var tonaj = parseInt(d);
-            run(tonaj);
+          if (d.startsWith("A")) {
+
+            //d = d.replaceAll(" ", "");
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+            //d = d.replace("B", "");
+            //d = d.replace("C", "");
+            //d = d.replace("D", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
           }
+
+
 
         } else {//BursaGiris
 
@@ -1366,7 +1438,7 @@ app.controller(
         });
 
         var len = 50; //flag
-        if ($rootScope.app.options.GirisCikis == "Çıkış") len = 100;
+        if ($rootScope.app.options.GirisCikis == "Çıkış") len = 60;
 
         if (tempTonaj.length >= len) {
 
@@ -2013,488 +2085,15 @@ app.controller(
 
   });
 
-app.controller(
-  "plakasecCtrl",
-  function (
-    $scope,
-    $rootScope,
-    kendoExt,
-    $linq,
-    $timeout,
-    $localStorage,
-    $base64,
-    $modalInstance,
-    PlakaListesi
-  ) {
-    $scope.PlakaListesi = PlakaListesi;
-    $scope.AracId = null;
 
-    $timeout(function () {
-      $("#gridAraclar").kendoGrid({
-        dataSource: {
-          data: $scope.PlakaListesi,
-          pageSize: 20,
-        },
-        height: 850,
-        scrollable: true,
-        sortable: true,
-        filterable: true,
-        pageable: {
-          alwaysVisible: false,
-          pageSizes: [5, 10, 20, 100]
-        },
-        toolbar: ["search"],
-        columns: [
-          { field: "PlakaNo", title: "Plaka No", width: "130px" },
-          {
-            field: "FirmaAdi",
-            title: "Firma",
-            width: "130px",
-            attributes: { style: "white-space:nowrap" },
-          },
-          { field: "Dara", title: "Dara", width: "130px" },
-          { field: "AracCinsi", title: "Araç Cinsi", width: "130px" },
-        ],
-        selectable: "row",
-        change: function (e) {
-          var selectedRows = this.select();
 
-          var selectedDataItems = [];
-          for (var i = 0; i < selectedRows.length; i++) {
-            var dataItem = this.dataItem(selectedRows[i]);
-            selectedDataItems.push(dataItem);
-          }
 
-          var data = selectedDataItems[0];
 
 
-          $scope.setSelected(data);
-        },
-      });
-    }, 200);
 
-    // $timeout(function () {
-    //   $("#txtSearch").focus();
-    //   if (PlakaListesi && PlakaListesi.length > 0) {
-    //     $scope.TumPlakalar = angular.copy(PlakaListesi);
-    //     if ($scope.TumPlakalar.length > 0) {
-    //       $scope.AracId = $scope.TumPlakalar[0].AracId;
-    //       $scope.PlakaNo = " | " + $scope.TumPlakalar[0].PlakaNo;
-    //     }
-    //   }
-    // }, 200);
 
-    $scope.setSelected = function (item) {
-      $scope.AracId = item.AracId;
-      $scope.PlakaNo = " | " + item.PlakaNo;
-    };
 
-    // $scope.$watch("filter", function () {
-    //   $scope.TumPlakalar = $linq
-    //     .Enumerable()
-    //     .From($scope.PlakaListesi)
-    //     .Where(function (x) {
-    //       return x.PlakaNo.startsWith($scope.filter);
-    //     })
-    //     .ToArray();
 
-    //   if ($scope.TumPlakalar.length > 0)
-    //     $scope.AracId = $scope.TumPlakalar[0].AracId;
-    // });
-
-    $scope.Enter = function (e) {
-      if (e.which === 13) {
-        var selected = $linq
-          .Enumerable()
-          .From($scope.PlakaListesi)
-          .Where(function (x) {
-            return x.AracId === $scope.AracId;
-          })
-          .FirstOrDefault();
-
-        $modalInstance.close(selected);
-      }
-    };
-
-    $scope.Sec = function () {
-      var selected = $linq
-        .Enumerable()
-        .From($scope.PlakaListesi)
-        .Where(function (x) {
-          return x.AracId === $scope.AracId;
-        })
-        .FirstOrDefault();
-
-      $modalInstance.close(selected);
-    };
-  }
-);
-
-app.controller(
-  "sahaCtrl",
-  function (
-    $scope,
-    $rootScope,
-    kendoExt,
-    $linq,
-    $timeout,
-    $localStorage,
-    $base64,
-    $modalInstance,
-    SahaListesi
-  ) {
-    $scope.SahaListesi = SahaListesi;
-    $scope.DepolamaAlaniSahaId = null;
-
-    $scope.setSelected = function (item) {
-      $scope.DepolamaAlaniSahaId = item.DepolamaAlaniSahaId;
-    };
-
-    $scope.Sec = function () {
-      var selected = $linq
-        .Enumerable()
-        .From($scope.SahaListesi)
-        .Where(function (x) {
-          return x.DepolamaAlaniSahaId === $scope.DepolamaAlaniSahaId;
-        })
-        .FirstOrDefault();
-
-      $modalInstance.close(selected);
-    };
-  }
-);
-
-app.controller(
-  "hgsCtrl",
-  function (
-    $scope,
-    $rootScope,
-    kendoExt,
-    $linq,
-    $timeout,
-    $localStorage,
-    $base64,
-    $modalInstance,
-    TumAracListesi
-  ) {
-
-
-    var araclar = $linq
-      .Enumerable()
-      .From(TumAracListesi)
-      .Where(function (x) {
-        return x.AracCinsiId == 30;
-      })
-      .ToArray();
-
-
-    $timeout(function () {
-      $("#gridAraclar").kendoGrid({
-        dataSource: {
-          data: araclar,
-          pageSize: 20,
-        },
-        height: 850,
-        scrollable: true,
-        sortable: true,
-        filterable: true,
-        pageable: {
-          alwaysVisible: false,
-          pageSizes: [5, 10, 20, 100]
-        },
-        toolbar: ["search"],
-        columns: [
-          {
-            command: [
-              {
-                field: "Tur",
-                text: "HGS Değiştir",
-                click: function (e) {
-                  e.preventDefault();
-
-                  var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-
-                  kendo.prompt(dataItem.PlakaNo + " için HGS No giriniz.", dataItem.OGSEtiket).then(function (data) {
-
-                    if (!data) {
-                      Notiflix.Notify.failure("HGS No giriniz.");
-                      return;
-                    }
-
-                    var aracId = dataItem.AracId;
-
-
-                    var data = {
-                      AracId: aracId,
-                      HgsNo: data
-                    };
-
-                    kendoExt.post(
-                      "api/kantar/HGSNoDegisimi",
-                      data,
-                      function (response) {
-
-                        Notiflix.Notify.success("Kaydedildi.");
-
-                        $scope.Iptal();
-                      },
-                      function (err) {
-                        console.log("SAVING failure :");
-                        Notiflix.Notify.failure(err.data);
-                        $scope.kabul.Temizle();
-                      }
-                    );
-
-
-
-                  }, function () {
-                    //kendo.alert("Cancel entering value.");
-                  })
-
-
-                },
-              },
-              {
-                field: "Tur",
-                text: "Dara Değiştir",
-                click: function (e) {
-                  e.preventDefault();
-
-                  var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-
-                  kendo.prompt(dataItem.PlakaNo + " için Dara giriniz.", dataItem.Dara).then(function (data) {
-
-                    if (!data) {
-                      Notiflix.Notify.failure("Dara giriniz!");
-                      return;
-                    }
-
-                    var aracId = dataItem.AracId;
-
-                    var data = {
-                      AracId: aracId,
-                      Dara: parseInt(data)
-                    };
-
-                    kendoExt.post(
-                      "api/kantar/DaraDegisimi",
-                      data,
-                      function (response) {
-
-                        Notiflix.Notify.success("Kaydedildi.");
-
-                        $scope.Iptal();
-                      },
-                      function (err) {
-                        console.log("SAVING failure :");
-                        Notiflix.Notify.failure(err.data);
-                        $scope.kabul.Temizle();
-                      }
-                    );
-
-
-
-                  }, function () {
-                    //kendo.alert("Cancel entering value.");
-                  })
-
-
-                },
-              }
-            ]
-
-          },
-          { field: "PlakaNo", title: "Plaka No", width: "130px" },
-          {
-            field: "FirmaAdi",
-            title: "Firma",
-            width: "130px",
-            attributes: { style: "white-space:nowrap" },
-          },
-          { field: "Dara", title: "Dara", width: "130px" },
-          { field: "AracCinsi", title: "Araç Cinsi", width: "130px" },
-          { field: "OGSEtiket", title: "OGSEtiket", width: "130px" },
-        ],
-        selectable: "row"
-      });
-    }, 200);
-
-
-    $scope.Iptal = function () {
-      $modalInstance.close('OK');
-    };
-
-  }
-);
-
-app.controller('AracEditCtrl', function ($scope, $localStorage, $modalInstance, $modal, parameter, kendoExt, $log, $timeout, SweetAlert) {
-  var firmaid;
-  var aracid;
-
-  $scope.onlyNumbers = function (text, type) {
-    if ($scope.ilid != 1) {
-      text = text.replace(/[^0-9]/g, '');
-
-      if (type == 1)
-        $scope.arac.Dara = text;
-      else
-        $scope.arac.Kapasitesi = text;
-    }
-  }
-
-  $scope.ilid = $localStorage.user.ilid;
-  $scope.AracTakipZorunlu = true;
-
-  $scope.arac = {
-    AracDurumId: 1,
-    AracCinsiId: 30,
-    MarkaId: 3,
-    FirmaId: null
-  }
-
-  if (parameter.tur == "aracid") {
-    aracid = parameter.id;
-    firmaid = 0;
-  }
-
-  if (parameter.tur == "firmaid") {
-    firmaid = parameter.id;
-    aracid = 0;
-  }
-
-  if (parameter.tur == "firmaid") {
-    $timeout(function () {
-      $scope.firma_disabled = true;
-      $scope.arac.FirmaId = firmaid;
-    }, 500);
-  } else
-    $scope.firma_disabled = false;
-
-
-  var urls = [
-    "/Api/FirmaListesiKamuMini?BuyukSehirId=1",
-  ]
-
-
-  kendoExt.Get$q(urls, function (response) {
-
-    $scope.dsFirma = kendoExt.ConvertToDataSource(response[0].data);
-
-
-  });
-
-
-  $scope.Kaydet = function () {
-    var isValidate = true;
-    if ($scope.arac == undefined) {
-      $scope.ShowMessage("warning", "Uyarı", "Plaka no giriniz.");
-      isValidate = false;
-    }
-    if ($scope.arac.Dara == null) {
-      $scope.ShowMessage("warning", "Uyarı", "Dara giriniz.");
-      isValidate = false;
-    }
-    if ($scope.arac.PlakaNo == null) {
-      $scope.ShowMessage("warning", "Uyarı", "Plaka no giriniz.");
-      isValidate = false;
-    }
-    if ($scope.arac.MarkaId == null) {
-      $scope.ShowMessage("warning", "Uyarı", "Araç markası seçiniz.");
-      isValidate = false;
-    }
-
-    if ($scope.arac.FirmaId == null || $scope.arac.FirmaId == undefined || $scope.arac.FirmaId == 0) {
-      $scope.ShowMessage("warning", "Uyarı", "Firma seçiniz.");
-      isValidate = false;
-    }
-
-    if ($scope.arac.AracCinsiId == null || $scope.arac.AracCinsiId == "" || $scope.arac.AracCinsiId == undefined) {
-      $scope.ShowMessage("warning", "Uyarı", "Araç cinsi seçiniz.");
-      isValidate = false;
-    }
-    if ($localStorage.user.ilid == 6 && $scope.arac.AracCinsiId == 30 && ($scope.arac.HGSEtiketNo == null || $scope.arac.HGSEtiketNo == "" || $scope.arac.AracCinsiId == undefined)) {
-      $scope.ShowMessage("warning", "Uyarı", "HGS Etiket No giriniz.");
-      isValidate = false;
-    }
-    if ($localStorage.user.ilid == 6 && $scope.hgs == true) {
-      $scope.ShowMessage("warning", "Uyarı", "Lütfen geçerli bir HGS Etiket No giriniz.");
-      isValidate = false;
-    }
-
-    if (!isValidate) return;
-
-    $scope.arac.BuyukSehirId = 1;
-    $scope.arac.CreateUser = $localStorage.user.userid;
-
-    if (aracid == 0) {
-      kendoExt.post("/Api/Arac", $scope.arac, function (response) {
-        if (response.data == "") {
-          Notiflix.Notify.success("Kaydedildi.");
-          $modalInstance.close('reload');
-        }
-      });
-    }
-  };
-
-  $scope.Iptal = function () {
-    $modalInstance.dismiss('cancel');
-  };
-
-
-  $scope.HGSEtiketCtrl = function () {
-
-    if ($scope.arac.HGSEtiketNo != null && $scope.arac.HGSEtiketNo != "")
-      kendoExt.Get("/api/HGSEtiketNoKontrol?HGSEtiketNo=" + $scope.arac.HGSEtiketNo,
-        function (response) {
-          if (response.data != "") {
-            $scope.hgs = true;
-            SweetAlert.swal("Bu HGS Etiketi Kullanılmaktadır!", $scope.arac.HGSEtiketNo + " nolu etiket " + response.data + " plakalı araçta kullanılmaktadır.", "error");
-          }
-          else
-            $scope.hgs = false;
-        });
-
-  };
-
-  $scope.PlakaEntry = function (e) {
-    var y = String.fromCharCode(e.keyCode);
-
-    var transformedInput = y.replace(/[^0-9]/g, '');
-    //if (transformedInput == "") {
-    //    $scope.arac.PlakaNo = $scope.arac.PlakaNo.substring(0, $scope.arac.PlakaNo.length - 1);
-    //    $scope.arac.PlakaNo = $scope.arac.PlakaNo + " " + y;
-    //}
-  };
-
-  $scope.ShowMessage = function (type, title, text) {
-    Notiflix.Notify.warning(text);
-  }
-
-});
-
-app.controller(
-  "bariyerCtrl",
-  function (
-    $scope,
-    $rootScope,
-    kendoExt,
-    $linq,
-    $timeout,
-    $localStorage,
-    $base64,
-    $modalInstance
-  ) {
-
-    $scope.OK = function (s) {
-      $modalInstance.close(s);
-    };
-
-    $scope.Iptal = function () {
-      $modalInstance.close('OK');
-    };
-
-  }
-);
 
 function byteToHex(byte) {
   // convert the possibly signed byte (-128 to 127) to an unsigned byte (0 to 255).
