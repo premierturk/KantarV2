@@ -104,6 +104,8 @@ app.controller(
           if (response.data == "") {
             Notiflix.Notify.success("Kaydedildi.");
             $modalInstance.close('reload');
+          } else {
+            $scope.ShowMessage("warning","Uyarı", response.data);
           }
         });
       }
