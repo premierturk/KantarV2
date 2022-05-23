@@ -231,6 +231,8 @@ autoUpdater.on("update-available", () => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
+  console.log(progressObj.percent );
+  
   let log_message = "Hız: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - İndirilen ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
@@ -255,7 +257,6 @@ ipc.on("restart_app", () => {
 });
 
 ipc.on("restart", async (event, data) => {
-
 
   app.exit();
   app.relaunch();
@@ -322,8 +323,8 @@ ipc.on("onprint", async (event, data) => {
   );
 });
 
-setInterval(() => {
-  autoUpdater.checkForUpdatesAndNotify();
-}, 60000);
+// setInterval(() => {
+//   autoUpdater.checkForUpdatesAndNotify();
+// }, 60000);
 
 

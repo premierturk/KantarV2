@@ -105,6 +105,16 @@ app.hideAside = true">
               <i class="fa fa-car fa-adn"></i>
               <span class="text-black">Çöp Aracı Ekle</span>
             </a>
+            <a ng-show="!isOnlyEntered" href="" class="list-group-item" ng-click="OnlyEntered()">
+              <i class="fa fa-car fa-adn"></i>
+              <span class="text-black">Çıkışı Yapılmayan(Sanayi)</span>
+            </a>
+            <a ng-show="isOnlyEntered" href="" class="list-group-item bg-red-gradient" ng-click="OnlyEntered()">
+              <i class=" text-white fa fa-car fa-adn"></i>
+              <span class="text-white">Çıkışı Yapılmayan(Sanayi)</span>
+            </a>
+
+
             <a class="list-group-item" ng-click="kabul.Temizle()">
               <i class="fa fa-close fa-fw"></i>
               <span class="text-black">Temizle</span>
@@ -174,8 +184,7 @@ app.hideAside = true">
             <div class="form-group m-b-xs">
               <label class="col-md-4 control-label">FİRMA BAK.</label>
               <div class="col-md-8">
-                <input kendo-numeric-text-box disabled k-format="'c2'" ng-model="kabul.Response.GuncelBakiye"
-                  k-spinners="false" style="width: 100%" />
+                <input type="text" disabled class="form-control input-md" ng-model="kabul.Response.GuncelBakiye" />
               </div>
             </div>
             <div class="form-group m-b-xs">

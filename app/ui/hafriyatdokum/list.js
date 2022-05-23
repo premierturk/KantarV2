@@ -163,15 +163,21 @@ app.controller(
 
     $scope.OgsAktif = $localStorage.user.depolamaalani.OgsAktif;
 
+    var serialNum = 0;
     var mySerialPort = function (run) {
       var temp = [];
       ipc.on("comport", (event, data) => {
+
+        //serialNum++;
+        //console.log(serialNum + " - " + data + " --- " + ab2str(data))
+
+
         //console.log(data.toString('utf8', 0, 1));
 
         var d = ab2str(data);
         //console.log(d);
 
-        if ($rootScope.app.options.GirisCikis == "Çıkış") {//BursaCikis
+        if ($rootScope.app.options.Kantar == "YenikentCikis") {//BursaCikis
 
 
           if (d.startsWith("A")) {
@@ -190,9 +196,7 @@ app.controller(
 
           }
 
-
-
-        } else {//BursaGiris
+        } else if ($rootScope.app.options.Kantar == "YenikentGiris") {//BursaGiris
 
           if ((data[0] == 2 && data[1] == 41) || (data[0] == 2 && data[1] == 33))
             temp = [];
@@ -210,7 +214,102 @@ app.controller(
           }
 
 
+        } else if ($rootScope.app.options.Kantar == "IgdirGiris") {
+
+
+          if (d.startsWith("A")) {
+
+            //d = d.replaceAll(" ", "");
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+            //d = d.replace("B", "");
+            //d = d.replace("C", "");
+            //d = d.replace("D", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
+        } else if ($rootScope.app.options.Kantar == "CihatliGiris") {
+
+          if (data[0] == 2 && data[1] == 121 && data[2] == 112 && data[3] == 48 && data[4] == 32 && data[5] == 32) {
+            temp = [];
+            for (let i = 6; i < data.length; i++) temp.push(data[i]);
+          } else if (data[0] != 13)
+            for (let i = 0; i < data.length; i++) temp.push(data[i]);
+
+
+          if (data[0] == 13) {
+
+            d = ab2str(temp);
+            var ddd = d.split(" ");
+            if (ddd.length > 1) {
+              var x = ddd[0];
+              run(parseInt(x));
+            }
+          }
+
+
+
+
+
+        } else if ($rootScope.app.options.Kantar == "BurhaniyeGiris") {
+
+          //WN002500 kg32
+          if (d.startsWith("WN")) {
+
+            d = d.replaceAll("WN", "");
+            d = d.substring(0, 6)
+            d = d.replaceAll(" ", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
+        } else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
+
+
+          if (data[0] == 65) {
+            temp = [];
+            for (let i = 0; i < data.length; i++) temp.push(data[i]);
+          } else
+            if (data[data.length - 1] == 13) {
+
+              for (let i = 0; i < data.length; i++) temp.push(data[i]);
+
+              d = ab2str(temp);
+              if (d.startsWith("A")) {
+
+                //d = d.replaceAll(" ", "");
+                d = d.replace("\r", "");
+                d = d.replace("A", "");
+                //d = d.replace("B", "");
+                //d = d.replace("C", "");
+                //d = d.replace("D", "");
+
+                if (d != "") {
+                  var tonaj = parseInt(d);
+                  run(tonaj);
+                }
+
+              }
+
+            }
+
+
+
+
+
         }
+
+
+
       });
     };
 
@@ -478,18 +577,18 @@ app.controller(
 
     var aracListesiYukle = function () {
 
-      if ($localStorage.user.depolamaalani.OgsAktif) {
-        swal({
-          title: "...",
-          text: "Araç listesi yükleniyor",
-          imageUrl: "./img/loading.gif",
-          showConfirmButton: false,
-        });
-        kendoExt.Get("api/kantar/araclistesi?EtiketNo=", function (response) {
-          $scope.TumAracListesi = response.data;
-          swal.close();
-        });
-      }
+      // if ($localStorage.user.depolamaalani.OgsAktif) { }
+      swal({
+        title: "...",
+        text: "Araç listesi yükleniyor",
+        imageUrl: "./img/loading.gif",
+        showConfirmButton: false,
+      });
+      kendoExt.Get("api/kantar/araclistesi?EtiketNo=", function (response) {
+        $scope.TumAracListesi = response.data;
+        swal.close();
+      });
+
 
     }
     aracListesiYukle();
@@ -1233,7 +1332,31 @@ app.controller(
             }
 
             if (!$localStorage.user.depolamaalani.OgsAktif) {
-              $scope.PlakaSec();
+
+              //$scope.kabul.Tonaj = 14000;
+
+              var modalInstance = $modal.open({
+                keyboard: true,
+                animation: false,
+                templateUrl: "araclarModal",
+                controller: "plakasecCtrl",
+                size: "lg",
+                resolve: {
+                  PlakaListesi: function () {
+                    return $scope.kabul.Response.Araclar;
+                  },
+                },
+              });
+
+              modalInstance.result.then(function (e) {
+                $scope.kabul.PlakaNo = e.PlakaNo;
+                $scope.kabul.Dara = e.Dara;
+                $scope.kabul.AracId = e.AracId;
+
+                $scope.kabul.Hesapla();
+                $scope.Kaydet();
+              });
+
             } else $scope.Kaydet();
 
 
@@ -1393,7 +1516,11 @@ app.controller(
         OgsTemizle();
       }
 
-    }, 3000);
+      $scope.$apply(function () {
+        $scope.readBarkod = "";
+      });
+
+    }, 5000);
 
 
     var kantarVeriTemizle = function () {
@@ -1433,12 +1560,18 @@ app.controller(
         tempTonaj.push(number);
         $scope.i = tempTonaj.length;
 
-        $scope.$apply(function () {
-          $scope.tempGelenTonaj = number;
-        });
+
 
         var len = 50; //flag
         if ($rootScope.app.options.GirisCikis == "Çıkış") len = 60;
+        else if ($rootScope.app.options.Kantar == "IgdirGiris") len = 10;
+        else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
+          len = 6;
+          $scope.i = parseInt(tempTonaj.length * 16.6);
+        }
+        $scope.$apply(function () {
+          $scope.tempGelenTonaj = number;
+        });
 
         if (tempTonaj.length >= len) {
 
@@ -1530,9 +1663,9 @@ app.controller(
             text: "SORUN",
             className: "k-error-colored",
             visible: function (dataItem) {
-              var r =
-                dataItem.Aciklama.indexOf("Hata") != -1 ||
-                dataItem.Aciklama.indexOf("Basarisiz") != -1;
+              var r = false;
+              if (dataItem.Aciklama != null)
+                r = dataItem.Aciklama.indexOf("Hata") != -1 || dataItem.Aciklama.indexOf("Basarisiz") != -1;
               return r;
             },
             click: function (e) {
@@ -1626,7 +1759,7 @@ app.controller(
               };
 
               kendoExt.post(
-                "api/kantar/SanayiAtikKontrol",
+                "api/kantar/TahakkukSorgula",
                 data,
                 function (response) {
 
@@ -1664,7 +1797,79 @@ app.controller(
 
             },
           },
+          {
+            field: "Tur",
+            text: "Belge",
+            // className: "k-error-colored",
+            visible: function (dataItem) {
+              return (dataItem.Tur == "Özel Döküm");
+            },
+            click: function (e) {
+              e.preventDefault();
+
+
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+              var data = { BelgeNo: dataItem.BelgeNo }
+
+              kendoExt.post(
+                "api/kantar/KabulBelgesiKontrol",
+                data,
+                function (response) {
+
+
+                  var item = {
+                    BelgeNo: response.data.BelgeNo,
+                    Firma: response.data.FirmaAdi,
+                    BelgeMiktari: response.data.TasinacakAtikMiktari.toString() + " m³",
+                    DokumMiktari: response.data.DokumMiktari.toString() + " m³",
+                    KalanMiktari: (response.data.TasinacakAtikMiktari - response.data.DokumMiktari).toString() + " m³",
+                    Aktif: response.data.Aktif ? "EVET" : "HAYIR",
+                    DepolamaAlani: response.data.DepolamaAlani,
+                    Araclar: response.data.Araclar
+                  }
+
+
+
+
+                  var d = JSON.parse(JSON.stringify(item));
+                  var html = JsonHuman.format(d).outerHTML;
+
+                  Notiflix.Report.info(
+                    "",
+                    html,
+                    'Tamam',
+
+                  );
+
+
+
+
+                },
+                function (err) {
+                  console.log("SAVING failure :");
+                  Notiflix.Notify.failure(err.data);
+                  $scope.kabul.Temizle();
+                  $scope.kabul.BelgeNo = "";
+                  $scope.kabul.BarkodNo = "";
+                }
+              );
+
+
+
+
+
+
+            },
+          },
         ],
+      },
+      {
+        field: "OwnerId",
+        title: "OwnerId",
+        hidden: true,
+        attributes: { style: "white-space:nowrap" },
+        width: "150px",
       },
       {
         field: "Tur",
@@ -1838,6 +2043,41 @@ app.controller(
     // }, 20000);
 
 
+    $scope.isOnlyEntered = false;
+    $scope.OnlyEntered = function () {
+
+
+      if (!$scope.isOnlyEntered) {
+
+        var query =
+          "?PlakaNo=" +
+          "&OwnerId=999" +
+          $scope.filtre.FirmaId +
+          "&DepolamaAlanId=" +
+          $scope.filtre.DepolamaAlanId;
+
+        var ops = kendoExt.datasource(
+          "api/ParaYukleme/GetRaporSanayi" + query,
+          col,
+          null,
+          onBound,
+          onDataBinding,
+          aggregate
+        );
+        $("#grid").data("kendoGrid").setOptions(ops);
+      } else {
+
+        $scope.Filter();
+
+
+      }
+
+
+
+      $scope.isOnlyEntered = !$scope.isOnlyEntered;
+    }
+
+
     var lastRefleshTime = Date.now();
     $scope.Filter = function () {
 
@@ -1913,14 +2153,20 @@ app.controller(
         } else if (dataItem.OwnerId == 998) {
           row.addClass("bg-green-gradient");
         }
-        // else if (dataItem.BelgeNo == "EVSELATIK") {
-        //   row.addClass("bg-light-blue-gradient");
-        // }
-
+        else if (dataItem.Tur == "Özel Döküm") {
+          row.addClass("bg-light-blue-gradient");
+        } else if (dataItem.BelgeNo == "EVSELATIK") {
+          row.addClass("bg-teal-gradient");
+        }
 
         if (dataItem.OwnerId == 999 && dataItem.Tonaj > 0 && dataItem.Dara == null) {
           row.addClass("bg-success");
         }
+
+        if (dataItem.Aciklama != null)
+          if (dataItem.Aciklama.indexOf("ISTİAP") > -1)
+            row.addClass("bg-red-gradient");
+
 
 
 

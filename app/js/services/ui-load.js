@@ -402,6 +402,113 @@ angular
         return result;
       };
 
+      this.KendoDataSource = function (url, columns, onChange, onDataBound, onDataBinding, agg, sort, requestStart, requestEnd) {
+
+
+        url = $rootScope.app.options.WebApiUrl + url;
+
+        authorization();
+
+        var result = {
+          dataSource: {
+            transport: {
+              read: {
+                dataType: "json",
+                url: url,
+                type: "POST",
+                beforeSend: function (req) {
+                  req.setRequestHeader('Authorization', 'Bearer ' + user.authtoken);
+                }
+              },
+              parameterMap: function (data, type) {
+                if (type == "read") {
+                  if (data.filter) {
+                    angular.forEach(data.filter.filters, function (val, key) {
+                      if (moment(val.value, "yyyy-MM-dd HH:mm:ss", true).isValid()) {
+                        var d = new Date(val.value);
+                        val.value = kendo.toString(d, "yyyy-MM-dd HH:mm:ss");
+                      }
+                    });
+                  }
+
+                  return data;
+                }
+              }
+            },
+            requestStart: function () {
+              if (typeof requestStart === "function")
+                requestStart();
+            },
+            requestEnd: function () {
+              if (typeof requestEnd === "function")
+                requestEnd();
+            },
+            pageSize: 17,
+            error: function (e) {
+              if (e.errorThrown == "Unauthorized")
+                $state.go('signin');
+            },
+            aggregate: agg,
+            sort: sort,
+            serverPaging: true,
+            serverFiltering: true,
+            serverSorting: true,
+            schema: {
+              data: "Data",
+              total: "Total",
+              aggregates: "Aggregates"
+            },
+          },
+          excel: {
+            filterable: true,
+            allPages: true,
+            fileName: "Export.xlsx"
+          },
+          pdf: {
+            allPages: true
+          },
+          columnMenu: true,
+          filterable: {
+            mode: "row",
+            extra: false
+          },
+          height: $(window).height() - 200,
+          change: onChange,
+          dataBound: function (e) {
+            for (var i = 0; i < this.columns.length; i++)
+              this.autoFitColumn(i);
+
+            ColShowHide(e);
+
+            if (typeof onDataBound === "function")
+              onDataBound(e, this.table);
+          },
+          dataBinding: onDataBinding,
+          scrollable: {
+            endless: true
+          },
+          //pageable: {
+          //    numeric: false,
+          //    previousNext: false
+          //},
+          navigatable: true,
+          selectable: "row",
+          resizable: true,
+          sortable: true,
+          groupable: true,
+          pageable: true,
+          pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5
+          },
+          columns: columns
+        };
+
+        return result;
+      }
+
+
       this.ddloptions = function (
         url,
         placeholder,
@@ -499,7 +606,15 @@ angular
 
             if (typeof error == "function") {
               error(errorPl);
-            } else SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
+            } else {
+
+              if (errorPl.data.Message)
+                SweetAlert.swal("Kaydedilemedi", errorPl.data.Message, "error");
+              else
+                SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
+
+
+            }
 
             if (errorPl.status == "401") $rootScope.login();
 
@@ -540,8 +655,13 @@ angular
             Notiflix.Loading.remove();
             errorSessionHistory(history);
             $log.info(errorPl);
-            SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
+
+            if (errorPl.data.Message)
+              SweetAlert.swal("Kaydedilemedi", errorPl.data.Message, "error");
+            else
+              SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
           }
+
         );
       };
 

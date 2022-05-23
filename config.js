@@ -17,12 +17,12 @@ var config_giris = {
   TcpPortAntenCikis: 5554, //anten remote pc port
   OgsEtiketStart: OGS_SERI[1].Seri,
   MinTonaj: 1000,
-  WebApiUrl: "http://bursa.premierturk.com/HYS.WebApi/",
-  //WebApiUrl: "http://localhost:2023/HYS.WebApi/",
+  //WebApiUrl: "http://bursa.premierturk.com/HYS.WebApi/",
+  WebApiUrl: "http://localhost:2023/HYS.WebApi/",
   //WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
   SignalR: {
-    host: "http://bursa.premierturk.com/HYS.SingnalR/signalr",
-    //host: 'http://localhost:2023/HYS.SingnalR/signalr'
+    //host: "http://bursa.premierturk.com/HYS.SingnalR/signalr",
+    host: 'http://localhost:2023/HYS.SingnalR/signalr'
     //host: 'http://hybs.diyarbakir.bel.tr/HYS.SingnalR/signalr'
   },
   SerialPort: {
