@@ -2156,7 +2156,7 @@ app.controller(
         else if (dataItem.Tur == "Özel Döküm") {
           row.addClass("bg-light-blue-gradient");
         } else if (dataItem.BelgeNo == "EVSELATIK") {
-          row.addClass("bg-teal-gradient");
+          row.addClass("bg-blue-gradient");
         }
 
         if (dataItem.OwnerId == 999 && dataItem.Tonaj > 0 && dataItem.Dara == null) {

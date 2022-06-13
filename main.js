@@ -32,8 +32,7 @@ let mainWindow;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    //frame: false,
-
+    frame: true,
     width: 1200,
     height: 800,
     show: false,
@@ -63,7 +62,7 @@ function createWindow() {
     url.format({
       pathname: path.join(__dirname, "app/index.html"),
       protocol: "file:",
-      slashes: true,
+      slashes: true
     })
   );
 
@@ -231,8 +230,8 @@ autoUpdater.on("update-available", () => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  console.log(progressObj.percent );
-  
+  console.log(progressObj.percent);
+
   let log_message = "Hız: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - İndirilen ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
