@@ -168,8 +168,8 @@ app.controller(
       var temp = [];
       ipc.on("comport", (event, data) => {
 
-        //serialNum++;
-        //console.log(serialNum + " - " + data + " --- " + ab2str(data))
+        // serialNum++;
+        // console.log(serialNum + " - " + data + " --- " + ab2str(data))
 
 
         //console.log(data.toString('utf8', 0, 1));
@@ -177,7 +177,7 @@ app.controller(
         var d = ab2str(data);
         //console.log(d);
 
-        if ($rootScope.app.options.Kantar == "YenikentCikis") {//BursaCikis
+        if ($rootScope.app.options.Kantar == "YenikentCikis") {
 
 
           if (d.startsWith("A")) {
@@ -196,7 +196,7 @@ app.controller(
 
           }
 
-        } else if ($rootScope.app.options.Kantar == "YenikentGiris") {//BursaGiris
+        } else if ($rootScope.app.options.Kantar == "YenikentGiris") {
 
           if ((data[0] == 2 && data[1] == 41) || (data[0] == 2 && data[1] == 33))
             temp = [];
@@ -305,6 +305,33 @@ app.controller(
 
 
 
+
+        } else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
+
+
+          if (data[0] == 65 || data[0] == 66 || data[0] == 67) {
+            temp = [];
+            run(0);
+          }
+
+
+
+          if (data[0] == 65 && data[1] == 32) {
+            temp = [];
+            for (let i = 2; i < data.length; i++) temp.push(data[i]);
+          } else if (temp.length > 0 && data[data.length - 1] == 13)
+            for (let i = 0; i < data.length; i++) temp.push(data[i]);
+
+
+
+          if (temp.length > 0 && data[data.length - 1] == 13) {
+            d = ab2str(temp);
+            var ddd = d.replace(" ", "");
+            var ddd = d.replace("\r", "");
+            if (ddd.length > 1) {
+              run(parseInt(ddd));
+            }
+          }
 
         }
 
@@ -1569,6 +1596,13 @@ app.controller(
           len = 6;
           $scope.i = parseInt(tempTonaj.length * 16.6);
         }
+        else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
+          len = 6;
+          $scope.i = parseInt(tempTonaj.length * 16.6);
+        }
+
+
+
         $scope.$apply(function () {
           $scope.tempGelenTonaj = number;
         });
