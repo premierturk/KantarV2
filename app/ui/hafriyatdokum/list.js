@@ -206,6 +206,7 @@ app.controller(
           if (((temp[0] == 2 && temp[1] == 41) || (temp[0] == 2 && temp[1] == 33)) && temp[temp.length - 1] == 13) {
 
             d = ab2str(temp);
+            temp = [];
             var ddd = d.split(" ");
             if (ddd.length == 3) {
               var x = ddd[1];
@@ -284,6 +285,8 @@ app.controller(
               for (let i = 0; i < data.length; i++) temp.push(data[i]);
 
               d = ab2str(temp);
+
+              temp = [];
               if (d.startsWith("A")) {
 
                 //d = d.replaceAll(" ", "");
@@ -301,9 +304,6 @@ app.controller(
               }
 
             }
-
-
-
 
 
         } else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
@@ -326,6 +326,7 @@ app.controller(
 
           if (temp.length > 0 && data[data.length - 1] == 13) {
             d = ab2str(temp);
+            temp = [];
             var ddd = d.replace(" ", "");
             var ddd = d.replace("\r", "");
             if (ddd.length > 1) {
@@ -526,6 +527,22 @@ app.controller(
             }
           } else if ($localStorage.user.ilid === 41) {
             //DİYARBAKIR
+            for (let i = 0; i < received.length; i++) {
+              if (received[i] == 0x13) {
+                if (received.Length < i + 3) return;
+                var hex1 = byteToHex(received[i + 1]);
+                var hex2 = byteToHex(received[i + 2]);
+                var hex3 = byteToHex(received[i + 3]);
+
+                var etiket = parseInt(hex1 + hex2 + hex3, 16);
+
+                // console.log("TCP CLIENT MESSAGE :", etiket);
+
+                e(etiket);
+              }
+            }
+          } else if ($localStorage.user.ilid === 81) {
+            //düzce
             for (let i = 0; i < received.length; i++) {
               if (received[i] == 0x13) {
                 if (received.Length < i + 3) return;
@@ -1100,10 +1117,7 @@ app.controller(
 
         console.log($scope.readBarkod);
 
-        if (
-          $scope.readBarkod.indexOf("ş") > -1 &&
-          $scope.readBarkod.indexOf("-") > -1
-        ) {
+        if ($scope.readBarkod.indexOf("ş") > -1 && $scope.readBarkod.indexOf("-") > -1) {
           //BURSA SANAYİ ATIK
 
           var belgeNo = $scope.readBarkod.split("ş")[0];
@@ -1127,10 +1141,8 @@ app.controller(
             angular.copy($scope.readBarkod),
             angular.copy(belgeNo)
           );
-        } else if (
-          $scope.readBarkod.indexOf("KF-") > -1 &&
-          $scope.readBarkod.indexOf("-KF") > -1
-        ) {
+
+        } else if ($scope.readBarkod.indexOf("KF-") > -1 && $scope.readBarkod.indexOf("-KF") > -1) {
           //KAMUFİŞ
 
           var belgeNo = $scope.readBarkod.replace("KF-", "").replace("-KF", "");
@@ -1141,21 +1153,19 @@ app.controller(
           });
 
           KamuFisBelgesi(belgeNo);
-        } else if (
-          $scope.readBarkod.indexOf("A") > -1 &&
-          $scope.readBarkod.indexOf("-") > -1
-        ) {
+
+        } else if ($scope.readBarkod.indexOf("a") > -1 && $scope.readBarkod.indexOf("-") > -1) {
           //KABUL BELGESİ
 
-          var belgeNo = $scope.readBarkod.split("A")[1];
+          var belgeNo = $scope.readBarkod.split("a")[1];
           TasimaKabuBelgesi(
             angular.copy($scope.readBarkod),
             angular.copy(belgeNo)
           );
-        } else if ($scope.readBarkod.indexOf("A") > -1) {
+        } else if ($scope.readBarkod.indexOf("a") > -1) {
           //NAKİT
 
-          var belgeNo = $scope.readBarkod.split("A")[1];
+          var belgeNo = $scope.readBarkod.split("a")[1];
           $scope.$apply(function () {
             $scope.kabul.Tur = "NAKİT DÖKÜM";
             $scope.kabul.BarkodNo = angular.copy($scope.readBarkod);
@@ -1301,6 +1311,7 @@ app.controller(
     var TasimaKabuBelgesi = function (Barkod, BelgeNo) {
       var data = {
         BelgeNo: BelgeNo,
+        BarkodNo: Barkod
       };
       kendoExt.post(
         "api/kantar/KabulBelgesiKontrol",
@@ -1379,6 +1390,7 @@ app.controller(
                 $scope.kabul.PlakaNo = e.PlakaNo;
                 $scope.kabul.Dara = e.Dara;
                 $scope.kabul.AracId = e.AracId;
+                $scope.kabul.AracCinsiId = e.AracCinsiId;
 
                 $scope.kabul.Hesapla();
                 $scope.Kaydet();
@@ -1593,8 +1605,8 @@ app.controller(
         if ($rootScope.app.options.GirisCikis == "Çıkış") len = 60;
         else if ($rootScope.app.options.Kantar == "IgdirGiris") len = 10;
         else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
-          len = 6;
-          $scope.i = parseInt(tempTonaj.length * 16.6);
+          len = 4;
+          $scope.i = parseInt(tempTonaj.length * 25);
         }
         else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
           len = 6;

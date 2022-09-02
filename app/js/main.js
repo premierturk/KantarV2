@@ -50,7 +50,8 @@ angular.module('app')
                 "asideDock": false,
                 "container": false,
             },
-            options: config        }
+            options: config
+        }
 
 
         $rootScope.app = $scope.app;
@@ -197,7 +198,10 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
                 }
             }, function (x) {
                 Notiflix.Loading.remove();
-                SweetAlert.swal("Giriş", 'Server Error ' + x.data.ExceptionMessage, "error");
+                if (x.data == "Unauthorized")
+                    SweetAlert.swal("Giriş", 'Hatalı kullanıcı', "error");
+                else
+                    SweetAlert.swal("Giriş", 'Server Error ' + x.data.ExceptionMessage, "error");
             });
     };
 

@@ -1,0 +1,20 @@
+{
+  "GirisCikis": "Giriş",
+  "Kantar": "BaskoyGiris",
+  "KantarVarMi": true,
+  "UsePrinter": false,
+  "UseOffline": false,
+  "TcpPort": 5555,
+  "TcpPortAntenCikis": 5554,
+  "OgsEtiketStart": 126,
+  "MinTonaj": 1000,
+  "WebApiUrl": "https://hybs.bursa.bel.tr/HYS.WebApi/",
+  "SignalR": {
+    "host": "https://hybs.bursa.bel.tr/HYS.SingnalR/signalr"
+  },
+  "SerialPort": {
+    "portName": "COM2",
+    "autoOpen": false,
+    "baudRate": 9600
+  }
+}
