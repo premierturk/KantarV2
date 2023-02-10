@@ -7,67 +7,7 @@ const ab2str = require("arraybuffer-to-string");
 const { ipcRenderer: ipc } = require("electron");
 const JsonHuman = require("json.human");
 const signalr = require('node-signalr');
-//const { config } = require('process');
-//const { ipcRender } = require("electron");
 
-
-
-
-// const { desktopCapturer } = require('electron');
-// desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-//   for (const source of sources) {
-//     if (source.name === 'Screen 1') {
-
-//       startSteam(source);
-
-//     }
-//   }
-// })
-
-// var startSteam = async function (source) {
-
-//   var hub = "ScreenShut";
-//   let client = new signalr.client(config.SignalR.host, [hub]);
-//   client.qs = { "tip": "kantar" };
-//   client.start();
-
-
-//   navigator.mediaDevices.getUserMedia({
-//     audio: false,
-//     video: {
-//       mandatory: {
-//         chromeMediaSource: 'desktop',
-//         chromeMediaSourceId: source.id,
-//         minWidth: 1280,
-//         maxWidth: 1280,
-//         minHeight: 720,
-//         maxHeight: 720
-//       }
-//     }
-//   }).then((stream) => {
-
-//     var mediaRecorder = new MediaRecorder(stream);
-//     mediaRecorder.ondataavailable = function (data) {
-
-//       var blob = data.data;
-
-//       var reader = new FileReader();
-//       reader.readAsArrayBuffer(blob);
-
-//       //reader.readAsDataURL(blob);
-//       reader.onloadend = function () {
-//         var result = reader.result;
-
-//         var byteArray = new Uint8Array(result);
-
-//         // var imgStr = new Buffer(result).toString("base64");
-//         client.connection.hub.invoke(hub, 'send', byteArray);
-//         //console.log(imgStr);
-//       }
-//     };
-//     mediaRecorder.start(1000);
-//   });
-// }
 
 app.controller(
   "hafriyatdokumlistCtrl",
@@ -236,9 +176,9 @@ app.controller(
 
         } else if ($rootScope.app.options.Kantar == "CihatliGiris") {
 
-          if (data[0] == 2 && data[1] == 121 && data[2] == 112 && data[3] == 48 && data[4] == 32 && data[5] == 32) {
+          if (data[0] == 2 && data[1] == 121 && data[2] == 112 && data[3] == 48 && data[4] == 32) {//&& data[5] == 32
             temp = [];
-            for (let i = 6; i < data.length; i++) temp.push(data[i]);
+            for (let i = 5; i < data.length; i++) temp.push(data[i]);
           } else if (data[0] != 13)
             for (let i = 0; i < data.length; i++) temp.push(data[i]);
 
@@ -246,6 +186,7 @@ app.controller(
           if (data[0] == 13) {
 
             d = ab2str(temp);
+            d = d.trimLeft();
             var ddd = d.split(" ");
             if (ddd.length > 1) {
               var x = ddd[0];
@@ -334,9 +275,36 @@ app.controller(
             }
           }
 
+        } else if ($rootScope.app.options.Kantar == "KucukbalikliGiris") {
+
+
+          if (d.startsWith("A")) {
+
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
+        } else if ($rootScope.app.options.Kantar == "MaksemPinarGiris") {
+
+          if (d.startsWith("A")) {
+
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
         }
-
-
 
       });
     };
@@ -943,8 +911,7 @@ app.controller(
         if (
           data.toString().substring(0, 3) !=
           $rootScope.app.options.OgsEtiketStart
-        )
-          return;
+        ) return;
 
         var number = parseInt(data);
 
@@ -979,7 +946,8 @@ app.controller(
 
             if (arac == null) {
               PlakaBul($scope.kabul.Ogs);
-            } else AracBulundu(arac);
+            } else
+              AracBulundu(arac);
 
           } else {
             PlakaBul($scope.kabul.Ogs);
@@ -1052,6 +1020,13 @@ app.controller(
         $scope.kabul.BelgeNo = "EVSELATIK";
         $scope.kabul.Tur = "EVSELATIK";
       }
+
+      if (!($scope.kabul.AracCinsiId == 30 || $scope.kabul.AracCinsiId == 31 || $scope.kabul.AracCinsiId == 32) && arac.IsDaraDegisimi && GirisCikis == "Giris") {
+        //hafriyat aracı ise dara güncellemesi
+        Notiflix.Notify.warning(arac.PlakaNo + " aracın dara bilgisini güncelleyiniz!");
+      }
+
+
 
       $scope.kabul.PlakaNo = arac.PlakaNo;
       $scope.kabul.Dara = arac.Dara;
@@ -1601,7 +1576,7 @@ app.controller(
 
 
 
-        var len = 50; //flag
+        var len = 40; //flag
         if ($rootScope.app.options.GirisCikis == "Çıkış") len = 60;
         else if ($rootScope.app.options.Kantar == "IgdirGiris") len = 10;
         else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
@@ -1611,6 +1586,12 @@ app.controller(
         else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
           len = 6;
           $scope.i = parseInt(tempTonaj.length * 16.6);
+        } else if ($rootScope.app.options.Kantar == "KucukbalikliGiris") {
+          len = 6;
+          $scope.i = parseInt(tempTonaj.length * 16.6);
+        } else if ($rootScope.app.options.Kantar == "MaksemPinarGiris") {
+          len = 10;
+          $scope.i = parseInt(tempTonaj.length * 10);
         }
 
 
@@ -2092,7 +2073,6 @@ app.controller(
     $scope.isOnlyEntered = false;
     $scope.OnlyEntered = function () {
 
-
       if (!$scope.isOnlyEntered) {
 
         var query =
@@ -2112,14 +2092,8 @@ app.controller(
         );
         $("#grid").data("kendoGrid").setOptions(ops);
       } else {
-
         $scope.Filter();
-
-
       }
-
-
-
       $scope.isOnlyEntered = !$scope.isOnlyEntered;
     }
 
@@ -2293,7 +2267,7 @@ app.controller(
         animation: false,
         templateUrl: "hgsModal",
         controller: "hgsCtrl",
-        size: "lg",
+        windowClass: 'modal-60',
         resolve: {
           TumAracListesi: function () {
             return $scope.TumAracListesi;
