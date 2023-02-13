@@ -126,7 +126,7 @@ app.controller('loginCtrl', function ($scope, $rootScope, $http, $modalInstance,
         var data = {
             username: $scope.user.username,
             password: $scope.user.password,
-            IsMobile: false
+            IsMobile: true
         }
 
         var url = $rootScope.app.options.WebApiUrl + 'api/User/CheckUser';
