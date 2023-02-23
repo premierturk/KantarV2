@@ -74,7 +74,7 @@ var config_cikis = {
 
 
 
-let rawdata = fs.readFileSync('c://hybs_kantar_config.json');
+let rawdata = fs.readFileSync('/home/pt/config.js');
 let config = JSON.parse(rawdata);
 module.exports = config;
 
