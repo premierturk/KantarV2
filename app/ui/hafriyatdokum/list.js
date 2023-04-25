@@ -275,7 +275,30 @@ app.controller(
             }
           }
 
-        } else if ($rootScope.app.options.Kantar == "KucukbalikliGiris") {
+        } else if ($rootScope.app.options.Kantar == "CeriklerGiris") {
+
+
+
+          if (d.startsWith("A")) {
+
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
+
+
+
+
+
+
+        }
+        else if ($rootScope.app.options.Kantar == "KucukbalikliGiris") {
 
 
           if (d.startsWith("A")) {
@@ -296,6 +319,21 @@ app.controller(
 
             d = d.replace("\r", "");
             d = d.replace("A", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+
+          }
+
+        } else if ($rootScope.app.options.Kantar == "Cataltepe") {
+
+          if (d.startsWith("A")) {
+
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+            d = d.replace(" ", "");
 
             if (d != "") {
               var tonaj = parseInt(d);
@@ -621,6 +659,7 @@ app.controller(
       Dara: 0,
       Kapasite: 0,
       Net: 0,
+      IsDaraDegisimi: false,
       Hesapla: function () {
         if ($scope.kabul.AracId == null) return;
 
@@ -681,6 +720,7 @@ app.controller(
         $scope.kabul.Dara = 0;
         $scope.kabul.Net = 0;
         $scope.kabul.Kapasite = 0;
+        $scope.kabul.IsDaraDegisimi = true;
         //$scope.kabul.BirimFiyat = 0
         $scope.kabul.IlDisiBirimFiyat = 0;
         $scope.kabul.SahaId = null;
@@ -727,7 +767,6 @@ app.controller(
 
 
 
-
     var isSend = true;
     $scope.Kaydet = function () {
       if (!isSend) return;
@@ -751,6 +790,17 @@ app.controller(
 
       if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null)
         return;
+
+
+
+
+      if ($scope.kabul.AracId != null && !($scope.kabul.AracCinsiId == 30 || $scope.kabul.AracCinsiId == 31 || $scope.kabul.AracCinsiId == 32) && $scope.kabul.IsDaraDegisimi && $rootScope.app.options.GirisCikis == "Giriş") {
+        //hafriyat aracı ise dara güncellemesi
+        Notiflix.Notify.warning($scope.kabul.PlakaNo + " aracın dara bilgisini güncelleyiniz!");
+      }
+
+
+
 
       $scope.uyari = "";
 
@@ -1021,10 +1071,7 @@ app.controller(
         $scope.kabul.Tur = "EVSELATIK";
       }
 
-      if (!($scope.kabul.AracCinsiId == 30 || $scope.kabul.AracCinsiId == 31 || $scope.kabul.AracCinsiId == 32) && arac.IsDaraDegisimi && GirisCikis == "Giris") {
-        //hafriyat aracı ise dara güncellemesi
-        Notiflix.Notify.warning(arac.PlakaNo + " aracın dara bilgisini güncelleyiniz!");
-      }
+
 
 
 
@@ -1205,6 +1252,8 @@ app.controller(
         $scope.kabul.AracId = e.AracId;
         $scope.kabul.AracCinsi = e.AracCinsi;
         $scope.kabul.AracCinsiId = e.AracCinsiId;
+        $scope.kabul.IsDaraDegisimi = e.IsDaraDegisimi;
+
 
         $scope.kabul.Hesapla();
         $scope.Kaydet();
@@ -1366,6 +1415,8 @@ app.controller(
                 $scope.kabul.Dara = e.Dara;
                 $scope.kabul.AracId = e.AracId;
                 $scope.kabul.AracCinsiId = e.AracCinsiId;
+                $scope.kabul.IsDaraDegisimi = e.IsDaraDegisimi;
+
 
                 $scope.kabul.Hesapla();
                 $scope.Kaydet();
@@ -1442,6 +1493,8 @@ app.controller(
               $scope.kabul.PlakaNo = e.PlakaNo;
               $scope.kabul.Dara = e.Dara;
               $scope.kabul.AracId = e.AracId;
+              $scope.kabul.IsDaraDegisimi = e.IsDaraDegisimi;
+
 
               $scope.kabul.Hesapla();
               $scope.Kaydet();
@@ -1586,12 +1639,18 @@ app.controller(
         else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
           len = 6;
           $scope.i = parseInt(tempTonaj.length * 16.6);
+        } else if ($rootScope.app.options.Kantar == "CeriklerGiris") {
+          len = 4;
+          $scope.i = parseInt(tempTonaj.length * 25);
         } else if ($rootScope.app.options.Kantar == "KucukbalikliGiris") {
           len = 6;
           $scope.i = parseInt(tempTonaj.length * 16.6);
         } else if ($rootScope.app.options.Kantar == "MaksemPinarGiris") {
           len = 10;
           $scope.i = parseInt(tempTonaj.length * 10);
+        } else if ($rootScope.app.options.Kantar == "Cataltepe") {
+          len = 6;
+          $scope.i = parseInt(tempTonaj.length * 16.6);
         }
 
 

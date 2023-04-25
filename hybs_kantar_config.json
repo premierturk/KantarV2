@@ -1,6 +1,6 @@
 {
   "GirisCikis": "Giriş",
-  "Kantar": "BaskoyGiris",
+  "Kantar": "CeriklerGiris",
   "KantarVarMi": true,
   "UsePrinter": false,
   "UseOffline": false,
@@ -13,7 +13,7 @@
     "host": "https://hybs.bursa.bel.tr/HYS.SingnalR/signalr"
   },
   "SerialPort": {
-    "portName": "COM2",
+    "portName": "COM3",
     "autoOpen": false,
     "baudRate": 9600
   }
