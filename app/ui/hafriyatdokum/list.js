@@ -106,6 +106,7 @@ app.controller(
     var serialNum = 0;
     var mySerialPort = function (run) {
       var temp = [];
+      var yenikentMsg = "";
       ipc.on("comport", (event, data) => {
 
         // serialNum++;
@@ -118,22 +119,24 @@ app.controller(
         //console.log(d);
 
         if ($rootScope.app.options.Kantar == "YenikentCikis") {
+          yenikentMsg += d;
+          if (!yenikentMsg.endsWith("\r")) return;
 
-
-          if (d.startsWith("A")) {
+          if (yenikentMsg.startsWith("A")) {
 
             //d = d.replaceAll(" ", "");
-            d = d.replace("\r", "");
-            d = d.replace("A", "");
+            yenikentMsg = yenikentMsg.replace("\r", "");
+            yenikentMsg = yenikentMsg.replace("A", "");
+            yenikentMsg = yenikentMsg.replace(" ", "");
             //d = d.replace("B", "");
             //d = d.replace("C", "");
             //d = d.replace("D", "");
 
-            if (d != "") {
-              var tonaj = parseInt(d);
+            if (yenikentMsg != "") {
+              var tonaj = parseInt(yenikentMsg);
               run(tonaj);
             }
-
+            yenikentMsg = "";
           }
 
         } else if ($rootScope.app.options.Kantar == "YenikentGiris") {
