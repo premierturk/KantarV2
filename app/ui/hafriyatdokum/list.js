@@ -1565,6 +1565,8 @@ app.controller(
           }
         }, function (err) {
 
+          Notiflix.Notify.failure(err.data.MessageTODO);
+
           requestSanayiAtikBelgesi = "";
 
         });
