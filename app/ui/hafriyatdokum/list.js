@@ -107,7 +107,9 @@ app.controller(
         //console.log(d);
 
         if ($rootScope.app.options.Kantar == "YenikentCikis") {
-          if (d.startsWith("A")) {
+
+
+          if (d.endsWith("\r") && d.startsWith("A")) {
             //d = d.replaceAll(" ", "");
             d = d.replace("\r", "");
             d = d.replace("A", "");
@@ -120,6 +122,8 @@ app.controller(
               run(tonaj);
             }
           }
+
+
         } else if ($rootScope.app.options.Kantar == "YenikentGiris") {
           if (
             (data[0] == 2 && data[1] == 41) ||
@@ -1221,10 +1225,10 @@ app.controller(
         Notiflix.Confirm.show(
           "Farklı depolama alanı",
           "Belge " +
-            data.DepolamaAlani +
-            " için oluşturulmuş. <br/> " +
-            data.DepolamaAlani +
-            " alanı kapalı olması nedeniyle Mevcut sahaya kabul edilecektir!",
+          data.DepolamaAlani +
+          " için oluşturulmuş. <br/> " +
+          data.DepolamaAlani +
+          " alanı kapalı olması nedeniyle Mevcut sahaya kabul edilecektir!",
           "Kabul Et",
           "Hayır",
           () => {
@@ -1673,8 +1677,8 @@ app.controller(
               kendo
                 .prompt(
                   "Giriş tonajı " +
-                    dataItem.Tonaj +
-                    " kg dır. Dara bilgisini giriniz.",
+                  dataItem.Tonaj +
+                  " kg dır. Dara bilgisini giriniz.",
                   "0"
                 )
                 .then(
@@ -2153,7 +2157,7 @@ app.controller(
       autoBind: false,
       dataSource: kendoExt.getDs(
         "api/DepolamaAlani/Saha?DepolamaAlaniId=" +
-          $localStorage.user.depolamaalani.DepolamaAlanId
+        $localStorage.user.depolamaalani.DepolamaAlanId
       ),
     };
 
