@@ -160,6 +160,20 @@ app.controller(
               run(tonaj);
             }
           }
+        } else if ($rootScope.app.options.Kantar == "MudanyaAltintasGiris") {
+          if (d.startsWith("A")) {
+            //d = d.replaceAll(" ", "");
+            d = d.replace("\r", "");
+            d = d.replace("A", "");
+            //d = d.replace("B", "");
+            //d = d.replace("C", "");
+            //d = d.replace("D", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+          }
         } else if ($rootScope.app.options.Kantar == "CihatliGiris") {
           if (
             data[0] == 2 &&
@@ -1527,6 +1541,9 @@ app.controller(
         if ($rootScope.app.options.GirisCikis == "Çıkış") len = 60;
         else if ($rootScope.app.options.Kantar == "IgdirGiris") len = 10;
         else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
+          len = 4;
+          $scope.i = parseInt(tempTonaj.length * 25);
+        } else if ($rootScope.app.options.Kantar == "MudanyaAltintasGiris") {
           len = 4;
           $scope.i = parseInt(tempTonaj.length * 25);
         } else if ($rootScope.app.options.Kantar == "AkcalarGiris") {
