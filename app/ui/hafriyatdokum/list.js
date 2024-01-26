@@ -1089,12 +1089,12 @@ app.controller(
             angular.copy(belgeNo)
           );
         } else if (
-          $scope.readBarkod.indexOf("KF-") > -1 &&
-          $scope.readBarkod.indexOf("-KF") > -1
+          $scope.readBarkod.toUpperCase().indexOf("KF-") > -1 &&
+          $scope.readBarkod.toUpperCase().indexOf("-KF") > -1
         ) {
           //KAMUFİŞ
 
-          var belgeNo = $scope.readBarkod.replace("KF-", "").replace("-KF", "");
+          var belgeNo = $scope.readBarkod.toUpperCase().replace("KF-", "").replace("-KF", "");
           $scope.$apply(function () {
             $scope.kabul.Tur = "KAMU FİŞİ";
             $scope.kabul.BarkodNo = angular.copy($scope.readBarkod);
@@ -1353,6 +1353,8 @@ app.controller(
     var KamuFisBelgesi = function (BelgeNo) {
       var data = {
         FisTeslimId: BelgeNo,
+        BarkodNo: "",
+        BelgeNo: ""
       };
       kendoExt.post("api/kantar/KamuFisKontrol", data, function (response) {
         var data = response.data;
