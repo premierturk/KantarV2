@@ -179,8 +179,7 @@ app.controller(
             data[0] == 2 &&
             data[1] == 121 &&
             data[2] == 112 &&
-            data[3] == 48 &&
-            data[4] == 32
+            data[3] == 48
           ) {
             //&& data[5] == 32
             temp = [];
