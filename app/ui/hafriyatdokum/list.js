@@ -100,7 +100,6 @@ app.controller(
       ipc.on("comport", (event, data) => {
         // serialNum++;
         // console.log(serialNum + " - " + data + " --- " + ab2str(data))
-
         //console.log(data.toString('utf8', 0, 1));
 
         var d = ab2str(data);
@@ -184,6 +183,7 @@ app.controller(
             //&& data[5] == 32
             temp = [];
             for (let i = 5; i < data.length; i++) temp.push(data[i]);
+
           } else if (data[0] != 13)
             for (let i = 0; i < data.length; i++) temp.push(data[i]);
 
@@ -194,6 +194,7 @@ app.controller(
             if (ddd.length > 1) {
               var x = ddd[0];
               run(parseInt(x));
+              temp = [];
             }
           }
         } else if ($rootScope.app.options.Kantar == "BurhaniyeGiris") {
@@ -802,7 +803,7 @@ app.controller(
             isSend = false;
             requestSanayiAtikBelgesi = "";
 
-            ipc.send("port_restart");
+            //ipc.send("port_restart");
 
             console.log("SAVING SUCCESS");
             $scope.kabul.Temizle();
@@ -1592,6 +1593,13 @@ app.controller(
           }
         }
       });
+
+
+    $scope.SetManuelTonaj = function () {
+      $scope.kabul.Tonaj = 44300;
+      $scope.kabul.Hesapla();
+
+    }
 
     $scope.filtre = {
       BasTarih: new Date(),
