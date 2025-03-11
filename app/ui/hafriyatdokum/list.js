@@ -1596,7 +1596,7 @@ app.controller(
 
 
     $scope.SetManuelTonaj = function () {
-      $scope.kabul.Tonaj = 44300;
+      $scope.kabul.Tonaj = 36060;
       $scope.kabul.Hesapla();
 
     }
