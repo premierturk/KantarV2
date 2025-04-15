@@ -1,6 +1,6 @@
 app.controller(
   "AracEditCtrl",
-  function ($scope, $localStorage, $modalInstance, $modal, parameter, kendoExt, $log, $timeout, SweetAlert) {
+  function ($scope, $localStorage, $modalInstance, $modal, parameter, isEdit, kendoExt, $log, $timeout, SweetAlert) {
     var firmaid;
     var aracid;
 
@@ -49,13 +49,28 @@ app.controller(
     ]
 
 
+
+
     kendoExt.Get$q(urls, function (response) {
-
       $scope.dsFirma = kendoExt.ConvertToDataSource(response[0].data);
-
-
     });
 
+
+    $timeout(function () {
+      if (isEdit) {
+        aracid = parameter.data.AracId;
+        firmaid = parameter.data.FirmaId;
+
+        $scope.arac.AracId = aracid;
+        $scope.arac.FirmaId = parameter.data.FirmaId;
+        $scope.arac.PlakaNo = parameter.data.PlakaNo;
+        if ($scope.ilid == 6) $scope.arac.HGSEtiketNo = parameter.data.OGSEtiket;
+        $scope.arac.Dara = parameter.data.Dara;
+        $scope.arac.Kapasitesi = parameter.data.Kapasitesi;
+        $scope.uneditedHGS = parameter.data.OGSEtiket;
+        $scope.arac.ChangeUser = $localStorage.user.userid;
+      }
+    }, 200)
 
     $scope.Kaydet = function () {
       var isValidate = true;
@@ -99,8 +114,7 @@ app.controller(
       $scope.arac.BuyukSehirId = 1;
       $scope.arac.CreateUser = $localStorage.user.userid;
 
-
-      if (aracid == 0) {
+      if (aracid == 0) { //create
         kendoExt.post("/Api/Arac", $scope.arac, function (response) {
           if (response.data == "") {
             Notiflix.Notify.success("Kaydedildi.");
@@ -109,6 +123,15 @@ app.controller(
             $scope.ShowMessage("warning", "Uyarı", response.data);
           }
         });
+      } else { //update
+        kendoExt.put("api/kantar/CopAraciDuzenle", $scope.arac, function (response) {
+          if (response) {
+            Notiflix.Notify.success("Kaydedildi.");
+            $modalInstance.close('reload');
+          } else {
+            $scope.ShowMessage("warning", "Uyarı", response.data);
+          }
+        })
       }
     };
 
@@ -118,8 +141,7 @@ app.controller(
 
 
     $scope.HGSEtiketCtrl = function () {
-
-      if ($scope.arac.HGSEtiketNo != null && $scope.arac.HGSEtiketNo != "")
+      if ($scope.arac.HGSEtiketNo != null && $scope.arac.HGSEtiketNo != "" && $scope.arac.HGSEtiketNo != uneditedHGS)
         kendoExt.Get("/api/HGSEtiketNoKontrol?HGSEtiketNo=" + $scope.arac.HGSEtiketNo,
           function (response) {
             if (response.data != "") {

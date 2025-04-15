@@ -5668,3 +5668,32 @@ video {
   top: 420.429px;
 
 }
+
+.btn-copAracSil {
+  background-color: #f93d3d !important;
+  color: white !important;
+}
+
+.r-selected {
+  color: orange !important;
+}
+
+.hafriyatCop>.sa-button-container>.cancel {
+  background-color: #FFBF00;
+  border-color: #FFBF00;
+}
+
+.hafriyatCop>.sa-button-container>.cancel:hover {
+  background-color: #f0b300;
+  border-color: #f0b300;
+}
+
+.hafriyatCop>.sa-button-container>.confirm {
+  background-color: #008C20;
+  border-color: #008C20;
+}
+
+.hafriyatCop>.sa-button-container>.confirm:hover {
+  background-color: #007b1c;
+  border-color: #007b1c;
+}

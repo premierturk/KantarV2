@@ -11,6 +11,10 @@ angular.module('app')
         isIE && angular.element($window.document.body).addClass('ie');
         isSmartDevice($window) && angular.element($window.document.body).addClass('smart');
 
+        Notiflix.Notify.init({
+            timeout: 10000
+        });
+
         // config
         $scope.app = {
             name: 'HYBS',

@@ -54,6 +54,7 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', '$localStor
 
         $http.post(url + 'api/User/CheckUser', data)
             .then(function (response) {
+
                 if (response.data == "Unauthorized") {
                     $scope.authError = 'Kullanici adi veya Sifre dogru degil.';
                 } else if (response.data == "Locked") {

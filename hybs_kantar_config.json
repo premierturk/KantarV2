@@ -8,9 +8,9 @@
   "TcpPortAntenCikis": 5554,
   "OgsEtiketStart": 126,
   "MinTonaj": 1000,
-  "WebApiUrl": "https://hybs.bursa.bel.tr/HYS.WebApi/",
+  "WebApiUrl": "http://localhost:2023/HYS.WebApi/",
   "SignalR": {
-    "host": "https://hybs.bursa.bel.tr/HYS.SingnalR/signalr"
+    "host": "http://localhost:2023/HYS.SingnalR/signalr"
   },
   "SerialPort": {
     "portName": "COM1",
