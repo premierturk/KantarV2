@@ -746,7 +746,7 @@ app.controller(
           $scope.kabul.AracCinsiId == 30 ||
           $scope.kabul.AracCinsiId == 31 ||
           $scope.kabul.AracCinsiId == 32 ||
-          $scope.kabul.AracCinsiId == 34
+          $scope.kabul.AracCinsiId == 35
         ) &&
         $scope.kabul.IsDaraDegisimi &&
         $rootScope.app.options.GirisCikis == "Giriş"
@@ -1023,7 +1023,7 @@ app.controller(
         $scope.kabul.BelgeNo = "EVSELATIK";
         $scope.kabul.Tur = "EVSELATIK";
 
-      } else if (arac.AracCinsiId == 34) {
+      } else if (arac.AracCinsiId == 35) { // açık kasa çöp
         //!?!
         $scope.kabul.Tutar = 0;
         $scope.kabul.Tonaj = 0;
@@ -1244,7 +1244,7 @@ app.controller(
           $scope.kabul.BelgeNo = "EVSELATIK";
           $scope.kabul.Tur = "EVSELATIK";
 
-        } else if (e.AracCinsiId == 34) {//açık kasa çöp
+        } else if (e.AracCinsiId == 35) {//açık kasa çöp
 
           $scope.kabul.Tutar = 0;
           $scope.kabul.Tonaj = 0;
