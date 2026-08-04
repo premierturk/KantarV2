@@ -569,6 +569,10 @@ app.controller(
       });
     };
 
+
+
+
+
     var formatPlaka = function (plate) {
       var p = (plate || "").replace(/\s+/g, "").toUpperCase();
       var m = p.match(/^(\d{2})([A-ZÇĞİÖŞÜ]{1,3})(\d{2,5})$/);
@@ -1088,7 +1092,7 @@ app.controller(
           let response = await new Promise((resolve, reject) => {
             swal({
               title: "Hafriyat mı Çöp mü?",
-              text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
+              text: "Bu atık Hafriyat atığı mı? Çöp mü?",
               type: "warning",
               showCancelButton: true,
               confirmButtonColor: "#008C20",
@@ -2205,7 +2209,7 @@ app.controller(
         attributes: { style: "font-size: 17px;" },
         field: "Tutar",
         title: "Tutar (₺)",
-        width: "130px",
+        width: "140px",
         format: "{0:c5}",
         type: "number",
         footerTemplate: "#= kendo.toString(sum, 'C2') #",
