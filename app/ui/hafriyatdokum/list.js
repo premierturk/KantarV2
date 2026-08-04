@@ -555,6 +555,56 @@ app.controller(
       });
     };
 
+    var formatPlaka = function (plate) {
+      var p = (plate || "").replace(/\s+/g, "").toUpperCase();
+      var m = p.match(/^(\d{2})([A-ZÇĞİÖŞÜ]{1,3})(\d{2,5})$/);
+      if (!m) return p;
+      return m[1] + " " + m[2] + " " + m[3];
+    };
+
+    var Pts_Tcp = function (onMessage) {
+      var server = net.createServer(function (client) {
+        console.log("PTS Client connect : ", client.remoteAddress);
+        var buffer = "";
+
+        client.on("data", function (received) {
+          buffer += received.toString();
+
+          try {
+            var msg = JSON.parse(buffer);
+            buffer = "";
+            onMessage(msg);
+          } catch (e) {
+            // JSON henüz tamamlanmadı, buffer birikmeye devam eder
+          }
+        });
+
+        client.on("end", function () {
+          console.log("PTS Client disconnect.");
+        });
+
+        client.on("close", function () {
+          console.log("PTS Client close.");
+        });
+
+        client.on("error", function (err) {
+          console.error("PTS Client error:", err);
+        });
+      });
+
+      server.listen($rootScope.app.options.TcpPortPts || 5556, function () {
+        server.on("close", function () {
+          console.log("PTS TCP server socket is closed.");
+        });
+
+        server.on("error", function (error) {
+          console.error("PTS TCP error:", JSON.stringify(error));
+        });
+
+        console.log("PTS TCP SERVER LISTEN:", $rootScope.app.options.TcpPortPts || 5556);
+      });
+    };
+
     var birimfiyat = $localStorage.user.depolamaalani.BirimFiyat.find(function (
       item
     ) {
@@ -1021,6 +1071,24 @@ app.controller(
         $scope.Kaydet();
       }
     };
+
+    Pts_Tcp(function (msg) {
+      console.log("PTS message:", msg);
+
+      $scope.$apply(function () {
+        var formatted = formatPlaka(msg.plate);
+        var arac = ($scope.TumAracListesi || []).find(function (item) {
+          return item.PlakaNo === formatted;
+        });
+
+        if (!arac) {
+          Notiflix.Notify.warning("PTS plaka bulunamadı: " + formatted);
+          return;
+        }
+
+        AracBulundu(arac);
+      });
+    });
 
     var OgsTemizle = function () {
       tempEtiketNo = [];

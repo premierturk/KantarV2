@@ -8,7 +8,7 @@
   "license": "CC0-1.0",
   "scripts": {
     "rebuild": "electron-rebuild --force -m ./",
-    "start": "npm rebuild && electron-rebuild -f -w kantarv2 && electron .",
+    "start": "electron-rebuild -f -w kantarv2 & electron .",
     "buildpack": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
     "setup": "electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/",
     "deploy": "npm rebuild  && electron-rebuild && electron-builder build --win --publish always",

@@ -8,7 +8,13 @@ var nrc = require("node-run-cmd");
 // const ab2str = require("arraybuffer-to-string");
 const config = require("./config");
 
-const serialport = require("serialport");
+let serialport;
+try {
+  serialport = require("serialport");
+} catch (e) {
+  serialport = null;
+  console.warn("Serialport yüklenemedi (native build gerekebilir):", e.message);
+}
 
 // const Readline = require("@serialport/parser-readline");
 // const { isNumber, parseInt } = require("lodash");
@@ -95,6 +101,7 @@ function createWindow() {
   });
 
 
+  if (serialport) {
   const port = new serialport(config.SerialPort.portName, config.SerialPort);
   var serial_port_open = function () {
 
@@ -142,6 +149,9 @@ function createWindow() {
   ipc.on("port_restart", (event) => {
     serial_port_close();
   });
+  } else {
+    ipc.on("port_restart", () => {});
+  }
 
 
   //todo : remote open/close

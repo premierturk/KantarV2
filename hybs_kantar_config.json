@@ -6,6 +6,7 @@
   "UseOffline": false,
   "TcpPort": 5555,
   "TcpPortAntenCikis": 5554,
+  "TcpPortPts": 5556,
   "OgsEtiketStart": 126,
   "MinTonaj": 1000,
   "WebApiUrl": "https://hybs.bursa.bel.tr/HYS.WebApi/",
