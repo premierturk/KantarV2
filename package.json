@@ -1,7 +1,7 @@
 {
   "name": "kantarv2",
   "productName": "HybsKantarV2",
-  "version": "1.0.89",
+  "version": "1.1.0",
   "description": "HybsKantarV2",
   "main": "main.js",
   "author": "Premierturk",
@@ -9,16 +9,17 @@
   "scripts": {
     "rebuild": "electron-rebuild --force -m ./",
     "start": "electron-rebuild -f -w kantarv2 & electron .",
-    "buildpack": "npm rebuild  && electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
+    "buildpack": "electron-rebuild -f -w kantarv2 &&  electron-packager . kantarv2 --platform win32  --out dist/ --overwrite=true --prune=true --icon=icon.png",
     "setup": "electron-installer-windows --src dist/kantarv2-win32-ia32/ --dest dist/installers/",
-    "deploy": "npm rebuild  && electron-rebuild && electron-builder build --win --publish always",
-    "build": "npm rebuild  && electron-rebuild && electron-builder build --win --publish never"
+    "deploy": "electron-rebuild && electron-builder build --win --publish always",
+    "build": "electron-rebuild && electron-builder build --win --publish never"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
     "electron": "^15.3.0",
     "electron-builder": "^22.13.1",
     "electron-packager": "^15.4.0",
-    "electron-rebuild": "^3.2.4"
+    "node-gyp": "^13.0.1"
   },
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
@@ -27,7 +28,6 @@
     "electron-shortcut": "^0.5.0",
     "electron-updater": "^6.3.9",
     "json.human": "^0.0.1",
-    "kantarv2": "file:",
     "kill-port-process": "^3.0.1",
     "lodash": "^4.17.21",
     "node-abi": "^3.2.0",
