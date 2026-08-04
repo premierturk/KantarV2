@@ -93,6 +93,7 @@ app.controller(
     }
 
     $scope.OgsAktif = $localStorage.user.depolamaalani.OgsAktif;
+    $scope.AcikKasaAtikSecildi = false;
 
     var serialNum = 0;
     var mySerialPort = function (run) {
@@ -772,15 +773,17 @@ app.controller(
       var UserId = $scope.kabul.UserId;
       var SahaId = $scope.kabul.SahaId;
 
-      if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null)
-        return;
+      if ($scope.kabul.BelgeNo !== "EVSELATIK")
+        if ($localStorage.user.depolamaalani.Sahalar.length > 0 && SahaId == null)
+          return;
 
       if (
         $scope.kabul.AracId != null &&
         !(
           $scope.kabul.AracCinsiId == 30 ||
           $scope.kabul.AracCinsiId == 31 ||
-          $scope.kabul.AracCinsiId == 32
+          $scope.kabul.AracCinsiId == 32 ||
+          $scope.kabul.AracCinsiId == 35
         ) &&
         $scope.kabul.IsDaraDegisimi &&
         $rootScope.app.options.GirisCikis == "Giriş"
@@ -1035,8 +1038,8 @@ app.controller(
       });
     });
 
-    var AracBulundu = function (arac) {
-      if ($scope.kabul.AracCinsiId == 30) {
+    var AracBulundu = async function (arac) {
+      if (arac.AracCinsiId == 30) {
         $scope.kabul.Tutar = 0;
         $scope.kabul.Tonaj = 0;
         $scope.kabul.Dara = 0;
@@ -1049,6 +1052,47 @@ app.controller(
         $scope.kabul.BarkodNo = "EVSELATIK";
         $scope.kabul.BelgeNo = "EVSELATIK";
         $scope.kabul.Tur = "EVSELATIK";
+      } else if (arac.AracCinsiId == 35) {
+        $scope.kabul.Tutar = 0;
+        $scope.kabul.Tonaj = 0;
+        $scope.kabul.Dara = 0;
+        $scope.kabul.Net = 0;
+        $scope.kabul.Kapasite = 0;
+        $scope.readBarkod = "";
+        $scope.i = 0;
+        $scope.iOgs = 0;
+
+        if (!$scope.AcikKasaAtikSecildi) {
+          var response = await new Promise(function (resolve) {
+            swal(
+              {
+                title: "Hafriyat mı Çöp mü?",
+                text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#008C20",
+                confirmButtonText: "Çöp",
+                cancelButtonText: "Hafriyat",
+                closeOnConfirm: true,
+                closeOnCancel: true,
+                customClass: "hafriyatCop",
+              },
+              function (isConfirm) {
+                resolve(isConfirm);
+              }
+            );
+          });
+
+          // HAFRİYAT seçilirse barkod okutulmasını bekler; ÇÖP seçilirse EVSELATIK
+          $scope.AcikKasaAtikSecildi = true;
+          if (response) {
+            $scope.kabul.BarkodNo = "EVSELATIK";
+            $scope.kabul.BelgeNo = "EVSELATIK";
+            $scope.kabul.Tur = "EVSELATIK";
+          } else {
+            $scope.uyari = "Belge no okutunuz/giriniz!";
+          }
+        }
       }
 
       $scope.kabul.PlakaNo = arac.PlakaNo;
@@ -1072,22 +1116,24 @@ app.controller(
       }
     };
 
-    Pts_Tcp(function (msg) {
+    Pts_Tcp(async function (msg) {
       console.log("PTS message:", msg);
 
-      $scope.$apply(function () {
-        var formatted = formatPlaka(msg.plate);
-        var arac = ($scope.TumAracListesi || []).find(function (item) {
-          return item.PlakaNo === formatted;
-        });
-
-        if (!arac) {
-          Notiflix.Notify.warning("PTS plaka bulunamadı: " + formatted);
-          return;
-        }
-
-        AracBulundu(arac);
+      var formatted = formatPlaka(msg.plate);
+      var arac = ($scope.TumAracListesi || []).find(function (item) {
+        return item.PlakaNo === formatted;
       });
+
+      if (!arac) {
+        $scope.$apply(function () {
+          Notiflix.Notify.warning("PTS plaka bulunamadı: " + formatted);
+        });
+        return;
+      }
+
+      // AracCinsiId == 35 ise AracBulundu içinde "Hafriyat mı Çöp mü?" sorulur
+      await AracBulundu(arac);
+      if (!$scope.$$phase) $scope.$apply();
     });
 
     var OgsTemizle = function () {
@@ -1103,6 +1149,7 @@ app.controller(
         $scope.kabul.AracId = null;
         $scope.kabul.AracCinsi = "";
         $scope.kabul.AracCinsiId = null;
+        $scope.AcikKasaAtikSecildi = false;
       });
     };
 
@@ -1227,8 +1274,8 @@ app.controller(
         },
       });
 
-      modalInstance.result.then(function (e) {
-        if ($scope.kabul.AracCinsiId == 30) {
+      modalInstance.result.then(async function (e) {
+        if (e.AracCinsiId == 30) {
           $scope.kabul.Tutar = 0;
           $scope.kabul.Tonaj = 0;
           $scope.kabul.Dara = 0;
@@ -1240,6 +1287,45 @@ app.controller(
           $scope.kabul.BarkodNo = "EVSELATIK";
           $scope.kabul.BelgeNo = "EVSELATIK";
           $scope.kabul.Tur = "EVSELATIK";
+        } else if (e.AracCinsiId == 35) {
+          // açık kasa çöp
+          $scope.kabul.Tutar = 0;
+          $scope.kabul.Tonaj = 0;
+          $scope.kabul.Dara = 0;
+          $scope.kabul.Net = 0;
+          $scope.kabul.Kapasite = 0;
+          $scope.readBarkod = "";
+          $scope.i = 0;
+          $scope.iOgs = 0;
+
+          var response = await new Promise(function (resolve) {
+            swal(
+              {
+                title: "Hafriyat mı Çöp mü?",
+                text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#008C20",
+                confirmButtonText: "Çöp",
+                cancelButtonText: "Hafriyat",
+                closeOnConfirm: true,
+                closeOnCancel: true,
+                customClass: "hafriyatCop",
+              },
+              function (isConfirm) {
+                resolve(isConfirm);
+              }
+            );
+          });
+
+          // HAFRİYAT seçilirse barkod okutulmasını bekler; ÇÖP seçilirse EVSELATIK
+          if (response) {
+            $scope.kabul.BarkodNo = "EVSELATIK";
+            $scope.kabul.BelgeNo = "EVSELATIK";
+            $scope.kabul.Tur = "EVSELATIK";
+          } else {
+            $scope.uyari = "Belge no okutunuz/giriniz!";
+          }
         }
 
         $scope.kabul.PlakaNo = e.PlakaNo;
