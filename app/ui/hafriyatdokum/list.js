@@ -28,6 +28,7 @@ app.controller(
       "ui/hafriyatdokum/hgsCTRL.js",
       "ui/hafriyatdokum/sahaCTRL.js",
       "ui/hafriyatdokum/plakaSecCTRL.js",
+      "ui/hafriyatdokum/dokumEditCTRL.js",
     ]);
 
     ipc.send("app_version");
@@ -451,9 +452,21 @@ app.controller(
             //bursa
             if (received.length < 11) return;
 
+            // var test = true;
+            // if (test) {
+            //   var index = received.indexOf(19);
+            //   if (index != -1) {
+            //     var hex1 = byteToHex(received[index + 1]);
+            //     var hex2 = byteToHex(received[index + 2]);
+            //     var hex3 = byteToHex(received[index + 3]);
+            //   }
+
+            // } else {
             var hex1 = byteToHex(received[8]);
             var hex2 = byteToHex(received[9]);
             var hex3 = byteToHex(received[10]);
+            // }
+
             var etiket = parseInt(hex1 + hex2 + hex3, 16);
             console.log(etiket);
             e(etiket);
@@ -829,6 +842,10 @@ app.controller(
 
       console.log("Kaydet start...");
 
+      var AtikCinsiId = null;
+      if ($scope.seciliAtikCinsiId != null || $scope.seciliAtikCinsiId != undefined)
+        AtikCinsiId = $scope.seciliAtikCinsiId;
+
       var data = {
         AracId: AracId,
         FirmaId: FirmaId,
@@ -841,6 +858,7 @@ app.controller(
         Tonaj: Tonaj,
         Tarih: new Date(),
         GirisCikis: $rootScope.app.options.GirisCikis,
+        AtikCinsiId: AtikCinsiId
       };
 
       console.log("kaydet start");
@@ -854,6 +872,7 @@ app.controller(
           data,
           function (response) {
             isSend = false;
+            $scope.seciliAtikCinsiId = null;
             requestSanayiAtikBelgesi = "";
 
             //ipc.send("port_restart");
@@ -892,6 +911,7 @@ app.controller(
             data,
             function (response) {
               isSend = false;
+              $scope.seciliAtikCinsiId = null;
               requestSanayiAtikBelgesi = "";
 
               ipc.send("port_restart");
@@ -939,7 +959,7 @@ app.controller(
         function (response) {
           var arac = response.data;
           if (arac == null)
-            Notiflix.Notify.warning("Tanımsız OGS ETiketi : " + EtiketNo);
+            Notiflix.Notify.warning("Tanımsız OGS Etiketi : " + EtiketNo);
           else AracBulundu(arac);
         }
       );
@@ -1052,7 +1072,9 @@ app.controller(
         $scope.kabul.BarkodNo = "EVSELATIK";
         $scope.kabul.BelgeNo = "EVSELATIK";
         $scope.kabul.Tur = "EVSELATIK";
-      } else if (arac.AracCinsiId == 35) {
+
+      } else if (arac.AracCinsiId == 35) { // açık kasa çöp
+        //!?!
         $scope.kabul.Tutar = 0;
         $scope.kabul.Tonaj = 0;
         $scope.kabul.Dara = 0;
@@ -1063,27 +1085,26 @@ app.controller(
         $scope.iOgs = 0;
 
         if (!$scope.AcikKasaAtikSecildi) {
-          var response = await new Promise(function (resolve) {
-            swal(
-              {
-                title: "Hafriyat mı Çöp mü?",
-                text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#008C20",
-                confirmButtonText: "Çöp",
-                cancelButtonText: "Hafriyat",
-                closeOnConfirm: true,
-                closeOnCancel: true,
-                customClass: "hafriyatCop",
-              },
+          let response = await new Promise((resolve, reject) => {
+            swal({
+              title: "Hafriyat mı Çöp mü?",
+              text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
+              type: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#008C20",
+              confirmButtonText: "Çöp",
+              cancelButtonText: "Hafriyat",
+              closeOnConfirm: true,
+              closeOnCancel: true,
+              customClass: "hafriyatCop",
+            },
               function (isConfirm) {
                 resolve(isConfirm);
-              }
-            );
+              });
           });
 
-          // HAFRİYAT seçilirse barkod okutulmasını bekler; ÇÖP seçilirse EVSELATIK
+          //HAFRİYAT SEÇERSE BARKOD OKUTULMASINI BEKLEYECEK
+          // ÇÖP SEÇERSE
           $scope.AcikKasaAtikSecildi = true;
           if (response) {
             $scope.kabul.BarkodNo = "EVSELATIK";
@@ -1093,6 +1114,8 @@ app.controller(
             $scope.uyari = "Belge no okutunuz/giriniz!";
           }
         }
+
+
       }
 
       $scope.kabul.PlakaNo = arac.PlakaNo;
@@ -1260,7 +1283,7 @@ app.controller(
       ipc.send("restart", true);
     };
 
-    $scope.PlakaSec = function () {
+    $scope.PlakaSec = async function () {
       var modalInstance = $modal.open({
         keyboard: true,
         animation: false,
@@ -1275,6 +1298,9 @@ app.controller(
       });
 
       modalInstance.result.then(async function (e) {
+        //!?!
+        console.log(e);
+
         if (e.AracCinsiId == 30) {
           $scope.kabul.Tutar = 0;
           $scope.kabul.Tonaj = 0;
@@ -1287,8 +1313,9 @@ app.controller(
           $scope.kabul.BarkodNo = "EVSELATIK";
           $scope.kabul.BelgeNo = "EVSELATIK";
           $scope.kabul.Tur = "EVSELATIK";
-        } else if (e.AracCinsiId == 35) {
-          // açık kasa çöp
+
+        } else if (e.AracCinsiId == 35) {//açık kasa çöp
+
           $scope.kabul.Tutar = 0;
           $scope.kabul.Tonaj = 0;
           $scope.kabul.Dara = 0;
@@ -1298,27 +1325,27 @@ app.controller(
           $scope.i = 0;
           $scope.iOgs = 0;
 
-          var response = await new Promise(function (resolve) {
-            swal(
-              {
-                title: "Hafriyat mı Çöp mü?",
-                text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#008C20",
-                confirmButtonText: "Çöp",
-                cancelButtonText: "Hafriyat",
-                closeOnConfirm: true,
-                closeOnCancel: true,
-                customClass: "hafriyatCop",
-              },
+          // SORU SORULACAK HAFİYAT MI ÇÖP MÜ?
+          let response = await new Promise((resolve, reject) => {
+            swal({
+              title: "Hafriyat mı Çöp mü?",
+              text: "Bu atık Hafriyat atığı mı Yoksa Çöp mü?",
+              type: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#008C20",
+              confirmButtonText: "Çöp",
+              cancelButtonText: "Hafriyat",
+              closeOnConfirm: true,
+              closeOnCancel: true,
+              customClass: "hafriyatCop",
+            },
               function (isConfirm) {
                 resolve(isConfirm);
-              }
-            );
+              });
           });
 
-          // HAFRİYAT seçilirse barkod okutulmasını bekler; ÇÖP seçilirse EVSELATIK
+          //HAFRİYAT SEÇERSE BARKOD OKUTULMASINI BEKLEYECEK
+          // ÇÖP SEÇERSE
           if (response) {
             $scope.kabul.BarkodNo = "EVSELATIK";
             $scope.kabul.BelgeNo = "EVSELATIK";
@@ -1326,6 +1353,7 @@ app.controller(
           } else {
             $scope.uyari = "Belge no okutunuz/giriniz!";
           }
+
         }
 
         $scope.kabul.PlakaNo = e.PlakaNo;
@@ -1336,7 +1364,6 @@ app.controller(
         $scope.kabul.IsDaraDegisimi = e.IsDaraDegisimi;
 
         $scope.kabul.Hesapla();
-        $scope.Kaydet();
       });
     };
 
@@ -1344,6 +1371,16 @@ app.controller(
       var data = {
         BelgeNo: BelgeNo,
       };
+
+      kendoExt.Get("api/kantar/AtikCinsiListesi", function (response) {
+        let options = response.data;
+        $scope.selectHTML = `<select id="atik-cinsi" class="atik-cinsi-select">`;
+        options.forEach(option => {
+          $scope.selectHTML += `<option value="${option.AtikCinsiId}">${option.AtikCinsi}</option>`;
+        });
+        $scope.selectHTML += `</select>`;
+      })
+
       kendoExt.post("api/kantar/NakitDokumKontrol", data, function (response) {
         var data = response.data;
 
@@ -1364,26 +1401,35 @@ app.controller(
 
           $scope.kabul.Response = response.data;
 
-          //SAHA SEÇİMİ
-          if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
-            var modalInstance = $modal.open({
-              keyboard: true,
-              animation: false,
-              templateUrl: "sahaModal",
-              controller: "sahaCtrl",
-              size: "lg",
-              resolve: {
-                SahaListesi: function () {
-                  return $localStorage.user.depolamaalani.Sahalar;
+          swal({
+            title: "Atık Cinsi Seçin",
+            text: $scope.selectHTML,
+            html: true,
+            focusConfirm: false,
+          }, function (s) {
+            //SAHA SEÇİMİ
+            $scope.seciliAtikCinsiId = document.getElementById('atik-cinsi').value;
+            console.log($scope.seciliAtikCinsiId);
+            if ($localStorage.user.depolamaalani.Sahalar.length > 0) {
+              var modalInstance = $modal.open({
+                keyboard: true,
+                animation: false,
+                templateUrl: "sahaModal",
+                controller: "sahaCtrl",
+                size: "lg",
+                resolve: {
+                  SahaListesi: function () {
+                    return $localStorage.user.depolamaalani.Sahalar;
+                  },
                 },
-              },
-            });
+              });
 
-            modalInstance.result.then(function (e) {
-              $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
-            });
-          }
-          $scope.PlakaSec();
+              modalInstance.result.then(function (e) {
+                $scope.kabul.SahaId = e.DepolamaAlaniSahaId;
+              });
+            }
+            $scope.PlakaSec();
+          });
         }
       });
     };
@@ -1752,6 +1798,7 @@ app.controller(
     $scope.SetManuelTonaj = function () {
       $scope.kabul.Tonaj = 36060;
       $scope.kabul.Hesapla();
+      $scope.Kaydet();
 
     }
 
@@ -2010,13 +2057,15 @@ app.controller(
         field: "OwnerId",
         title: "OwnerId",
         hidden: true,
-        attributes: { style: "white-space:nowrap" },
         width: "150px",
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
       },
       {
         field: "Tur",
         title: "Tür",
-        attributes: { style: "white-space:nowrap" },
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "white-space:nowrap; font-size: 17px;" },
         width: "150px",
         filterable: {
           cell: {
@@ -2040,7 +2089,8 @@ app.controller(
         },
       },
       {
-        attributes: { style: "white-space:nowrap" },
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "white-space:nowrap; font-size: 17px;" },
         field: "IslemTarihi",
         title: "İşlem Tarihi",
         type: "date",
@@ -2050,7 +2100,8 @@ app.controller(
       {
         field: "BelgeNo",
         title: "BelgeNo",
-        attributes: { style: "white-space:nowrap" },
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "white-space:nowrap; font-size: 17px;" },
         width: "120px",
         filterable: {
           cell: {
@@ -2072,13 +2123,14 @@ app.controller(
       {
         field: "FirmaAdi",
         title: "Firma Adı",
-        attributes: { style: "white-space:nowrap" },
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "white-space:nowrap; font-size: 17px;" },
         filterable: {
           cell: {
             operator: "contains",
             template: function (args) {
               args.element
-                .css("width", "90%")
+                .css("width", "70%")
                 .addClass("k-textbox")
                 .keydown(function (e) {
                   setTimeout(function () {
@@ -2091,9 +2143,11 @@ app.controller(
         },
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "PlakaNo",
         title: "Plaka No",
-        width: "100px",
+        width: "150px",
         filterable: {
           cell: {
             operator: "contains",
@@ -2112,6 +2166,8 @@ app.controller(
         },
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "BirimFiyat",
         title: "Birim Fiyat (₺)",
         format: "{0:C5}",
@@ -2119,12 +2175,16 @@ app.controller(
         type: "number",
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "Dara",
         title: "Dara (Kg)",
         width: "100px",
         type: "number",
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "Tonaj",
         title: "Tonaj (Kg)",
         width: "110px",
@@ -2133,12 +2193,16 @@ app.controller(
         //footerTemplate: "{{Total_Tonaj}}"
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "ToplamTonaj",
         title: "TopTonaj(Kg)",
         width: "110px",
         type: "number",
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px;" },
         field: "Tutar",
         title: "Tutar (₺)",
         width: "130px",
@@ -2148,10 +2212,11 @@ app.controller(
         //footerTemplate: "{{Total_Tutar | currency:'₺ ':3 }}"
       },
       {
+        headerAttributes: { style: "font-size: 19px;" },
+        attributes: { style: "font-size: 17px; white-space:nowrap;" },
         field: "IslemYapan",
         title: "İşlem Yapan",
-        width: "70px",
-        attributes: { style: "white-space:nowrap" },
+        width: "150px",
         filterable: {
           cell: {
             operator: "contains",
@@ -2309,6 +2374,57 @@ app.controller(
           Notiflix.Report.info("", html, "Tamam");
         });
       }
+
+
+      grid.tbody.off("click", "tr");
+      grid.tbody.on("click", "tr", function () {
+        var selectedRow = $(this);
+        console.log($scope.seciliDokumData);
+
+        //seçim kaldırma
+        if (selectedRow.hasClass("r-selected")) {
+          $scope.seciliDokumData = null;
+          selectedRow.removeClass("r-selected");
+          $("#btn-dokum-duzenle").addClass("hidden");
+        }
+        //seçme
+        else {
+          //başka bir row seçildiyse önceki seçimi kaldırma
+          if ($(".r-selected").length) $(".r-selected").removeClass("r-selected");
+
+          //nakit döküm ise seçim işlemini gerçekleştir.
+          if (grid.dataItem(selectedRow).BelgeNo == "NAKİT" || grid.dataItem(selectedRow).BelgeNo == "EVSELATIK") {
+            selectedRow.addClass("r-selected");
+            $scope.seciliDokumData = grid.dataItem(selectedRow);
+            $("#btn-dokum-duzenle").removeClass("hidden");
+          } else {
+            $("#btn-dokum-duzenle").addClass("hidden");
+          }
+        }
+      });
+    }
+
+    $scope.DokumEdit = function () {
+
+      var modalInstance = $modal.open({
+        animation: true,
+        templateUrl: "dokumedit",
+        controller: "DokumEditCtrl",
+        size: "lg",
+        resolve: {
+          dokum: function () {
+            return $scope.seciliDokumData;
+          },
+        },
+      });
+
+
+      modalInstance.result.then(function (s) {
+        if (s === 'reload') $("#grid").data("kendoGrid").dataSource.read();
+        $scope.seciliDokumData = null;
+        $("#btn-dokum-duzenle").addClass("hidden");
+        $(".r-selected").removeClass("r-selected");
+      });
     }
 
     function onDataBinding(e) {
@@ -2369,6 +2485,9 @@ app.controller(
           TumAracListesi: function () {
             return $scope.TumAracListesi;
           },
+          kabul: function () {
+            return $scope.kabul;
+          },
         },
       });
 
@@ -2402,29 +2521,6 @@ app.controller(
       });
     };
 
-    $scope.AracEdit = function () {
-      var parameter = {
-        tur: "aracid",
-        id: 0,
-      };
-
-      var modalInstance = $modal.open({
-        animation: true,
-        templateUrl: "aracedit",
-        controller: "AracEditCtrl",
-        size: "lg",
-        resolve: {
-          parameter: function () {
-            return parameter;
-          },
-        },
-      });
-
-      modalInstance.result.then(function (s) {
-        $scope.kabul.Temizle();
-        aracListesiYukle();
-      });
-    };
 
     function resizeGrid() {
       var gridElement = $("#grid");

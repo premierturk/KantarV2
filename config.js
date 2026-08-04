@@ -1,6 +1,5 @@
 "use strict";
 
-
 const fs = require('fs');
 
 var OGS_SERI = [
@@ -51,11 +50,11 @@ var config_cikis = {
   TcpPortPts: 5556, // PTS plaka tanıma
   OgsEtiketStart: OGS_SERI[1].Seri,
   MinTonaj: 1000,
-  WebApiUrl: "http://bursa.premierturk.com/HYS.WebApi/",
+  WebApiUrl: "http://localhost:2023/HYS.WebApi/",
   //WebApiUrl: "http://localhost:2023/HYS.WebApi/",
   //WebApiUrl: "http://hybs.diyarbakir.bel.tr//HYS.WebApi/",
   SignalR: {
-    host: "http://bursa.premierturk.com/HYS.SingnalR/signalr",
+    host: "http://localhost:2023/HYS.SingnalR/signalr",
     //host: 'http://localhost:2023/HYS.SingnalR/signalr'
     //host: 'http://hybs.diyarbakir.bel.tr/HYS.SingnalR/signalr'
   },
@@ -76,7 +75,7 @@ var config_cikis = {
 
 
 
-let rawdata = fs.readFileSync('c://hybs_kantar_config.json');
+let rawdata = fs.readFileSync('C://hybs_kantar_config.json');
 let config = JSON.parse(rawdata);
 module.exports = config;
 

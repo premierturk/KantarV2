@@ -58,9 +58,11 @@ app.hideAside = true">
                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span id="pr_download_text"></span>
                 </div>
               </div>
-
             </div>
-
+            <div class="col-md-4 text-end">
+              <button class="btn btn-info hidden" type="button" id="btn-dokum-duzenle" ng-click="DokumEdit()">
+                DÖKÜM DÜZENLE </button>
+            </div>
 
           </div>
 
@@ -99,12 +101,12 @@ app.hideAside = true">
             </a> -->
             <a href="" class="list-group-item" ng-click="HgsEtiketi()">
               <i class="fa fa-star fa-adn"></i>
-              <span class="text-black">HGS & Dara Değişimi</span>
+              <span class="text-black">Araç İşlemleri</span>
             </a>
-            <a href="" class="list-group-item" ng-click="AracEdit()">
+            <!-- <a href="" class="list-group-item" ng-click="AracEdit()">
               <i class="fa fa-car fa-adn"></i>
               <span class="text-black">Çöp Aracı Ekle</span>
-            </a>
+            </a> -->
             <a ng-show="!isOnlyEntered" href="" class="list-group-item" ng-click="OnlyEntered()">
               <i class="fa fa-car fa-adn"></i>
               <span class="text-black">Çıkışı Yapılmayan(Sanayi)</span>
@@ -337,11 +339,16 @@ app.hideAside = true">
 <script type="text/ng-template" id="hgsModal">
   <div class="modal-header wrapper-xs">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
-    <h4>HGS</h2>         
+    
+    <h4>Araç İşlemleri</h2>         
   
   </div>
   </div>
   <div class="modal-body wrapper-xs"> 
+    <button class="btn btn-cop-arac-ekle" type="button" ng-click="AracEdit()">
+      <i class="fa fa-car fa-adn"></i>
+        Çöp Aracı Ekle
+    </button>
     <div id="gridAraclar"></div>
   </div>
   <div class="modal-footer">
@@ -353,7 +360,7 @@ app.hideAside = true">
   <div class="modal-header wrapper-xs">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
     <h4>Araç Bilgileri</h4>         
-  
+  <!--   -->
   </div>
   <div class="modal-body wrapper-xs">
       <div class="row">
@@ -435,6 +442,115 @@ app.hideAside = true">
   </div>
 </script>
 
+
+<script type="text/ng-template" id="dokumedit">
+  <div class="modal-header wrapper-xs">
+    <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
+    <h4>Döküm Bilgileri</h4>         
+  <!--   -->
+  </div>
+  <div class="modal-body wrapper-xs">
+      <div class="row">
+          <div class="col-sm-12 ">
+            
+              <form role="form">
+                  <div class="form-group m-b-xs">
+                      <div class="row">
+                          <div class="col-sm-12">
+                            
+                              <label>Firma</label>
+
+                              <select kendo-combo-box
+                                      required
+                                      ng-model="dokum.FirmaId"
+                                      k-placeholder="'Firma seçiniz'"
+                                      k-data-text-field="'FirmaAdi'"
+                                      k-data-value-field="'FirmaId'"
+                                      k-filter="'contains'"
+                                      k-data-source="dsFirma"
+                                      k-on-change="firmaDegisti()"
+                                      ng-disabled="isEvselAtik"
+                                      style="width: 100%"></select>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="form-group m-b-xs">
+                      <div class="row">
+                          <div class="col-sm-4">
+                              <label>Plaka No</label>
+                              <select kendo-combo-box
+                              required
+                              ng-model="dokum.PlakaNo"
+                              k-placeholder="'Plaka seçiniz'"
+                              k-data-text-field="'PlakaNo'"
+                              k-data-value-field="'PlakaNo'"
+                              k-filter="'contains'"
+                              k-data-source="dsPlaka"
+                              ng-disabled="isEvselAtik"
+                              style="width: 100%"></select>
+                          </div>
+
+                          <div class="col-sm-4">
+                              <label>Belge No</label>
+                              <input type="text" class="form-control" ng-model="dokum.BelgeNo" readonly>
+                          </div>
+
+
+                          <div class="col-sm-4">
+                              <label>Birim Fiyat</label>
+                              <input type="text" class="form-control" ng-model="dokum.BirimFiyat" readonly>
+                          </div>
+                      </div>
+                  </div>                 
+
+                  <div class="form-group m-b-xs">
+                      <div class="row">
+                          <div class="col-sm-4">
+                              <label>Dara</label>
+                              <input type="text" class="form-control"  ng-model="dokum.Dara" ng-change="toplamTonajGuncelle()" ng-readonly="isEvselAtik">
+                          </div>
+
+                          <div class="col-sm-4">
+                            <label>Tonaj</label>
+                            <input type="text" class="form-control" ng-model="dokum.Tonaj" ng-change="toplamTonajGuncelle()" ng-readonly="isNakitDokum">
+                          </div>
+
+                          <div class="col-sm-4">
+                              <label>Toplam Tonaj</label>
+                              <input type="text" class="form-control" ng-model="dokum.ToplamTonaj"  readonly>
+                          </div>
+
+                      </div>
+                  </div>
+
+                  <div class="form-group m-b-xs">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <label>Tutar</label>
+                        <input type="text" class="form-control" ng-model="dokum.Tutar" readonly>
+                      </div>
+  
+                      <div class="col-sm-4">
+                        <label>İşlem Yapan</label>
+                        <input type="text" class="form-control" ng-model="dokum.IslemYapan" readonly>
+                      </div>
+                    </div>
+                  </div>
+
+              </form>
+          </div>
+
+      </div>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-success">
+          <span class="text" ng-click="Kaydet()">Kaydet</span>
+      </button>
+      <button class="btn btn-danger" type="button" ng-click="Iptal()">Iptal</button>
+  </div>
+</script>
+
 <script type="text/ng-template" id="bariyer_open">
   <div class="modal-header wrapper-xs">
     <a class="close text-danger" data-dismiss="modal" ng-click="Iptal()"><i class="icon-close"></i></a>
@@ -472,5 +588,9 @@ app.hideAside = true">
 <style>
   .k-grid .k-header .k-grid-search {
     width: 99%;
+  }
+
+  .btn-cop-arac-ekle {
+    margin-bottom: 4px;
   }
 </style>

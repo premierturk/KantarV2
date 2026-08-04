@@ -635,7 +635,13 @@ angular
         var history = addSessionHistory(url, "PUT");
         if (history == null) return;
 
-        Notiflix.Loading.Standard("Yükleniyor...");
+        //Notiflix.Loading.Standard("Yükleniyor...");
+        SweetAlert.swal({
+          title: "...",
+          text: "Kaydediliyor",
+          imageUrl: "/HYS/img/loading.gif",
+          showConfirmButton: false,
+        });
 
         $http({
           method: "PUT",
@@ -644,24 +650,35 @@ angular
         }).then(
           function (response) {
             successSessionHistory(history);
-            Notiflix.Loading.remove();
-            Notiflix.Notify.Success("Kaydedildi");
+            //Notiflix.Loading.remove();
+            // Notiflix.Notify.Success("Kaydedildi");
 
-            $timeout(function () {
-              success(response);
-            }, 200);
+            SweetAlert.basarili(function () {
+              swal.close();
+
+              $timeout(function () {
+                success(response);
+              }, 200);
+            });
           },
           function (errorPl) {
-            Notiflix.Loading.remove();
+            //Notiflix.Loading.remove();
             errorSessionHistory(history);
             $log.info(errorPl);
 
-            if (errorPl.data.Message)
-              SweetAlert.swal("Kaydedilemedi", errorPl.data.Message, "error");
-            else
-              SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
-          }
+            if (typeof error == "function") {
+              error(errorPl);
+            } else {
+              if (errorPl.data.Message)
+                SweetAlert.swal("Kaydedilemedi", errorPl.data.Message, "error");
+              else
+                SweetAlert.swal("Kaydedilemedi", errorPl.data, "error");
 
+            }
+
+            if (errorPl.status == "401") $rootScope.login();
+
+          }
         );
       };
 
