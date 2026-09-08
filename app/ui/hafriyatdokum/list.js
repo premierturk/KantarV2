@@ -211,6 +211,18 @@ app.controller(
               run(tonaj);
             }
           }
+        } else if ($rootScope.app.options.Kantar == "YeniyorukGiris") {
+          //WN002500 kg32
+          if (d.startsWith("WN")) {
+            d = d.replaceAll("WN", "");
+            d = d.substring(0, 6);
+            d = d.replaceAll(" ", "");
+
+            if (d != "") {
+              var tonaj = parseInt(d);
+              run(tonaj);
+            }
+          }
         } else if ($rootScope.app.options.Kantar == "BaskoyGiris") {
           if (data[0] == 65) {
             temp = [];

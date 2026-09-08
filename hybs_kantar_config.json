@@ -1,6 +1,6 @@
 {
   "GirisCikis": "Giriş",
-  "Kantar": "YenikentGiris",
+  "Kantar": "YeniyorukGiris",
   "KantarVarMi": true,
   "UsePrinter": false,
   "UseOffline": false,
@@ -9,12 +9,12 @@
   "TcpPortPts": 5556,
   "OgsEtiketStart": 126,
   "MinTonaj": 1000,
-  "WebApiUrl": "http://localhost:2023/HYS.WebApi/",
+  "WebApiUrl": "https://hybs.bursa.bel.tr/HYS.WebApi/",
   "SignalR": {
-    "host": "http://localhost:2023/HYS.SingnalR/signalr"
+    "host": "https://hybs.bursa.bel.tr/HYS.SingnalR/signalr"
   },
   "SerialPort": {
-    "portName": "COM1",
+    "portName": "COM3",
     "autoOpen": false,
     "baudRate": 9600
   }
